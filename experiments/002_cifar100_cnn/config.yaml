@@ -1,0 +1,40 @@
+# Experiment Configuration
+# ========================
+# CIFAR-100 CNN Classification
+
+experiment:
+  name: "002_cifar100_cnn"
+  description: "CIFAR-100 classification with CNN (100 classes)"
+
+# Data Configuration
+# CIFAR-100: 60,000 32x32 color images in 100 classes (500 train + 100 test per class)
+data:
+  dataset: "cifar100"
+  batch_size: 64
+  num_workers: 4
+
+# Model Configuration
+# num_classes: CIFAR-100 has 100 fine-grained classes
+model:
+  architecture: "simple_cnn"
+  pretrained: true
+  num_classes: 100
+
+# Training Configuration
+# More epochs needed for 100 classes
+training:
+  epochs: 30
+  learning_rate: 0.001
+  optimizer: "adam"
+  scheduler: "cosine"
+  early_stopping_patience: 10
+
+# MLflow Configuration
+mlflow:
+  experiment_name: "cifar100-cnn"
+  run_name: null
+
+# Paths (auto-configured by config/paths.py)
+paths:
+  data_dir: null
+  output_dir: null

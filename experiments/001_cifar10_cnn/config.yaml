@@ -1,0 +1,62 @@
+# Experiment Configuration
+# ========================
+# This YAML file defines all hyperparameters and settings for your experiment.
+# YAML is a human-readable format that's easy to modify without touching code.
+
+experiment:
+  name: "001_cifar10_cnn"
+  description: "First experiment: CIFAR-10 classification with CNN"
+
+# Data Configuration
+# ------------------
+# dataset: Name of the dataset (cifar10 has 60,000 32x32 color images in 10 classes)
+# batch_size: Number of images processed together (larger = faster but uses more memory)
+#   - Common values: 32, 64, 128. Start with 64 for CIFAR-10.
+# num_workers: Parallel data loading threads (set to 0 if you get errors on Windows)
+data:
+  dataset: "cifar10"
+  batch_size: 64
+  num_workers: 4
+
+# Model Configuration
+# -------------------
+# architecture: Which model to use
+#   - "simple_cnn": Our custom CNN (fast, good for learning)
+#   - "resnet18": Pretrained model (better accuracy, slower)
+# pretrained: Use ImageNet weights (only matters for ResNet)
+# num_classes: CIFAR-10 has 10 classes (airplane, car, bird, cat, deer, dog, frog, horse, ship, truck)
+model:
+  architecture: "simple_cnn"
+  pretrained: true
+  num_classes: 10
+
+# Training Configuration
+# ----------------------
+# epochs: Complete passes through the dataset (start with 20, increase if learning)
+# learning_rate: How big of steps to take when updating weights
+#   - Too high (>0.01): Training unstable, loss oscillates
+#   - Too low (<0.0001): Training very slow
+#   - Sweet spot for Adam: 0.001
+# optimizer: Algorithm for updating weights
+#   - "adam": Good default, adapts learning rate per-parameter
+#   - "sgd": Classic, sometimes better final accuracy but needs LR scheduling
+# early_stopping_patience: Stop if no improvement for N epochs (saves time)
+training:
+  epochs: 20
+  learning_rate: 0.001
+  optimizer: "adam"
+  scheduler: "cosine"
+  early_stopping_patience: 10
+
+# MLflow Configuration
+# --------------------
+# experiment_name: Groups related runs together (use format: dataset-model)
+# run_name: Identifies this specific run (null = auto-generated timestamp)
+mlflow:
+  experiment_name: "cifar10-cnn"
+  run_name: "2026-01-27_v1"
+
+# Paths (auto-configured by config/paths.py)
+paths:
+  data_dir: null
+  output_dir: null
