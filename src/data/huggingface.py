@@ -16,6 +16,9 @@ Usage:
 from pathlib import Path
 from datasets import load_dataset
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent

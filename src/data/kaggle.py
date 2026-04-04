@@ -23,6 +23,9 @@ import os
 import subprocess
 from pathlib import Path
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent

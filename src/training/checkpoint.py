@@ -13,6 +13,9 @@ import torch.nn as nn
 from pathlib import Path
 from typing import Optional
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -55,7 +58,7 @@ def save_checkpoint(
         checkpoint["metrics"] = metrics
     
     torch.save(checkpoint, path)
-    print(f"Checkpoint saved to {path}")
+    logger.info(f"Checkpoint saved to {path}")
 
 
 def load_checkpoint(
@@ -78,7 +81,7 @@ def load_checkpoint(
     Returns:
         Tuple of (model, optimizer, epoch, metrics)
     """
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=True)
     
     model.load_state_dict(checkpoint["model_state_dict"])
     
@@ -91,7 +94,7 @@ def load_checkpoint(
     epoch = checkpoint.get("epoch", 0)
     metrics = checkpoint.get("metrics", {})
     
-    print(f"Loaded checkpoint from {path} (epoch {epoch})")
+    logger.info(f"Loaded checkpoint from {path} (epoch {epoch})")
     
     return model, optimizer, epoch, metrics
 

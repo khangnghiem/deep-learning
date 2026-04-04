@@ -15,6 +15,9 @@ from typing import Optional, Callable
 from tqdm import tqdm
 import sys
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -95,13 +98,13 @@ class Trainer:
         for inputs, targets in tqdm(loader, desc="Training", leave=False):
             inputs, targets = inputs.to(self.device), targets.to(self.device)
             
-            self.optimizer.zero_grad()
+            self.optimizer.zero_grad(set_to_none=True)
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
             loss.backward()
             self.optimizer.step()
             
-            total_loss += loss.item()
+            total_loss += loss.detach().item()
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
@@ -156,7 +159,7 @@ class Trainer:
             })
             
             for epoch in range(epochs):
-                print(f"\nEpoch {epoch + 1}/{epochs}")
+                logger.info(f"\nEpoch {epoch + 1}/{epochs}")
                 
                 train_loss, train_acc = self.train_epoch(train_loader)
                 val_loss, val_acc = self.validate(val_loader)
@@ -174,8 +177,8 @@ class Trainer:
                 history["val_loss"].append(val_loss)
                 history["val_acc"].append(val_acc)
                 
-                print(f"  Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
-                print(f"  Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
+                logger.info(f"  Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
+                logger.info(f"  Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
                 
                 # Learning rate scheduler
                 if self.scheduler:
@@ -190,7 +193,7 @@ class Trainer:
                 
                 # Early stopping
                 if early_stopping and early_stopping(val_loss):
-                    print(f"Early stopping at epoch {epoch + 1}")
+                    logger.info(f"Early stopping at epoch {epoch + 1}")
                     break
             
             self.mlflow.log_metric("best_val_acc", best_acc)
