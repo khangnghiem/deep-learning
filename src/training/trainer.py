@@ -88,46 +88,46 @@ class Trainer:
     def train_epoch(self, loader: DataLoader) -> tuple[float, float]:
         """Single training epoch."""
         self.model.train()
-        total_loss = 0
-        correct = 0
+        total_loss = torch.tensor(0.0, device=self.device)
+        correct = torch.tensor(0, device=self.device)
         total = 0
         
         for inputs, targets in tqdm(loader, desc="Training", leave=False):
-            inputs, targets = inputs.to(self.device), targets.to(self.device)
+            inputs, targets = inputs.to(self.device, non_blocking=True), targets.to(self.device, non_blocking=True)
             
-            self.optimizer.zero_grad()
+            self.optimizer.zero_grad(set_to_none=True)
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
             loss.backward()
             self.optimizer.step()
             
-            total_loss += loss.item()
+            total_loss += loss.detach()
             _, predicted = outputs.max(1)
             total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
+            correct += predicted.eq(targets).sum()
         
-        return total_loss / len(loader), correct / total
+        return total_loss.item() / len(loader), correct.item() / total
     
     def validate(self, loader: DataLoader) -> tuple[float, float]:
         """Validation loop."""
         self.model.eval()
-        total_loss = 0
-        correct = 0
+        total_loss = torch.tensor(0.0, device=self.device)
+        correct = torch.tensor(0, device=self.device)
         total = 0
         
         with torch.no_grad():
             for inputs, targets in tqdm(loader, desc="Validating", leave=False):
-                inputs, targets = inputs.to(self.device), targets.to(self.device)
+                inputs, targets = inputs.to(self.device, non_blocking=True), targets.to(self.device, non_blocking=True)
                 
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
                 
-                total_loss += loss.item()
+                total_loss += loss.detach()
                 _, predicted = outputs.max(1)
                 total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
+                correct += predicted.eq(targets).sum()
         
-        return total_loss / len(loader), correct / total
+        return total_loss.item() / len(loader), correct.item() / total
     
     def fit(
         self,

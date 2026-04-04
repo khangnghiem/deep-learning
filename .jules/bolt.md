@@ -1,0 +1,3 @@
+## 2025-02-14 - PyTorch Device-Host Synchronization Bottleneck
+**Learning:** Calling `.item()` on loss or accuracy tensors inside the batch loop forces expensive, blocking synchronization between the GPU and CPU on every single step, significantly slowing down training.
+**Action:** Accumulate metrics as detached tensors directly on the device during the loop (`total_loss += loss.detach()`), and only call `.item()` once at the end of the epoch before returning or logging. Always combine this with `non_blocking=True` on data transfers and `set_to_none=True` on `zero_grad()` for maximum throughput.
