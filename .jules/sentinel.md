@@ -1,0 +1,4 @@
+## 2024-04-04 - [CRITICAL] Prevent Insecure Deserialization in PyTorch
+**Vulnerability:** The `torch.load()` function was being called without `weights_only=True`. This default behavior allows for arbitrary code execution if a malicious checkpoint file is loaded.
+**Learning:** PyTorch's default `torch.load` behavior is to use `pickle`, which is notoriously insecure and can execute arbitrary code upon deserialization. This is a common and critical vulnerability when loading models from untrusted sources.
+**Prevention:** Always use `weights_only=True` when calling `torch.load()` to load model weights. This restricts the unpickler to only load tensors, primitive types, and dictionaries, preventing arbitrary code execution. Requirements must ensure `torch>=2.1.0` (or `torch>=1.13.0` depending on exact feature availability, but 2.1.0 is safe) to use this feature.
