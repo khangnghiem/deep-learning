@@ -42,7 +42,7 @@ class WarmupCosineScheduler(_LRScheduler):
         else:
             # Cosine annealing
             progress = (self.last_epoch - self.warmup_epochs) / \
-                       (self.total_epochs - self.warmup_epochs)
+                       max(1, self.total_epochs - self.warmup_epochs)
             return [
                 self.min_lr + (base_lr - self.min_lr) * 0.5 * (1 + math.cos(math.pi * progress))
                 for base_lr in self.base_lrs
@@ -108,10 +108,12 @@ class OneCycleLR(_LRScheduler):
         
         if step < self.total_steps * self.pct_start:
             # Increasing phase
-            progress = step / (self.total_steps * self.pct_start)
-            return [self.initial_lr + (self.max_lr - self.initial_lr) * progress]
+            progress = step / max(1.0, self.total_steps * self.pct_start)
+            lr = self.initial_lr + (self.max_lr - self.initial_lr) * progress
         else:
             # Decreasing phase
             progress = (step - self.total_steps * self.pct_start) / \
-                       (self.total_steps * (1 - self.pct_start))
-            return [self.max_lr - (self.max_lr - self.final_lr) * progress]
+                       max(1.0, self.total_steps * (1 - self.pct_start))
+            lr = self.max_lr - (self.max_lr - self.final_lr) * progress
+
+        return [lr for _ in self.base_lrs]

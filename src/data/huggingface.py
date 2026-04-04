@@ -13,9 +13,12 @@ Usage:
     train_ds = load_hf_dataset("mnist", split="train")
 """
 
+import logging
 from pathlib import Path
 from datasets import load_dataset
 import sys
+
+logger = logging.getLogger(__name__)
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -98,6 +101,6 @@ def get_image_classification_datasets() -> dict:
 
 
 if __name__ == "__main__":
-    print("Popular datasets:")
+    logger.info("Popular datasets:")
     for ds in list_popular_datasets():
-        print(f"  - {ds}")
+        logger.info(f"  - {ds}")
