@@ -95,7 +95,7 @@ class Trainer:
         for inputs, targets in tqdm(loader, desc="Training", leave=False):
             inputs, targets = inputs.to(self.device), targets.to(self.device)
             
-            self.optimizer.zero_grad()
+            self.optimizer.zero_grad(set_to_none=True)
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
             loss.backward()

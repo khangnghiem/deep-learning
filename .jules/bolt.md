@@ -1,0 +1,3 @@
+## 2024-04-04 - [PyTorch Memory Optimization]
+**Learning:** In PyTorch training loops, using `optimizer.zero_grad(set_to_none=True)` instead of `optimizer.zero_grad()` is a crucial optimization. It minimizes memory bandwidth usage and reduces memory footprint by completely deallocating the gradient tensors rather than just setting their values to zero. This is a common performance pattern across PyTorch training scripts and notebooks.
+**Action:** Always verify and implement `optimizer.zero_grad(set_to_none=True)` in any PyTorch optimization tasks, especially when looking for immediate memory usage or bandwidth improvements during training.
