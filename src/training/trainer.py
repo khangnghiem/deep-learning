@@ -92,7 +92,7 @@ class Trainer:
         correct = 0
         total = 0
         
-        for inputs, targets in tqdm(loader, desc="Training", leave=False):
+        for inputs, targets in tqdm(loader, desc="Training", leave=False, unit="batch"):
             inputs, targets = inputs.to(self.device), targets.to(self.device)
             
             self.optimizer.zero_grad()
@@ -116,7 +116,7 @@ class Trainer:
         total = 0
         
         with torch.no_grad():
-            for inputs, targets in tqdm(loader, desc="Validating", leave=False):
+            for inputs, targets in tqdm(loader, desc="Validating", leave=False, unit="batch"):
                 inputs, targets = inputs.to(self.device), targets.to(self.device)
                 
                 outputs = self.model(inputs)
