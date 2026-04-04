@@ -19,10 +19,14 @@ Usage:
     download_competition("titanic")
 """
 
+import logging
 import os
+import re
 import subprocess
 from pathlib import Path
 import sys
+
+logger = logging.getLogger(__name__)
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -75,6 +79,11 @@ def download_dataset(
     """
     check_kaggle_auth()
     
+    # Validate dataset slug to prevent argument injection
+    for part in dataset.split("/"):
+        if not re.match(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$", part):
+            raise ValueError(f"Invalid dataset identifier: {dataset}")
+
     dataset_name = dataset.split("/")[-1]
     if output_dir is None:
         output_dir = get_bronze_path(category) / dataset_name
@@ -89,7 +98,7 @@ def download_dataset(
     if unzip:
         cmd.append("--unzip")
     
-    print(f"Downloading {dataset} to {output_dir}")
+    logger.info(f"Downloading {dataset} to {output_dir}")
     subprocess.run(cmd, check=True)
     
     return output_dir
@@ -115,6 +124,10 @@ def download_competition(
     """
     check_kaggle_auth()
     
+    # Validate competition name to prevent argument injection
+    if not re.match(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$", competition):
+        raise ValueError(f"Invalid competition identifier: {competition}")
+
     if output_dir is None:
         output_dir = get_bronze_path(category) / competition
     
@@ -128,7 +141,7 @@ def download_competition(
     if unzip:
         cmd.append("--unzip")
     
-    print(f"Downloading {competition} to {output_dir}")
+    logger.info(f"Downloading {competition} to {output_dir}")
     subprocess.run(cmd, check=True)
     
     return output_dir
@@ -146,9 +159,9 @@ def list_popular_competitions() -> list[str]:
 
 
 if __name__ == "__main__":
-    print("Checking Kaggle authentication...")
+    logger.info("Checking Kaggle authentication...")
     try:
         check_kaggle_auth()
-        print("✓ Kaggle API configured")
+        logger.info("✓ Kaggle API configured")
     except FileNotFoundError as e:
-        print(f"✗ {e}")
+        logger.info(f"✗ {e}")

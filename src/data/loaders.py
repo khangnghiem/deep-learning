@@ -5,10 +5,13 @@ Usage:
     from src.data.loaders import create_dataloaders, get_class_weights
 """
 
+import logging
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from typing import Optional, Tuple
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def create_dataloaders(
@@ -69,7 +72,7 @@ def create_dataloaders(
         pin_memory=pin_memory,
     )
     
-    print(f"Dataset split: train={train_size}, val={val_size}, test={test_size}")
+    logger.info(f"Dataset split: train={train_size}, val={val_size}, test={test_size}")
     
     return train_loader, val_loader, test_loader
 

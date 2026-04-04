@@ -8,6 +8,7 @@ Usage:
     trainer.fit(train_loader, val_loader, epochs=50)
 """
 
+import logging
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -15,6 +16,8 @@ from typing import Optional, Callable
 from tqdm import tqdm
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -156,7 +159,7 @@ class Trainer:
             })
             
             for epoch in range(epochs):
-                print(f"\nEpoch {epoch + 1}/{epochs}")
+                logger.info(f"Epoch {epoch + 1}/{epochs}")
                 
                 train_loss, train_acc = self.train_epoch(train_loader)
                 val_loss, val_acc = self.validate(val_loader)
@@ -174,8 +177,8 @@ class Trainer:
                 history["val_loss"].append(val_loss)
                 history["val_acc"].append(val_acc)
                 
-                print(f"  Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
-                print(f"  Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
+                logger.info(f"  Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
+                logger.info(f"  Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
                 
                 # Learning rate scheduler
                 if self.scheduler:
@@ -190,7 +193,7 @@ class Trainer:
                 
                 # Early stopping
                 if early_stopping and early_stopping(val_loss):
-                    print(f"Early stopping at epoch {epoch + 1}")
+                    logger.info(f"Early stopping at epoch {epoch + 1}")
                     break
             
             self.mlflow.log_metric("best_val_acc", best_acc)
