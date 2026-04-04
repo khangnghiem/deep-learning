@@ -14,6 +14,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from shared_config.paths import get_bronze_path
+import logging
+
+logger = logging.getLogger(__name__)
 
 BRONZE_MEDICAL = get_bronze_path("medical")
 
@@ -176,24 +179,24 @@ def download_medical_dataset(name: str):
         else:
             download_dataset(dataset_id, output_dir, category="medical")
         
-        print(f"Downloaded {name} to {output_dir}")
+        logger.info(f"Downloaded {name} to {output_dir}")
         return output_dir
     
     elif source == "huggingface":
         from .huggingface import load_hf_dataset
         
         dataset = load_hf_dataset(info["id"], name=info.get("subset"))
-        print(f"Loaded {name} from HuggingFace")
+        logger.info(f"Loaded {name} from HuggingFace")
         return dataset
     
     elif source == "sklearn":
         from sklearn.datasets import load_breast_cancer
         data = load_breast_cancer()
-        print(f"Loaded {name} from sklearn")
+        logger.info(f"Loaded {name} from sklearn")
         return data
     
     else:
-        print(f"Manual download required. Info: {info}")
+        logger.info(f"Manual download required. Info: {info}")
         return None
 
 
@@ -201,20 +204,20 @@ def list_medical_datasets():
     """Pretty print available medical datasets."""
     datasets = get_medical_datasets()
     
-    print("\n=== MEDICAL IMAGING ===")
+    logger.info("\n=== MEDICAL IMAGING ===")
     for name, info in datasets.items():
         if info.get("modality"):
-            print(f"  {name}: {info['name']} ({info['modality']})")
+            logger.info(f"  {name}: {info['name']} ({info['modality']})")
     
-    print("\n=== MEDMNIST (28x28 standardized) ===")
+    logger.info("\n=== MEDMNIST (28x28 standardized) ===")
     for name, info in datasets.items():
         if "mnist" in name:
-            print(f"  {name}: {info['name']}")
+            logger.info(f"  {name}: {info['name']}")
     
-    print("\n=== GENOMICS / GENETICS ===")
+    logger.info("\n=== GENOMICS / GENETICS ===")
     for name, info in datasets.items():
         if info.get("task"):
-            print(f"  {name}: {info['name']}")
+            logger.info(f"  {name}: {info['name']}")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ from torchvision import datasets, transforms
 from tqdm import tqdm
 
 from shared_config.paths import BRONZE, TRAINED, setup_mlflow
+from src.training.trainer import Trainer
 
 
 def load_config(config_path: str = "config.yaml") -> dict:
@@ -59,36 +60,6 @@ def get_dataloaders(config):
     return train_loader, val_loader
 
 
-def train_epoch(model, loader, criterion, optimizer, device):
-    model.train()
-    total_loss, correct, total = 0, 0, 0
-    for x, y in tqdm(loader, desc="Training"):
-        x, y = x.to(device), y.to(device)
-        optimizer.zero_grad()
-        out = model(x)
-        loss = criterion(out, y)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-        correct += (out.argmax(1) == y).sum().item()
-        total += y.size(0)
-    return total_loss / len(loader), correct / total
-
-
-def validate(model, loader, criterion, device):
-    model.eval()
-    total_loss, correct, total = 0, 0, 0
-    with torch.no_grad():
-        for x, y in tqdm(loader, desc="Validating"):
-            x, y = x.to(device), y.to(device)
-            out = model(x)
-            loss = criterion(out, y)
-            total_loss += loss.item()
-            correct += (out.argmax(1) == y).sum().item()
-            total += y.size(0)
-    return total_loss / len(loader), correct / total
-
-
 def main():
     config = load_config()
     print("=" * 60)
@@ -107,27 +78,22 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config["training"]["learning_rate"])
     
-    with mlflow.start_run():
-        mlflow.log_params({"model": "SimpleCNN", "epochs": config["training"]["epochs"], "lr": config["training"]["learning_rate"]})
-        
-        best_acc = 0
-        for epoch in range(config["training"]["epochs"]):
-            print(f"\nEpoch {epoch+1}/{config['training']['epochs']}")
-            train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
-            val_loss, val_acc = validate(model, val_loader, criterion, device)
-            
-            mlflow.log_metrics({"train_loss": train_loss, "train_acc": train_acc, "val_loss": val_loss, "val_acc": val_acc}, step=epoch)
-            print(f"Train: {train_acc:.4f} | Val: {val_acc:.4f}")
-            
-            if val_acc > best_acc:
-                best_acc = val_acc
-                save_path = TRAINED / config["experiment"]["name"] / "best_model.pt"
-                save_path.parent.mkdir(parents=True, exist_ok=True)
-                torch.save(model.state_dict(), save_path)
-                print(f"✓ Best: {best_acc:.4f}")
-        
-        mlflow.log_metric("best_val_acc", best_acc)
-        print(f"\n✅ Complete! Best: {best_acc:.4f}")
+    trainer = Trainer(
+        model=model,
+        optimizer=optimizer,
+        criterion=criterion,
+        device=device,
+        experiment_name=config["mlflow"]["experiment_name"]
+    )
+
+    save_dir = TRAINED / config["experiment"]["name"]
+
+    trainer.fit(
+        train_loader=train_loader,
+        val_loader=val_loader,
+        epochs=config["training"]["epochs"],
+        save_dir=save_dir
+    )
 
 
 if __name__ == "__main__":

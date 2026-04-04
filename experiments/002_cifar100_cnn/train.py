@@ -30,6 +30,7 @@ from tqdm import tqdm
 from shared_config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 from src.models import SimpleCNN, get_pretrained_resnet
 from src.data.transforms import get_cifar_transforms
+from src.training.trainer import Trainer
 
 
 # =============================================================================
@@ -111,53 +112,6 @@ def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
 
 
 # =============================================================================
-# TRAINING FUNCTIONS
-# =============================================================================
-def train_epoch(model, loader, criterion, optimizer, device):
-    model.train()
-    total_loss = 0
-    correct = 0
-    total = 0
-    
-    for inputs, targets in tqdm(loader, desc="Training"):
-        inputs, targets = inputs.to(device), targets.to(device)
-        
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
-        
-        total_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
-    
-    return total_loss / len(loader), correct / total
-
-
-def validate(model, loader, criterion, device):
-    model.eval()
-    total_loss = 0
-    correct = 0
-    total = 0
-    
-    with torch.no_grad():
-        for inputs, targets in tqdm(loader, desc="Validating"):
-            inputs, targets = inputs.to(device), targets.to(device)
-            
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-            
-            total_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
-    
-    return total_loss / len(loader), correct / total
-
-
-# =============================================================================
 # MAIN
 # =============================================================================
 def main():
@@ -182,42 +136,23 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config["training"]["learning_rate"])
     
-    with mlflow.start_run(run_name=config["mlflow"].get("run_name")):
-        mlflow.log_params({
-            "model": config["model"]["architecture"],
-            "epochs": config["training"]["epochs"],
-            "lr": config["training"]["learning_rate"],
-            "batch_size": config["data"]["batch_size"],
-            "dataset": "cifar100",
-            "num_classes": 100,
-        })
-        
-        best_acc = 0
-        
-        for epoch in range(config["training"]["epochs"]):
-            print(f"\nEpoch {epoch + 1}/{config['training']['epochs']}")
-            
-            train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
-            val_loss, val_acc = validate(model, val_loader, criterion, device)
-            
-            mlflow.log_metrics({
-                "train_loss": train_loss, "train_acc": train_acc,
-                "val_loss": val_loss, "val_acc": val_acc,
-            }, step=epoch)
-            
-            print(f"Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
-            print(f"Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
-            
-            if val_acc > best_acc:
-                best_acc = val_acc
-                save_path = TRAINED / config["experiment"]["name"] / "best_model.pt"
-                save_path.parent.mkdir(parents=True, exist_ok=True)
-                torch.save(model.state_dict(), save_path)
-                print(f"✓ New best model saved! (acc: {best_acc:.4f})")
-                mlflow.log_artifact(str(save_path))
-        
-        mlflow.log_metric("best_val_acc", best_acc)
-        print(f"\n✅ Training complete! Best accuracy: {best_acc:.4f}")
+    trainer = Trainer(
+        model=model,
+        optimizer=optimizer,
+        criterion=criterion,
+        device=device,
+        experiment_name=config["mlflow"]["experiment_name"]
+    )
+
+    save_dir = TRAINED / config["experiment"]["name"]
+
+    trainer.fit(
+        train_loader=train_loader,
+        val_loader=val_loader,
+        epochs=config["training"]["epochs"],
+        run_name=config["mlflow"].get("run_name"),
+        save_dir=save_dir
+    )
 
 
 if __name__ == "__main__":
