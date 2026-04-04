@@ -21,6 +21,7 @@ Usage:
 
 import os
 import subprocess
+import re
 from pathlib import Path
 import sys
 
@@ -73,6 +74,11 @@ def download_dataset(
     Returns:
         Path to downloaded data
     """
+    # Security: Validate dataset format strictly to prevent argument injection
+    for part in dataset.split("/"):
+        if not re.match(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$', part):
+            raise ValueError(f"Invalid dataset identifier part: {part}")
+
     check_kaggle_auth()
     
     dataset_name = dataset.split("/")[-1]
@@ -113,6 +119,10 @@ def download_competition(
     Returns:
         Path to downloaded data
     """
+    # Security: Validate competition format strictly to prevent argument injection
+    if not re.match(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$', competition):
+        raise ValueError(f"Invalid competition identifier: {competition}")
+
     check_kaggle_auth()
     
     if output_dir is None:
