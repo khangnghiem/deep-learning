@@ -17,7 +17,7 @@ from transformers import SegformerForSemanticSegmentation
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.training.losses import StructureLoss
 from src.training import WarmupCosineScheduler, EarlyStopping, ModelCheckpoint
-from shared_config.paths import setup_mlflow
+from src.config.paths import setup_mlflow
 
 # Auto-release Colab GPU runtime when script finishes
 import atexit
@@ -72,7 +72,7 @@ def calculate_metrics(pred, mask, threshold=0.5):
 
 def get_data_splits(val_ratio=0.2, seed=42):
     """Collects Kvasir for train/val and uses CVC for test."""
-    from shared_config.paths import BRONZE_MEDICAL
+    from src.config.paths import BRONZE_MEDICAL
     kvasir_images_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/images')
     kvasir_masks_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/masks')
     
@@ -202,7 +202,7 @@ def main():
     )
     
     # Checkpointing
-    from shared_config.paths import REPOS
+    from src.config.paths import REPOS
     chkpt_dir = str(REPOS / 'deep-learning/experiments/014_segformer_polyp/checkpoints')
     os.makedirs(chkpt_dir, exist_ok=True)
     checkpoint_callback = ModelCheckpoint(

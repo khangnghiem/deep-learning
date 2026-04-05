@@ -26,12 +26,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
 
 import yaml
 import numpy as np
@@ -41,7 +36,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from tqdm import tqdm
 
-from shared_config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
+from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 from src.models import SimpleCNN, get_pretrained_resnet
 from src.data.transforms import get_cifar_transforms
 from src.training import EarlyStopping, save_checkpoint

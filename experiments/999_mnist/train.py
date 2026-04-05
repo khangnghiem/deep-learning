@@ -25,13 +25,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-# Automatically run the %pip install if in Colab to fix module loading issues
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
 
 import yaml
 import torch
@@ -40,7 +34,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # Import shared utilities
-from shared_config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
+from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 # TODO: Import your model and transforms
 # from src.models import YourModel
 # from src.data.transforms import get_transforms

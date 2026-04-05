@@ -24,13 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-# Automatically run the %pip install if in Colab to fix module loading issues
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
 
 import yaml
 import torch
@@ -40,7 +34,7 @@ from torchvision import datasets, transforms
 from tqdm import tqdm
 
 # Import shared utilities
-from shared_config.paths import SILVER, TRAINED, setup_mlflow
+from src.config.paths import SILVER, TRAINED, setup_mlflow
 from src.models.medical import get_medical_resnet
 
 

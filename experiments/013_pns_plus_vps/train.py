@@ -16,7 +16,7 @@ import segmentation_models_pytorch as smp
 # Adjust path to find src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.training.losses import StructureLoss
-from shared_config.paths import setup_mlflow
+from src.config.paths import setup_mlflow
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

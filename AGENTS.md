@@ -28,14 +28,14 @@ This file provides guidance when working with code in this repository.
 
 ### Dependencies
 
-- **`shared_config`** (sibling repo `../shared_config`): Provides `shared_config.paths` (environment-aware paths, data lake, MLflow config) and `shared_config.catalog` (100+ dataset catalog).
+- **`shared_config`** (sibling repo `../shared_config`): Provides `src.config.paths` (environment-aware paths, data lake, MLflow config) and `src.config.catalog` (100+ dataset catalog).
 - Data ingestion scripts live in **`../data-ingestion`** (separate repo).
 
 ### Repository layout
 
-- `src/data/` — Dataset loaders, transforms, augmentation. Imports paths from `shared_config.paths`.
+- `src/data/` — Dataset loaders, transforms, augmentation. Imports paths from `src.config.paths`.
 - `src/models/` — `SimpleCNN`, `MLP`, `get_pretrained_resnet`, `get_pretrained_vit`, medical models, U-Net.
-- `src/training/` — `Trainer` class, `EarlyStopping`, checkpoint utilities. Uses `shared_config.paths` for MLflow and model saving.
+- `src/training/` — `Trainer` class, `EarlyStopping`, checkpoint utilities. Uses `src.config.paths` for MLflow and model saving.
 - `src/utils/` — Metrics, visualization.
 - `experiments/` — **Reproducible training runs**. Each has `config.yaml`, `train.py` (source of truth), thin `train.ipynb` (Colab launcher), `README.md`.
 - `explorations/` — **Interactive notebooks** for EDA, prototyping, visualization, and architecture search. No MLflow logging or checkpoints.
@@ -44,8 +44,8 @@ This file provides guidance when working with code in this repository.
 
 ## Agent usage notes
 
-- Import paths/MLflow from `shared_config.paths`, never hardcode.
-- Import `DATASETS` from `shared_config.catalog` when needed by `create_experiment.py`.
+- Import paths/MLflow from `src.config.paths`, never hardcode.
+- Import `DATASETS` from `src.config.catalog` when needed by `create_experiment.py`.
 - **NEVER run training locally** — use Google Colab.
 - When creating new experiments, follow patterns in `experiments/001_cifar10_cnn` and `_template/`.
 - **`experiments/` = `.py` scripts** (train.py is the source of truth). Notebooks here are thin Colab launchers only.

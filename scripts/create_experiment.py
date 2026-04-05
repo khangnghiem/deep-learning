@@ -27,7 +27,7 @@ sys.path.insert(0, str(PROJECT_ROOT.parent / "shared_config"))
 if os.name == "nt" and "DRIVE_ROOT" not in os.environ:
     os.environ["DRIVE_ROOT"] = "G:\\My Drive"
 
-from shared_config.catalog import DATASETS
+from src.config.catalog import DATASETS
 
 EXPERIMENTS_DIR = PROJECT_ROOT / "experiments"
 TEMPLATE_DIR = EXPERIMENTS_DIR / "_template"

@@ -8,11 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared_config"))
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
-from shared_config.paths import PRETRAINED
+from src.config.paths import PRETRAINED
 
 # SAM2 model — lives in models/pretrained/sam2/
 # Download source: https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt

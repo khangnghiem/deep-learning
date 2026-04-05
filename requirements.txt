@@ -1,5 +1,4 @@
-# Shared config (editable install)
--e ../shared_config
+
 
 # Core
 numpy>=1.24.0,<2.0.0

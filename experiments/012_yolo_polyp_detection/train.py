@@ -6,9 +6,8 @@ from ultralytics import YOLO
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-from shared_config.paths import TRAINED
+from src.config.paths import TRAINED
 
 def main() -> None:
     parser = argparse.ArgumentParser()

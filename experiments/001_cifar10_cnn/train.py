@@ -30,13 +30,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-# Automatically run the %pip install if in Colab to fix module loading issues
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
 
 import yaml
 import numpy as np
@@ -57,7 +51,7 @@ except ImportError:
     pass  # Not in Colab — no-op
 
 # Import shared utilities
-from shared_config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
+from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 from src.models import SimpleCNN, get_pretrained_resnet
 from src.data.transforms import get_cifar_transforms
 from src.training import EarlyStopping, save_checkpoint, load_checkpoint

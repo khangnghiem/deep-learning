@@ -8,14 +8,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(REPOS_ROOT / "shared_config"))
 
-# Automatically run the %pip install if in Colab to fix module loading issues
-try:
-    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared_config")
-except NameError:
-    pass
-from shared_config.paths import setup_mlflow, TRAINED
+
+from src.config.paths import setup_mlflow, TRAINED
 with open("config.yaml") as f: config = yaml.safe_load(f)
 mlflow = setup_mlflow()
 mlflow.set_experiment(config["mlflow"]["experiment_name"])

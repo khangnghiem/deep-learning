@@ -17,7 +17,7 @@ import sys
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from shared_config.paths import TRAINED
+from src.config.paths import TRAINED
 
 
 def save_checkpoint(
