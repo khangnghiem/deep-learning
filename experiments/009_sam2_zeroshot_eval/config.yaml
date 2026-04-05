@@ -1,0 +1,11 @@
+data:
+  coco_json: /content/drive/MyDrive/data_lake/02_silver/polyp_coco/polypgen_annotations.json
+  dataset: polypgen
+  image_root: /content/drive/MyDrive/data_lake/01_bronze_medical/polypgen
+experiment:
+  name: 009_sam2_zeroshot_eval
+mlflow:
+  experiment_name: 009_sam2_zeroshot_eval
+model:
+  sam2_checkpoint: sam2_hiera_large.pt
+  yolo_checkpoint: /content/drive/MyDrive/models/trained/polyp_detection/yolov8m_run/weights/best.pt

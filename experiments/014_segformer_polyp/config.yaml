@@ -1,0 +1,34 @@
+# Experiment Configuration: 014 SegFormer Polyp Baseline
+
+experiment:
+  name: "014_segformer_polyp"
+  description: "SOTA Baseline for polyp segmentation using SegFormer-B2 (transformers library)"
+
+data:
+  dataset: "kvasir_cvc_combined"
+  train_split: 0.8
+  val_split: 0.2
+  test_split: 0.0
+  batch_size: 16
+  num_workers: 2
+
+model:
+  architecture: "nvidia/mit-b2" # using HuggingFace native
+  pretrained: true
+  num_classes: 1 # semantic segmentation binary output
+
+training:
+  epochs: 25
+  learning_rate: 0.00006
+  optimizer: "adamw"
+  scheduler: "cosine"
+  early_stopping_patience: 10
+  seed: 42
+
+mlflow:
+  experiment_name: "014_segformer_polyp"
+  run_name: null
+
+paths:
+  data_dir: null
+  output_dir: null

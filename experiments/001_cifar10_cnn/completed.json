@@ -1,0 +1,10 @@
+{
+  "experiment": "001_cifar10_cnn",
+  "completed_at": "2026-04-01T09:03:33.959419",
+  "success": true,
+  "duration_seconds": 516.5,
+  "best_val_acc": 0.8503,
+  "model": "simple_cnn",
+  "epochs": 20,
+  "error": null
+}

@@ -1,0 +1,10 @@
+{
+  "experiment": "010_polypgen_unet",
+  "completed_at": "2026-03-21T19:03:07.962806",
+  "success": true,
+  "duration_seconds": 10.5,
+  "best_val_acc": 0.95,
+  "model": "unet",
+  "epochs": 1,
+  "error": null
+}

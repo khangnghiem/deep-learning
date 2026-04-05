@@ -1,0 +1,30 @@
+experiment:
+  name: polyp_segmentation_pvt
+  description: High-accuracy polyp segmentation using Polyp-PVT
+data:
+  datasets:
+    - kvasir_seg
+    - cvc_clinic
+  annotation_format: coco
+  coco_json: data_lake/02_silver/polyp_coco/polyp_yolo_annotations.json
+  img_size: 352
+  batch_size: 16
+model:
+  architecture: polyp_pvt
+  pretrained: true
+  num_classes: 1
+training:
+  epochs: 100
+  learning_rate: 1e-4
+  optimizer: adamw
+  loss: structure_loss # specialized loss for polyp segmentation
+mlflow:
+  experiment_name: polyp-segmentation
+  run_name: polyp_pvt_baseline
+evaluation:
+  target_dice: 0.94
+  target_iou: 0.85
+edge_deployment:
+  target_fps: 50
+  format: tensorrt
+  precision: fp16

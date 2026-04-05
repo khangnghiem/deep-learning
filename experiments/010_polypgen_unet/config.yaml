@@ -1,0 +1,18 @@
+data:
+  batch_size: 2
+  dataset: polypgen
+  path: /content/drive/MyDrive/data_lake/01_bronze_medical/polypgen
+experiment:
+  name: 010_polypgen_unet
+mlflow:
+  experiment_name: 010_polypgen_unet
+model:
+  architecture: unet
+paths:
+  data_dir: null
+  output_dir: null
+training:
+  batch_size: 2
+  epochs: 1
+  learning_rate: 0.001
+  optimizer: adam

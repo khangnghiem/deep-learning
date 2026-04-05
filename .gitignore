@@ -51,6 +51,10 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Weights
+*.pt
+*.onnx
+
 # Translations
 *.mo
 *.pot
@@ -205,3 +209,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Model weights — must live in models/pretrained/ or models/trained/, not in experiments/
+experiments/**/*.pt
+experiments/**/*.pth
+experiments/**/*.onnx

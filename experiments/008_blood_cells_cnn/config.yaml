@@ -1,0 +1,42 @@
+# Experiment Configuration
+# ========================
+# Blood cell classification (4 classes) using pretrained ResNet18.
+# Data: blood-cells dataset from silver layer (cleaned from bronze).
+
+experiment:
+  name: "008_blood_cells_cnn"
+  description: "Blood cell classification: EOSINOPHIL, LYMPHOCYTE, MONOCYTE, NEUTROPHIL"
+
+# Data Configuration
+data:
+  dataset: "blood-cells"
+  layer: "silver"          # Use cleaned silver data
+  image_size: 224
+  batch_size: 32
+  num_workers: 4
+
+# Model Configuration
+model:
+  architecture: "resnet18"
+  pretrained: true
+  num_classes: 4
+  in_channels: 3           # RGB blood cell images
+
+# Training Configuration
+training:
+  epochs: 30
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: "adam"
+  scheduler: "cosine"
+  early_stopping_patience: 10
+
+# MLflow Configuration
+mlflow:
+  experiment_name: "blood-cells-resnet"
+  run_name: null
+
+# Paths (auto-configured by shared_config/paths.py)
+paths:
+  data_dir: null
+  output_dir: null

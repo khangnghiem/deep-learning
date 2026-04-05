@@ -1,0 +1,24 @@
+data:
+  dataset: kvasir_cvc_combined
+  path: null # Using direct bronze paths now
+experiment:
+  name: 013_pns_plus_vps
+mlflow:
+  experiment_name: 013_pns_plus_vps
+model:
+  architecture: UNet-ResNet34
+  num_classes: 1
+paths:
+  data_dir: null
+  output_dir: null
+training:
+  early_stopping_patience: 10
+  epochs: 15
+  batch_size: 32
+  num_workers: 2 # Reduced to 2 to prevent Colab DataLoader bottleneck
+  learning_rate: 0.0001
+  optimizer: adamw
+  weight_decay: 0.0001
+  scheduler: cosine
+  loss: structure_loss
+  seed: 42
