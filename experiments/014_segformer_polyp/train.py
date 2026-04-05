@@ -72,11 +72,12 @@ def calculate_metrics(pred, mask, threshold=0.5):
 
 def get_data_splits(val_ratio=0.2, seed=42):
     """Collects Kvasir for train/val and uses CVC for test."""
-    kvasir_images_dir = '/content/drive/MyDrive/data_lake/01_bronze_medical/kvasir-seg/Kvasir-SEG/Kvasir-SEG/images'
-    kvasir_masks_dir = '/content/drive/MyDrive/data_lake/01_bronze_medical/kvasir-seg/Kvasir-SEG/Kvasir-SEG/masks'
+    from shared_config.paths import BRONZE_MEDICAL
+    kvasir_images_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/images')
+    kvasir_masks_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/masks')
     
-    cvc_images_dir = '/content/drive/MyDrive/data_lake/01_bronze_medical/cvc_datasetninja/images'
-    cvc_masks_dir = '/content/drive/MyDrive/data_lake/01_bronze_medical/cvc_datasetninja/masks'
+    cvc_images_dir = str(BRONZE_MEDICAL / 'cvc_datasetninja/images')
+    cvc_masks_dir = str(BRONZE_MEDICAL / 'cvc_datasetninja/masks')
     
     kvasir_images = []
     kvasir_masks = []
@@ -201,9 +202,11 @@ def main():
     )
     
     # Checkpointing
-    os.makedirs(os.path.join(os.path.dirname(__file__), 'checkpoints'), exist_ok=True)
+    from shared_config.paths import REPOS
+    chkpt_dir = str(REPOS / 'deep-learning/experiments/014_segformer_polyp/checkpoints')
+    os.makedirs(chkpt_dir, exist_ok=True)
     checkpoint_callback = ModelCheckpoint(
-        save_dir=os.path.join(os.path.dirname(__file__), 'checkpoints'),
+        save_dir=chkpt_dir,
         monitor='val_dice',
         mode='max',
         save_last=True
