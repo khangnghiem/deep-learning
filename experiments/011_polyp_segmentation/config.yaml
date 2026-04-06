@@ -2,13 +2,15 @@ experiment:
   name: polyp_segmentation_pvt
   description: High-accuracy polyp segmentation using Polyp-PVT
 data:
-  datasets:
-    - kvasir_seg
-    - cvc_clinic
-  annotation_format: coco
-  coco_json: data_lake/02_silver/polyp_coco/polyp_yolo_annotations.json
-  img_size: 352
-  batch_size: 16
+  silver: "medical.polyp_silver"
+  gold:
+    transform: gold.segmentation_gold
+    resolution: [352, 352]
+    train_split: 0.8
+    val_split: 0.2
+  sources:
+  - name: kvasir-seg
+  - name: cvc-clinicdb
 model:
   architecture: polyp_pvt
   pretrained: true
@@ -17,7 +19,7 @@ training:
   epochs: 100
   learning_rate: 1e-4
   optimizer: adamw
-  loss: structure_loss # specialized loss for polyp segmentation
+  loss: structure_loss
 mlflow:
   experiment_name: polyp-segmentation
   run_name: polyp_pvt_baseline

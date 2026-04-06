@@ -8,6 +8,11 @@ data:
   test_split: 0.1
   batch_size: 64
   num_workers: 4
+  silver: null
+  gold:
+    transform: gold.classification_gold
+  sources:
+  - name: mnist
 model:
   architecture: resnet18
   pretrained: true

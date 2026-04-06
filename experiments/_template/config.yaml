@@ -1,35 +1,32 @@
-# Experiment Configuration
-
 experiment:
-  name: "experiment_name"
-  description: "Brief description"
-
+  name: experiment_name
+  description: Brief description
 data:
-  dataset: "dataset_name"
+  dataset: dataset_name
   train_split: 0.8
   val_split: 0.1
   test_split: 0.1
   batch_size: 32
   num_workers: 4
-
+  silver: null
+  gold:
+    transform: gold.segmentation_gold
+  sources:
+  - name: dataset_name
 model:
-  architecture: "resnet18"
+  architecture: resnet18
   pretrained: true
   num_classes: 10
-
 training:
   epochs: 50
   learning_rate: 0.001
-  optimizer: "adam"         # adam | sgd | adamw
-  scheduler: "cosine"       # cosine | step | null
-  early_stopping_patience: 10  # null to disable
-  seed: 42                  # null for non-deterministic
-
+  optimizer: adam
+  scheduler: cosine
+  early_stopping_patience: 10
+  seed: 42
 mlflow:
-  experiment_name: "deep-learning"
-  run_name: null  # Auto-generated if null
-
+  experiment_name: deep-learning
+  run_name: null
 paths:
-  # These will be overridden by config/paths.py
   data_dir: null
   output_dir: null

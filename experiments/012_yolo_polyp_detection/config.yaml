@@ -1,0 +1,13 @@
+experiment:
+  name: 012_yolo_polyp_detection
+  description: YOLO Object Detection for Polyps
+data:
+  silver: "medical.polyp_silver"
+  gold:
+    transform: gold.yolo_gold
+    resolution: [640, 640]
+  sources:
+  - name: kvasir-seg
+  - name: cvc-clinicdb
+model:
+  architecture: yolov8n-seg

@@ -5,10 +5,16 @@ experiment:
   description: "SOTA Baseline for polyp segmentation using SegFormer-B2 (transformers library)"
 
 data:
-  dataset: "kvasir_cvc_combined"
-  train_split: 0.8
-  val_split: 0.2
-  test_split: 0.0
+  sources:
+    - name: "kvasir-seg"
+    - name: "cvc-clinicdb"
+  silver: "medical.polyp_silver"
+  gold:
+    transform: "gold.segmentation_gold"
+    resolution: [352, 352]
+    train_split: 0.8
+    val_split: 0.2
+    test_sources: ["cvc-clinicdb"]
   batch_size: 16
   num_workers: 2
 

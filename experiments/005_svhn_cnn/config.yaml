@@ -1,24 +1,23 @@
-# 005_svhn_cnn
-
 experiment:
-  name: "005_svhn_cnn"
-  description: "Street View House Numbers classification"
-
+  name: 005_svhn_cnn
+  description: Street View House Numbers classification
 data:
-  dataset: "svhn"
+  dataset: svhn
   batch_size: 64
   num_workers: 4
-
+  silver: null
+  gold:
+    transform: gold.classification_gold
+  sources:
+  - name: svhn
 model:
-  architecture: "simple_cnn"
+  architecture: simple_cnn
   pretrained: false
   num_classes: 10
-
 training:
   epochs: 20
   learning_rate: 0.001
-  optimizer: "adam"
-
+  optimizer: adam
 mlflow:
-  experiment_name: "svhn-cnn"
+  experiment_name: svhn-cnn
   run_name: null

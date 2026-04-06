@@ -2,6 +2,11 @@ data:
   coco_json: /content/drive/MyDrive/data_lake/02_silver/polyp_coco/polypgen_annotations.json
   dataset: polypgen
   image_root: /content/drive/MyDrive/data_lake/01_bronze_medical/polypgen
+  silver: null
+  gold:
+    transform: gold.classification_gold
+  sources:
+  - name: polypgen
 experiment:
   name: 009_sam2_zeroshot_eval
 mlflow:

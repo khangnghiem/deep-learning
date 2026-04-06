@@ -27,22 +27,23 @@ def load_config(config_path: str = "config.yaml") -> dict:
 
 
 def get_dataloaders(config):
+    from src.data.gold import GoldClassificationDataset
+    import torchvision.transforms as transforms
+    
+    # We could dynamically load transforms here, but for simplicity we keep minimal normalization
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4377, 0.4438, 0.4728), (0.1980, 0.2010, 0.1970))
+        transforms.ToTensor()
     ])
     
-    data_dir = BRONZE / "svhn"
+    train_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="train", transform=transform)
+    val_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="val", transform=transform)
     
-    train_ds = datasets.SVHN(str(data_dir), split='train', download=True, transform=transform)
-    val_ds = datasets.SVHN(str(data_dir), split='test', download=True, transform=transform)
-    
+    from torch.utils.data import DataLoader
     train_loader = DataLoader(train_ds, batch_size=config["data"]["batch_size"], shuffle=True, num_workers=config["data"]["num_workers"])
     val_loader = DataLoader(val_ds, batch_size=config["data"]["batch_size"], shuffle=False, num_workers=config["data"]["num_workers"])
     
-    print(f"SVHN: {len(train_ds)} train, {len(val_ds)} val")
+    print(f"Loaded: {len(train_ds)} train, {len(val_ds)} val")
     return train_loader, val_loader
-
 
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()

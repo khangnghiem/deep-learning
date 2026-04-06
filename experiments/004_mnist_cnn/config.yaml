@@ -1,24 +1,23 @@
-# 004_mnist_cnn
-
 experiment:
-  name: "004_mnist_cnn"
-  description: "MNIST digit classification (0-9)"
-
+  name: 004_mnist_cnn
+  description: MNIST digit classification (0-9)
 data:
-  dataset: "mnist"
+  dataset: mnist
   batch_size: 64
   num_workers: 4
-
+  silver: null
+  gold:
+    transform: gold.classification_gold
+  sources:
+  - name: mnist
 model:
-  architecture: "simple_cnn"
+  architecture: simple_cnn
   pretrained: false
   num_classes: 10
-
 training:
   epochs: 10
   learning_rate: 0.001
-  optimizer: "adam"
-
+  optimizer: adam
 mlflow:
-  experiment_name: "mnist-cnn"
+  experiment_name: mnist-cnn
   run_name: null

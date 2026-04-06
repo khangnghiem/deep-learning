@@ -4,9 +4,8 @@ import yaml
 import mlflow
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset
-from PIL import Image
-import numpy as np
+from torch.utils.data import DataLoader
+
 from tqdm import tqdm
 import logging
 import albumentations as A
@@ -30,34 +29,7 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class SingleImagePolypDataset(Dataset):
-    """Dataset for training single-frame segmentation using real medical datasets."""
-    def __init__(self, image_paths, mask_paths, transform=None):
-        self.image_paths = image_paths
-        self.mask_paths = mask_paths
-        self.transform = transform
-        
-    def __len__(self):
-        return len(self.image_paths)
-        
-    def __getitem__(self, idx):
-        # Read as NumPy arrays for Albumentations
-        image = np.array(Image.open(self.image_paths[idx]).convert("RGB"))
-        mask = np.array(Image.open(self.mask_paths[idx]).convert("L"))
-        
-        if self.transform:
-            augmented = self.transform(image=image, mask=mask)
-            image = augmented['image']
-            mask = augmented['mask']
-        else:
-            image = ToTensorV2()(image=image)['image'] / 255.0
-            mask = ToTensorV2()(image=mask)['mask'] / 255.0
-            
-        mask = (mask > 0.5).float()
-        if mask.dim() == 2:
-            mask = mask.unsqueeze(0)
-            
-        return image, mask
+from src.data.gold import GoldSegmentationDataset
 
 def calculate_metrics(pred, mask, threshold=0.5):
     """Calculates Dice and IoU (batch average)."""
@@ -70,62 +42,7 @@ def calculate_metrics(pred, mask, threshold=0.5):
     
     return dice.mean().item(), iou.mean().item()
 
-def get_data_splits(val_ratio=0.2, seed=42):
-    """Collects Kvasir for train/val and uses CVC for test."""
-    from src.config.paths import BRONZE_MEDICAL
-    kvasir_images_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/images')
-    kvasir_masks_dir = str(BRONZE_MEDICAL / 'kvasir-seg/Kvasir-SEG/Kvasir-SEG/masks')
-    
-    cvc_images_dir = str(BRONZE_MEDICAL / 'cvc_datasetninja/images')
-    cvc_masks_dir = str(BRONZE_MEDICAL / 'cvc_datasetninja/masks')
-    
-    kvasir_images = []
-    kvasir_masks = []
-    cvc_images = []
-    cvc_masks = []
-    
-    # Kvasir
-    if os.path.exists(kvasir_images_dir):
-        for img_name in sorted(os.listdir(kvasir_images_dir)):
-            if img_name.endswith(('.jpg', '.png')):
-                mask_candidate_1 = img_name.replace('.jpg', '.png')
-                mask_candidate_2 = img_name.replace('.png', '.jpg')
-                mask_name = img_name
-                
-                if os.path.exists(os.path.join(kvasir_masks_dir, mask_candidate_1)):
-                    mask_name = mask_candidate_1
-                elif os.path.exists(os.path.join(kvasir_masks_dir, mask_candidate_2)):
-                    mask_name = mask_candidate_2
 
-                if os.path.exists(os.path.join(kvasir_masks_dir, mask_name)):
-                    kvasir_images.append(os.path.join(kvasir_images_dir, img_name))
-                    kvasir_masks.append(os.path.join(kvasir_masks_dir, mask_name))
-                    
-    # CVC Ninja
-    if os.path.exists(cvc_images_dir):
-        for img_name in sorted(os.listdir(cvc_images_dir)):
-            if img_name.endswith(('.jpg', '.png')):
-                if os.path.exists(os.path.join(cvc_masks_dir, img_name)):
-                    cvc_images.append(os.path.join(cvc_images_dir, img_name))
-                    cvc_masks.append(os.path.join(cvc_masks_dir, img_name))
-
-    if len(kvasir_images) == 0:
-        logger.error("No data found! Check if Google Drive is mounted and paths are correct.")
-        return [], [], [], [], [], []
-
-    np.random.seed(seed)
-    indices = np.random.permutation(len(kvasir_images))
-    split = int((1.0 - val_ratio) * len(kvasir_images))
-    
-    train_imgs = [kvasir_images[i] for i in indices[:split]]
-    train_masks = [kvasir_masks[i] for i in indices[:split]]
-    val_imgs = [kvasir_images[i] for i in indices[split:]]
-    val_masks = [kvasir_masks[i] for i in indices[split:]]
-    test_imgs = cvc_images
-    test_masks = cvc_masks
-    
-    logger.info(f"Loaded {len(train_imgs)} train images, {len(val_imgs)} val images, and {len(test_imgs)} test images.")
-    return train_imgs, train_masks, val_imgs, val_masks, test_imgs, test_masks
 
 def main():
     config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
@@ -171,16 +88,14 @@ def main():
         ToTensorV2(),
     ])
     
-    train_imgs, train_masks, val_imgs, val_masks, test_imgs, test_masks = get_data_splits()
+    experiment_name = config.get('experiment', {}).get('name', '014_segformer_polyp')
     
-    if len(train_imgs) == 0:
-        return
-        
-    train_dataset = SingleImagePolypDataset(train_imgs, train_masks, transform=train_transform)
-    val_dataset = SingleImagePolypDataset(val_imgs, val_masks, transform=val_transform)
-    if len(test_imgs) > 0:
-        test_dataset = SingleImagePolypDataset(test_imgs, test_masks, transform=val_transform)
-    else:
+    train_dataset = GoldSegmentationDataset(experiment_name=experiment_name, split="train", transform=train_transform)
+    val_dataset = GoldSegmentationDataset(experiment_name=experiment_name, split="val", transform=val_transform)
+    
+    try:
+        test_dataset = GoldSegmentationDataset(experiment_name=experiment_name, split="test", transform=val_transform)
+    except FileNotFoundError:
         test_dataset = val_dataset
     
     train_loader = DataLoader(train_dataset, batch_size=config['training'].get('batch_size', 16), shuffle=True, num_workers=config['data'].get('num_workers', 2))

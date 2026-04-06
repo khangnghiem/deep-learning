@@ -1,24 +1,23 @@
-# 006_stl10_cnn
-
 experiment:
-  name: "006_stl10_cnn"
-  description: "STL-10 classification (96x96 images)"
-
+  name: 006_stl10_cnn
+  description: STL-10 classification (96x96 images)
 data:
-  dataset: "stl10"
+  dataset: stl10
   batch_size: 32
   num_workers: 4
-
+  silver: null
+  gold:
+    transform: gold.classification_gold
+  sources:
+  - name: stl10
 model:
-  architecture: "resnet18"
+  architecture: resnet18
   pretrained: true
   num_classes: 10
-
 training:
   epochs: 25
   learning_rate: 0.0001
-  optimizer: "adam"
-
+  optimizer: adam
 mlflow:
-  experiment_name: "stl10-cnn"
+  experiment_name: stl10-cnn
   run_name: null

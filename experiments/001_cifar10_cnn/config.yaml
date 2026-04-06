@@ -14,6 +14,12 @@ experiment:
 #   - Common values: 32, 64, 128. Start with 64 for CIFAR-10.
 # num_workers: Parallel data loading threads (set to 0 if you get errors on Windows)
 data:
+  sources:
+    - name: "cifar10"
+  silver: null
+  gold:
+    transform: "gold.classification_gold"
+    resolution: [32, 32]
   dataset: "cifar10"
   batch_size: 64
   num_workers: 4

@@ -54,6 +54,7 @@ except ImportError:
 from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 from src.models import SimpleCNN, get_pretrained_resnet
 from src.data.transforms import get_cifar_transforms
+from src.data.gold import GoldClassificationDataset
 from src.training import EarlyStopping, save_checkpoint, load_checkpoint
 from src.utils.metrics import precision_recall_f1, get_confusion_matrix
 from src.utils.visualization import plot_confusion_matrix, show_predictions
@@ -129,18 +130,18 @@ def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
     """Create train and validation DataLoaders for CIFAR-10."""
     batch_size = config["data"]["batch_size"]
     num_workers = config["data"]["num_workers"]
-    data_dir = BRONZE / "cifar10"
+    experiment_name = config["experiment"]["name"]
 
     train_transform = get_cifar_transforms(train=True)
     val_transform = get_cifar_transforms(train=False)
 
-    print(f"Loading CIFAR-10 from {data_dir}")
+    print(f"Loading CIFAR-10 from GOLD / {experiment_name}")
 
-    train_dataset = datasets.CIFAR10(
-        root=data_dir, train=True, download=True, transform=train_transform
+    train_dataset = GoldClassificationDataset(
+        experiment_name=experiment_name, split="train", transform=train_transform
     )
-    val_dataset = datasets.CIFAR10(
-        root=data_dir, train=False, download=True, transform=val_transform
+    val_dataset = GoldClassificationDataset(
+        experiment_name=experiment_name, split="val", transform=val_transform
     )
 
     train_loader = DataLoader(
@@ -167,8 +168,8 @@ def validate_data(train_loader, val_loader, mlflow):
     val_dataset = val_loader.dataset
 
     # Class distribution
-    train_dist = Counter(train_dataset.targets)
-    val_dist = Counter(val_dataset.targets)
+    train_dist = Counter([t for _, t in train_dataset.samples])
+    val_dist = Counter([t for _, t in val_dataset.samples])
     print(f"Train class distribution: {dict(sorted(train_dist.items()))}")
     print(f"Val   class distribution: {dict(sorted(val_dist.items()))}")
 

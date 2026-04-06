@@ -16,6 +16,7 @@ from .medical import (
     download_medical_dataset,
     list_medical_datasets,
 )
+from .gold import GoldClassificationDataset, GoldSegmentationDataset
 
 __all__ = [
     # HuggingFace
@@ -37,4 +38,7 @@ __all__ = [
     "get_medical_datasets",
     "download_medical_dataset",
     "list_medical_datasets",
+    # Gold layer
+    "GoldClassificationDataset",
+    "GoldSegmentationDataset",
 ]

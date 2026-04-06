@@ -1,7 +1,10 @@
 data:
-  batch_size: 2
-  dataset: polypgen
-  path: /content/drive/MyDrive/data_lake/01_bronze_medical/polypgen
+  silver: "medical.polyp_silver"
+  gold:
+    transform: gold.segmentation_gold
+    resolution: [352, 352]
+  sources:
+  - name: polypgen
 experiment:
   name: 010_polypgen_unet
 mlflow:

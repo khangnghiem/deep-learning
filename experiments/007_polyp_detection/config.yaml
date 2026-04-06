@@ -2,18 +2,13 @@ experiment:
   name: polyp_detection
   description: Colonoscopy polyp detection with YOLOv8 fine-tuning
 data:
-  datasets:
-  - kvasir_seg
-  - cvc_clinic
-  custom_polyps: data_lake/00_landing/polyp
-  train_split: 0.8
-  val_split: 0.1
-  test_split: 0.1
-  img_size: 640
-  batch_size: 16
-  annotation_format: coco
-  coco_json: data_lake/02_silver/polyp_coco/polyp_yolo_annotations.json
-  coco_to_yolo_script: repos/data-ingestion/scripts/coco_to_yolo_seg.py
+  silver: "medical.polyp_silver"
+  gold:
+    transform: gold.yolo_gold
+    resolution: [640, 640]
+  sources:
+  - name: kvasir-seg
+  - name: cvc-clinicdb
 model:
   architecture: yolov8m
   pretrained: true

@@ -89,24 +89,24 @@ def get_model(config):
 # DATA
 # =============================================================================
 def get_dataloaders(config):
-    data_dir = BRONZE / "cifar100"
-    train_transform = get_cifar_transforms(train=True)
-    val_transform = get_cifar_transforms(train=False)
-
-    train_ds = datasets.CIFAR100(root=data_dir, train=True, download=True, transform=train_transform)
-    val_ds = datasets.CIFAR100(root=data_dir, train=False, download=True, transform=val_transform)
-
-    bs, nw = config["data"]["batch_size"], config["data"]["num_workers"]
-    train_loader = DataLoader(train_ds, batch_size=bs, shuffle=True, num_workers=nw, pin_memory=True)
-    val_loader = DataLoader(val_ds, batch_size=bs, shuffle=False, num_workers=nw, pin_memory=True)
-
-    print(f"CIFAR-100: {len(train_ds)} train, {len(val_ds)} val, {len(train_loader)} batches")
+    from src.data.gold import GoldClassificationDataset
+    import torchvision.transforms as transforms
+    
+    # We could dynamically load transforms here, but for simplicity we keep minimal normalization
+    transform = transforms.Compose([
+        transforms.ToTensor()
+    ])
+    
+    train_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="train", transform=transform)
+    val_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="val", transform=transform)
+    
+    from torch.utils.data import DataLoader
+    train_loader = DataLoader(train_ds, batch_size=config["data"]["batch_size"], shuffle=True, num_workers=config["data"]["num_workers"])
+    val_loader = DataLoader(val_ds, batch_size=config["data"]["batch_size"], shuffle=False, num_workers=config["data"]["num_workers"])
+    
+    print(f"Loaded: {len(train_ds)} train, {len(val_ds)} val")
     return train_loader, val_loader
 
-
-# =============================================================================
-# TRAINING
-# =============================================================================
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0

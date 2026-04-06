@@ -27,30 +27,23 @@ def load_config(config_path: str = "config.yaml") -> dict:
 
 
 def get_dataloaders(config):
-    # STL10 has 96x96 images - resize to 224 for pretrained ResNet
-    train_transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    ])
-    val_transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    from src.data.gold import GoldClassificationDataset
+    import torchvision.transforms as transforms
+    
+    # We could dynamically load transforms here, but for simplicity we keep minimal normalization
+    transform = transforms.Compose([
+        transforms.ToTensor()
     ])
     
-    data_dir = BRONZE / "stl10"
+    train_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="train", transform=transform)
+    val_ds = GoldClassificationDataset(experiment_name=config["experiment"]["name"], split="val", transform=transform)
     
-    train_ds = datasets.STL10(str(data_dir), split='train', download=True, transform=train_transform)
-    val_ds = datasets.STL10(str(data_dir), split='test', download=True, transform=val_transform)
-    
+    from torch.utils.data import DataLoader
     train_loader = DataLoader(train_ds, batch_size=config["data"]["batch_size"], shuffle=True, num_workers=config["data"]["num_workers"])
     val_loader = DataLoader(val_ds, batch_size=config["data"]["batch_size"], shuffle=False, num_workers=config["data"]["num_workers"])
     
-    print(f"STL10: {len(train_ds)} train, {len(val_ds)} val (96x96 → 224x224)")
+    print(f"Loaded: {len(train_ds)} train, {len(val_ds)} val")
     return train_loader, val_loader
-
 
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
