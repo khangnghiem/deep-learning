@@ -12,7 +12,7 @@ Usage:
 """
 
 import sys
-from shared_config.catalog import (
+from src.config.catalog import (
     DATASETS, TOTAL_DATASETS, list_datasets, download_dataset, download_small, _parse_size
 )
 

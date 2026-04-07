@@ -4,7 +4,7 @@ Education Dataset Downloader
 
 Thin wrapper around batch_download.py --education.
 
-All education datasets are defined in shared_config.catalog.DATASETS.
+All education datasets are defined in src.config.catalog.DATASETS.
 This script simply delegates to batch_download for consistent behavior
 (skip-existing, progress tracking, parallel support, resume).
 

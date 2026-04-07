@@ -27,8 +27,8 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
-from shared_config.catalog import DATASETS, download_dataset, _parse_size
-from shared_config.paths import BRONZE
+from src.config.catalog import DATASETS, download_dataset, _parse_size
+from src.config.paths import BRONZE
 
 # Try to import tqdm, fallback to simple progress
 try:

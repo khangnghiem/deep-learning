@@ -40,12 +40,12 @@ if __name__=='__main__':
     import sys
     from pathlib import Path
     
-    # Try importing shared_config to get standard paths and downloader
+    # Try importing src.config to get standard paths and downloader
     try:
         from src.config.catalog import download_dataset
         from src.config.paths import get_bronze_path, SILVER
         
-        print("📥 Downloading PolypGen via shared_config...")
+        print("📥 Downloading PolypGen via src.config...")
         success = download_dataset("polypgen")
         if success is False:
             print("❌ Download failed. Make sure ~/.kaggle/kaggle.json exists.")
@@ -55,7 +55,7 @@ if __name__=='__main__':
         out = str(SILVER / "polypgen_coco" / "annotations.json")
         
     except ImportError:
-        # Fallback to local parsing if shared_config is missing
+        # Fallback to local parsing if src.config is missing
         p = argparse.ArgumentParser()
         p.add_argument('--root', required=True)
         p.add_argument('--out', required=True)

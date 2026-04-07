@@ -18,15 +18,15 @@ import sys
 import argparse
 from pathlib import Path
 
-from shared_config.paths import LANDING, DATA_LAKE, get_bronze_path, get_all_bronze_paths
-from shared_config.catalog import DATASETS, download_dataset
+from src.config.paths import LANDING, DATA_LAKE, get_bronze_path, get_all_bronze_paths
+from src.config.catalog import DATASETS, download_dataset
 
 
 def get_all_bronze_datasets() -> set:
     """Get all dataset names across all bronze category folders."""
     # Prefer MANIFEST.json over filesystem scan
     try:
-        from shared_config.manifest import get_manifest_datasets
+        from src.config.manifest import get_manifest_datasets
         datasets = get_manifest_datasets()
         print("📋 Using MANIFEST.json (skipping filesystem scan)")
         return datasets
@@ -282,7 +282,7 @@ def main():
     args = parser.parse_args()
     
     if args.refresh_manifest:
-        from shared_config.manifest import generate_manifest
+        from src.config.manifest import generate_manifest
         generate_manifest()
     
     issues = audit_data_lake()
