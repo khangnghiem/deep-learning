@@ -70,7 +70,21 @@ DRIVE = get_drive_root()
 # Data Lake (Medallion Architecture)
 # =============================================================================
 
-DATA_LAKE = DRIVE / "data_lake"
+data_lake_root = "data_lake"
+try:
+    if Path("config.yaml").exists():
+        import yaml
+        with open("config.yaml") as f:
+            cf = yaml.safe_load(f)
+            if cf and "data" in cf and "root" in cf["data"]:
+                data_lake_root = cf["data"]["root"]
+except Exception:
+    pass
+
+if "DATA_LAKE_DIR" in os.environ:
+    data_lake_root = os.environ["DATA_LAKE_DIR"]
+
+DATA_LAKE = DRIVE / data_lake_root
 LANDING = DATA_LAKE / "00_landing"
 
 # Bronze layer - organized by category

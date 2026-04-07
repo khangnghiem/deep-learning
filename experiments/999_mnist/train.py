@@ -25,7 +25,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOS_ROOT = PROJECT_ROOT.parent
 
 sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(REPOS_ROOT / "shared-config"))
 
+# Automatically run the %pip install if in Colab to fix module loading issues
+try:
+    get_ipython().run_line_magic("pip", "install -q -e /content/drive/MyDrive/repos/shared-config")
+except NameError:
+    pass
 
 import yaml
 import torch
@@ -73,12 +79,8 @@ def write_completion_marker(config: dict, best_acc: float, duration: float, succ
 # =============================================================================
 def get_model(config: dict) -> nn.Module:
     """Build model based on configuration."""
-    return nn.Sequential(
-        nn.Flatten(),
-        nn.Linear(28*28, 128),
-        nn.ReLU(),
-        nn.Linear(128, config["model"]["num_classes"])
-    )
+    # TODO: Implement model creation
+    raise NotImplementedError("Implement get_model()")
 
 
 # =============================================================================
@@ -86,16 +88,8 @@ def get_model(config: dict) -> nn.Module:
 # =============================================================================
 def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
     """Create train and validation DataLoaders."""
-    from torch.utils.data import TensorDataset
-    # Dummy dataset for fast local test
-    x_train = torch.randn(100, 1, 28, 28)
-    y_train = torch.randint(0, config["model"]["num_classes"], (100,))
-    x_val = torch.randn(20, 1, 28, 28)
-    y_val = torch.randint(0, config["model"]["num_classes"], (20,))
-    
-    train_dl = DataLoader(TensorDataset(x_train, y_train), batch_size=config["data"]["batch_size"])
-    val_dl = DataLoader(TensorDataset(x_val, y_val), batch_size=config["data"]["batch_size"])
-    return train_dl, val_dl
+    # TODO: Implement data loading
+    raise NotImplementedError("Implement get_dataloaders()")
 
 
 # =============================================================================

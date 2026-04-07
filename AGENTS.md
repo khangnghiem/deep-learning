@@ -6,7 +6,6 @@ This file provides guidance when working with code in this repository.
 
 ### Environment setup
 
-- Install shared config: `pip install -e ../shared_config`
 - Install dependencies: `pip install -r requirements.txt`
 
 ### Running experiments
@@ -28,7 +27,6 @@ This file provides guidance when working with code in this repository.
 
 ### Dependencies
 
-- **`shared_config`** (sibling repo `../shared_config`): Provides `src.config.paths` (environment-aware paths, data lake, MLflow config) and `src.config.catalog` (100+ dataset catalog).
 - Data ingestion scripts live in **`../data-ingestion`** (separate repo).
 
 ### Repository layout
