@@ -1,0 +1,31 @@
+experiment:
+  name: 015_cifar10_e2e_test
+  description: E2E Pipeline test
+data:
+  dataset: cifar10
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  batch_size: 128
+  num_workers: 2
+  silver: null
+  gold: null
+  sources:
+  - name: cifar10
+model:
+  architecture: resnet18
+  pretrained: true
+  num_classes: 10
+training:
+  epochs: 2  # Keep it ultra-fast for testing
+  learning_rate: 0.001
+  optimizer: adam
+  scheduler: null
+  early_stopping_patience: 1
+  seed: 42
+mlflow:
+  experiment_name: deep-learning
+  run_name: null
+paths:
+  data_dir: null
+  output_dir: null

@@ -21,7 +21,7 @@ This folder is your **sketchpad** — use it for:
 
 > [!IMPORTANT]
 > **Every experiment must be explored first.** 
-> The filename of the exploratory notebook must exactly match its formal experiment folder.
+> The exploratory notebook must exist BEFORE its formal experiment folder is created. The filename must exactly match.
 
 ```
 experiments/001_cifar10_cnn/  <--->  explorations/001_cifar10_cnn.ipynb

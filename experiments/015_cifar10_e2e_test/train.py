@@ -117,12 +117,10 @@ def write_completion_marker(config: dict, best_acc: float, duration: float, succ
 # =============================================================================
 def get_model(config: dict) -> nn.Module:
     """Build model based on configuration."""
-    # TODO: Implement model creation for your experiment
-    # Example:
-    #   from src.models import SimpleCNN, get_pretrained_resnet
-    #   if config["model"]["architecture"] == "simple_cnn":
-    #       return SimpleCNN(num_classes=config["model"]["num_classes"])
-    raise NotImplementedError("Implement get_model() for your experiment")
+    import torchvision.models as models
+    model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+    model.fc = nn.Linear(model.fc.in_features, config["model"]["num_classes"])
+    return model
 
 
 # =============================================================================
@@ -130,13 +128,29 @@ def get_model(config: dict) -> nn.Module:
 # =============================================================================
 def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
     """Create train and validation DataLoaders."""
-    # TODO: Implement data loading for your experiment
-    # Example:
-    #   from torchvision import datasets
-    #   from src.data.transforms import get_cifar_transforms
-    #   train_ds = datasets.CIFAR10(root=BRONZE/"cifar10", train=True, ...)
-    #   val_ds = datasets.CIFAR10(root=BRONZE/"cifar10", train=False, ...)
-    raise NotImplementedError("Implement get_dataloaders() for your experiment")
+    from torchvision import datasets, transforms
+    bs = config["data"]["batch_size"]
+    nw = config["data"]["num_workers"]
+    
+    transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    ])
+    
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    ])
+    
+    # Using local ephemeral /content/data so no downloading to Drive happens
+    train_ds = datasets.CIFAR10(root='/content/data', train=True, download=True, transform=transform_train)
+    val_ds = datasets.CIFAR10(root='/content/data', train=False, download=True, transform=transform_test)
+    
+    train_loader = DataLoader(train_ds, batch_size=bs, shuffle=True, num_workers=nw)
+    val_loader = DataLoader(val_ds, batch_size=bs, shuffle=False, num_workers=nw)
+    return train_loader, val_loader
 
 
 # =============================================================================

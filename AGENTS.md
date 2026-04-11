@@ -45,7 +45,11 @@ This file provides guidance when working with code in this repository.
 - Import paths/MLflow from `src.config.paths`, never hardcode.
 - Import `DATASETS` from `src.config.catalog` when needed by `create_experiment.py`.
 - **NEVER run training locally** — use Google Colab.
+- **Naming Convention:** All experiments, explorations, and folders MUST strictly follow the format `{NNN}_{dataset}_{model}` (e.g., `001_cifar10_cnn.ipynb` matching `experiments/001_cifar10_cnn/`).
+  - `{NNN}`: 3-digit zero-padded sequential number.
+  - `{dataset}`: The dataset or generic domain used.
+  - `{model}`: The primary architecture or algorithm.
 - When creating new experiments, follow patterns in `experiments/001_cifar10_cnn` and `_template/`.
 - **`experiments/` = `.py` scripts** (train.py is the source of truth). Notebooks here are thin Colab launchers only.
-- **`explorations/` = `.ipynb` notebooks** mapped 1:1 to `experiments/`. **Every experiment must be explored first here.** Put EDA, prototyping, and visualization work here.
+- **`explorations/` = `.ipynb` notebooks** mapped 1:1 to `experiments/`. **Every experiment must be explored first here.** The exploration notebook MUST exist before the formal experiment directory is created. Put EDA, prototyping, and visualization work here. **Important:** Any processed or modified data generated during exploration MUST simply be held in memory or written to Colab's ephemeral `/content/` disk, NEVER directly to Bronze/Silver.
 - When exploration work matures, graduate reusable code to `src/` and create a formal experiment via `create_experiment.py`.
