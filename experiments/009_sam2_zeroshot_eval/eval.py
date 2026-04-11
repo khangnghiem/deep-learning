@@ -61,7 +61,7 @@ with mlflow.start_run(run_name=f"{experiment_name}_eval"):
     count = 0
     generated = 0
     # Process just 20 images to save time and prove it works end-to-end
-    for img_info in tqdm(coco['images'][:20]):
+    for img_info in tqdm(coco['images'][:20], leave=False, unit="batch"):
         rel_path = img_info['file_name']
         base_name = os.path.basename(rel_path).replace('polypgen_', '')
         

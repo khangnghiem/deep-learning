@@ -66,7 +66,7 @@ def get_dataloaders(config):
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0
-    for x, y in tqdm(loader, desc="Training"):
+    for x, y in tqdm(loader, desc="Training", leave=False, unit="batch"):
         x, y = x.to(device), y.to(device)
         optimizer.zero_grad()
         out = model(x)
@@ -83,7 +83,7 @@ def validate(model, loader, criterion, device):
     model.eval()
     total_loss, correct, total = 0, 0, 0
     with torch.no_grad():
-        for x, y in tqdm(loader, desc="Validating"):
+        for x, y in tqdm(loader, desc="Validating", leave=False, unit="batch"):
             x, y = x.to(device), y.to(device)
             out = model(x)
             loss = criterion(out, y)
