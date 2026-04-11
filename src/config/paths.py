@@ -72,9 +72,10 @@ DRIVE = get_drive_root()
 
 data_lake_root = "data_lake"
 try:
-    if Path("config.yaml").exists():
+    config_path = _REPO_ROOT / "config.yaml"
+    if config_path.exists():
         import yaml
-        with open("config.yaml") as f:
+        with open(config_path) as f:
             cf = yaml.safe_load(f)
             if cf and "data" in cf and "root" in cf["data"]:
                 data_lake_root = cf["data"]["root"]
@@ -98,9 +99,6 @@ BRONZE_TABULAR = DATA_LAKE / "01_bronze_tabular"
 BRONZE_TIMESERIES = DATA_LAKE / "01_bronze_timeseries"
 BRONZE_VIDEO = DATA_LAKE / "01_bronze_video"
 BRONZE_VISION = DATA_LAKE / "01_bronze_vision"
-
-# Legacy alias for backward compatibility
-BRONZE = DATA_LAKE / "01_bronze"
 
 # Category to path mapping
 _BRONZE_CATEGORY_PATHS = {
@@ -134,16 +132,24 @@ def get_all_bronze_paths() -> list:
 
 SILVER = DATA_LAKE / "02_silver"
 GOLD = DATA_LAKE / "03_gold"
-PLATINUM = DATA_LAKE / "04_platinum"
-FEATURES = DATA_LAKE / "05_features"
-INFERENCE = DATA_LAKE / "06_inference"
-CRAWL_CACHE = DATA_LAKE / "09_cache"
 
 # =============================================================================
-# MLflow (kept at root, not inside data_lake)
+# ML Ops (Active Tooling)
 # =============================================================================
 
-MLFLOW_DIR = DRIVE / "mlflow"
+OPS = DRIVE / "ops"
+
+# =============================================================================
+# Observability
+# =============================================================================
+
+OBSERVABILITY = OPS / "observability"
+
+# =============================================================================
+# MLflow (kept in ops, out of data_lake)
+# =============================================================================
+
+MLFLOW_DIR = OPS / "mlflow"
 MLFLOW_TRACKING_URI = f"file://{MLFLOW_DIR / 'mlruns'}"
 MLFLOW_ARTIFACTS = MLFLOW_DIR / "artifacts"
 

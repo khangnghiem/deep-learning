@@ -10,7 +10,7 @@ cd experiments/001_cifar10_cnn
 python train.py
 
 # View MLflow results
-cd /path/to/My\ Drive/mlflow
+cd /path/to/My\ Drive/ops/mlflow
 mlflow ui --backend-store-uri file://./mlruns
 ```
 
@@ -30,12 +30,14 @@ deep-learning/
 
 All data lives in `My Drive/data_lake/`:
 
-| Layer   | Path          | Purpose                                 |
-| ------- | ------------- | --------------------------------------- |
-| Landing | `00_landing/` | Raw uploads, zips, untouched files      |
-| Bronze  | `01_bronze/`  | Extracted raw data (CIFAR, MNIST, etc.) |
-| Silver  | `02_silver/`  | Cleaned, validated data                 |
-| Gold    | `03_gold/`    | Analysis-ready datasets                 |
+| Layer      | Path             | Purpose                                           |
+| ---------- | ---------------- | ------------------------------------------------- |
+| Landing    | `00_landing/`    | Raw uploads, zips, untouched files                |
+| Bronze     | `01_bronze_*/`     | Extracted raw data (CIFAR, MNIST, etc.)           |
+| Silver     | `02_silver/`     | Cleaned, validated data                           |
+| Gold       | `03_gold/`       | Analysis-ready datasets                           |
+| Telemetry  | `07_telemetry/`  | Exported DuckDB logs / system telemetry           |
+| Monitoring | `08_monitoring/` | Data drift reports & model health snapshots       |
 
 See [`config/paths.py`](config/paths.py) for path constants.
 

@@ -27,7 +27,7 @@ This file provides guidance when working with code in this repository.
 
 ### Dependencies
 
-- Data ingestion scripts live in **`../data-ingestion`** (separate repo).
+- Data ingestion scripts live in **`../../data_lake/scripts`**.
 
 ### Repository layout
 
