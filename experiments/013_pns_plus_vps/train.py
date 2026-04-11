@@ -49,14 +49,14 @@ def main():
         encoder_weights="imagenet",
         in_channels=3,
         classes=1,
-    ).to(device)
+    ).to(device, non_blocking=True)
     
     optimizer = torch.optim.AdamW(
         model.parameters(), 
         lr=float(config['training'].get('learning_rate', 1e-4)), 
         weight_decay=float(config['training'].get('weight_decay', 1e-4))
     )
-    criterion = StructureLoss().to(device)
+    criterion = StructureLoss().to(device, non_blocking=True)
 
     # Albumentations Training Pipeline
     train_transform = A.Compose([
@@ -103,9 +103,9 @@ def main():
             
             pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs} [Train]")
             for images, masks in pbar:
-                images, masks = images.to(device), masks.to(device)
+                images, masks = images.to(device, non_blocking=True), masks.to(device, non_blocking=True)
                 
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 preds = model(images)
                 
                 loss = criterion(preds, masks)
@@ -130,7 +130,7 @@ def main():
             with torch.no_grad():
                 pbar_val = tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Val]")
                 for images, masks in pbar_val:
-                    images, masks = images.to(device), masks.to(device)
+                    images, masks = images.to(device, non_blocking=True), masks.to(device, non_blocking=True)
                     
                     preds = model(images)
                     loss = criterion(preds, masks)

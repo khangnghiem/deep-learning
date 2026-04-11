@@ -59,14 +59,14 @@ def main():
         config['model'].get('architecture', 'nvidia/mit-b2'),
         num_labels=1,
         ignore_mismatched_sizes=True
-    ).to(device)
+    ).to(device, non_blocking=True)
     
     optimizer = torch.optim.AdamW(
         model.parameters(), 
         lr=float(config['training'].get('learning_rate', 6e-5)), 
         weight_decay=float(config['training'].get('weight_decay', 1e-4))
     )
-    criterion = StructureLoss().to(device)
+    criterion = StructureLoss().to(device, non_blocking=True)
 
     # Albumentations Training Pipeline with Stronger Augmentations (Session 3)
     train_transform = A.Compose([
@@ -143,9 +143,9 @@ def main():
             
             pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs} [Train]")
             for images, masks in pbar:
-                images, masks = images.to(device), masks.to(device)
+                images, masks = images.to(device, non_blocking=True), masks.to(device, non_blocking=True)
                 
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 with torch.amp.autocast('cuda'):
                     outputs = model(images)
                     # Segformer outputs logits at 1/4 resolution, so interpolate:
@@ -181,7 +181,7 @@ def main():
             with torch.no_grad():
                 pbar_val = tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Val]")
                 for images, masks in pbar_val:
-                    images, masks = images.to(device), masks.to(device)
+                    images, masks = images.to(device, non_blocking=True), masks.to(device, non_blocking=True)
                     
                     outputs = model(images)
                     logits = nn.functional.interpolate(
@@ -241,7 +241,7 @@ def main():
         test_dice, test_iou = 0.0, 0.0
         with torch.no_grad():
             for images, masks in test_loader:
-                images, masks = images.to(device), masks.to(device)
+                images, masks = images.to(device, non_blocking=True), masks.to(device, non_blocking=True)
                 outputs = model(images)
                 logits = nn.functional.interpolate(
                     outputs.logits,
