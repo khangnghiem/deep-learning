@@ -1,0 +1,32 @@
+experiment:
+  name: 019_polyp_yolact
+  description: Brief description
+data:
+  dataset: polyp
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  batch_size: 32
+  num_workers: 4
+  silver: null
+  gold:
+    transform: gold.segmentation_gold
+  sources:
+  - name: polyp
+model:
+  architecture: yolact
+  pretrained: true
+  num_classes: 10
+training:
+  epochs: 50
+  learning_rate: 0.001
+  optimizer: adam
+  scheduler: cosine
+  early_stopping_patience: 10
+  seed: 42
+mlflow:
+  019_polyp_yolact: deep-learning
+  run_name: null
+paths:
+  data_dir: null
+  output_dir: null
