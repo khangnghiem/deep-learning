@@ -26,12 +26,12 @@ import numpy as np
 
 DATASETS = {
     "kvasir-seg": {
-        "images_dir": "kvasir-seg/images",
-        "masks_dir": "kvasir-seg/masks",
+        "images_dir": "kvasir-seg/Kvasir-SEG/Kvasir-SEG/images",
+        "masks_dir": "kvasir-seg/Kvasir-SEG/Kvasir-SEG/masks",
     },
     "cvc-clinicdb": {
-        "images_dir": "cvc-clinicdb/Original",
-        "masks_dir": "cvc-clinicdb/Ground Truth",
+        "images_dir": "cvc-clinicdb/PNG/Original",
+        "masks_dir": "cvc-clinicdb/PNG/Ground Truth",
     },
     "cvc-colondb": {
         "images_dir": "cvc-colondb/Original",
