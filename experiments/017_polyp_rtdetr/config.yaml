@@ -1,32 +1,24 @@
 experiment:
   name: 017_polyp_rtdetr
-  description: Brief description
+  description: RT-DETR polyp detection using Ultralytics engine
 data:
   dataset: polyp
-  train_split: 0.8
-  val_split: 0.1
-  test_split: 0.1
-  batch_size: 32
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  batch_size: 16
   num_workers: 4
-  silver: null
-  gold:
-    transform: gold.segmentation_gold
-  sources:
-  - name: polyp
+  imgsz: 640
 model:
-  architecture: rtdetr
+  architecture: rtdetr-l
   pretrained: true
-  num_classes: 10
+  num_classes: 1
 training:
   epochs: 50
-  learning_rate: 0.001
-  optimizer: adam
-  scheduler: cosine
-  early_stopping_patience: 10
+  learning_rate: 0.0001
+  optimizer: AdamW
+  patience: 10
   seed: 42
 mlflow:
   experiment_name: polyp-rtdetr
   run_name: null
 paths:
-  data_dir: null
-  output_dir: null
+  project: /content/drive/MyDrive/models/trained/017_polyp_rtdetr

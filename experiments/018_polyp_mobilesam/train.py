@@ -1,328 +1,127 @@
 """
 =============================================================================
-EXPERIMENT TEMPLATE - TRAINING SCRIPT
+018_polyp_mobilesam — MobileSAM Polyp Segmentation
 =============================================================================
 
-Works both locally and in Colab (via template_reference_train.ipynb).
-Writes completed.json on finish for batch monitoring.
+Two-stage pipeline:
+  Stage 1: Fine-tune a lightweight YOLO detector on polyp bounding boxes.
+  Stage 2: Use MobileSAM in zero-shot mode — feed detected boxes as prompts,
+           then evaluate predicted masks against ground-truth polygon masks.
 
-Usage:
-    cd experiments/{EXPERIMENT_NAME}
-    python train.py
+This evaluates whether a foundation segmentation model (SAM) can produce
+higher-fidelity masks than end-to-end models like YOLO-Seg.
+
+Usage (Colab):
+    %run train.py
 """
 
 import sys
 import json
 import time
-import random
 import logging
+import shutil
 from pathlib import Path
 from datetime import datetime
-from collections import Counter
+
+import numpy as np
 
 # =============================================================================
 # LOCAL SETUP
 # =============================================================================
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-REPOS_ROOT = PROJECT_ROOT.parent
-
 sys.path.insert(0, str(PROJECT_ROOT))
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%H:%M:%S",
 )
 
 import yaml
-import numpy as np
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from tqdm import tqdm
+import cv2
 
-# Auto-release Colab GPU runtime when script finishes
+# Auto-release Colab GPU runtime
 import atexit
 try:
     from google.colab import runtime
-    # atexit will fire when the python interpreter shuts down.
-    # Note: When using `%run train.py` in IPython, this may not fire until the kernel dies.
     atexit.register(runtime.unassign)
 except ImportError:
-    pass  # Not in Colab — no-op
+    pass
 
-# Import shared utilities
-from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
-from src.training import EarlyStopping, save_checkpoint, load_checkpoint
-from src.utils.metrics import precision_recall_f1, get_confusion_matrix
-from src.utils.visualization import plot_confusion_matrix, show_predictions
-# TODO: Import your model and transforms
-# from src.models import YourModel
-# from src.data.transforms import get_transforms
+from src.config.paths import MLFLOW_TRACKING_URI, TRAINED, setup_mlflow
 
 
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-REQUIRED_CONFIG = {
-    "experiment": ["name"],
-    "data": ["dataset", "batch_size", "num_workers"],
-    "model": ["architecture", "num_classes"],
-    "training": ["epochs", "learning_rate"],
-    "mlflow": ["experiment_name"],
-}
-
-
 def load_config(config_path: str = "config.yaml") -> dict:
-    """Load and validate experiment configuration from YAML file."""
     with open(config_path) as f:
         config = yaml.safe_load(f)
-    validate_config(config)
-    return config
-
-
-def validate_config(config: dict):
-    """Check that all required config sections and keys exist."""
-    for section, keys in REQUIRED_CONFIG.items():
+    required = {
+        "experiment": ["name"],
+        "data": ["dataset_yaml", "imgsz"],
+        "model": ["architecture"],
+        "mlflow": ["experiment_name"],
+    }
+    for section, keys in required.items():
         if section not in config:
             raise ValueError(f"Missing config section: '{section}'")
         for key in keys:
             if key not in config[section]:
                 raise ValueError(f"Missing config key: '{section}.{key}'")
+    return config
 
 
-# =============================================================================
-# COMPLETION MARKER (for batch monitoring)
-# =============================================================================
-def write_completion_marker(config: dict, best_acc: float, duration: float, success: bool, error: str = None):
-    """Write completed.json so batch_status.ipynb can track run results."""
+def write_completion_marker(config, metrics, duration, success, error=None):
     marker = {
         "experiment": config["experiment"]["name"],
         "completed_at": datetime.now().isoformat(),
         "success": success,
         "duration_seconds": round(duration, 1),
-        "best_val_acc": round(best_acc, 4) if best_acc else None,
+        "metrics": metrics,
         "model": config["model"]["architecture"],
-        "epochs": config["training"]["epochs"],
         "error": error,
     }
-    marker_path = Path("completed.json")
-    marker_path.write_text(json.dumps(marker, indent=2))
-    logger.info("Completion marker written to %s", marker_path)
+    Path("completed.json").write_text(json.dumps(marker, indent=2))
+    logger.info("Completion marker written.")
 
 
 # =============================================================================
-# MODEL (TODO: Implement for your experiment)
+# MASK UTILITIES
 # =============================================================================
-def get_model(config: dict) -> nn.Module:
-    """Build dummy model to bypass NotImplementedError."""
-    num_classes = config["model"].get("num_classes", 10)
-    return nn.Sequential(
-        nn.Flatten(),
-        nn.Linear(3 * 32 * 32, 128),
-        nn.ReLU(),
-        nn.Linear(128, num_classes)
-    )
-
-# =============================================================================
-# DATA LOADING (TODO: Implement for your experiment)
-# =============================================================================
-def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
-    """Create dummy train and validation DataLoaders to bypass NotImplementedError."""
-    from torch.utils.data import TensorDataset, DataLoader
-    import torch
-    num_classes = config["model"].get("num_classes", 10)
-    batch_size = config["data"].get("batch_size", 32)
-    
-    X_train = torch.randn(100, 3, 32, 32)
-    y_train = torch.randint(0, num_classes, (100,))
-    X_val = torch.randn(50, 3, 32, 32)
-    y_val = torch.randint(0, num_classes, (50,))
-    
-    train_ds = TensorDataset(X_train, y_train)
-    train_ds.targets = y_train.tolist()
-    val_ds = TensorDataset(X_val, y_val)
-    val_ds.targets = y_val.tolist()
-    
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
-    return train_loader, val_loader
+def yolo_polygon_to_mask(label_path: Path, img_h: int, img_w: int) -> np.ndarray:
+    """Convert YOLO polygon label file to binary mask."""
+    mask = np.zeros((img_h, img_w), dtype=np.uint8)
+    if not label_path.exists():
+        return mask
+    with open(label_path) as f:
+        for line in f:
+            parts = line.strip().split()
+            if len(parts) < 6:
+                continue
+            # Skip class id, rest are x,y pairs normalized
+            coords = list(map(float, parts[1:]))
+            pts = np.array(coords).reshape(-1, 2)
+            pts[:, 0] *= img_w
+            pts[:, 1] *= img_h
+            pts = pts.astype(np.int32)
+            cv2.fillPoly(mask, [pts], 1)
+    return mask
 
 
-# =============================================================================
-# DATA VALIDATION
-# =============================================================================
-def validate_data(train_loader, val_loader, mlflow):
-    """Verify data integrity: class distribution, sample shape, value range."""
-    train_dataset = train_loader.dataset
-    val_dataset = val_loader.dataset
-
-    # Class distribution (works for datasets with .targets attribute)
-    if hasattr(train_dataset, "targets"):
-        train_dist = Counter(train_dataset.targets)
-        logger.info("Train class distribution: %s", dict(sorted(train_dist.items())))
-    if hasattr(val_dataset, "targets"):
-        val_dist = Counter(val_dataset.targets)
-        logger.info("Val class distribution: %s", dict(sorted(val_dist.items())))
-
-    # Verify sample shape
-    sample, label = train_dataset[0]
-    logger.debug("Sample shape: %s, min: %.3f, max: %.3f, label: %s", sample.shape, sample.min(), sample.max(), label)
-
-    # Log dataset info to MLflow
-    mlflow.log_params({
-        "train_samples": len(train_dataset),
-        "val_samples": len(val_dataset),
-    })
+def compute_iou(pred_mask: np.ndarray, gt_mask: np.ndarray) -> float:
+    """Compute IoU between two binary masks."""
+    intersection = np.logical_and(pred_mask, gt_mask).sum()
+    union = np.logical_or(pred_mask, gt_mask).sum()
+    return float(intersection / (union + 1e-8))
 
 
-# =============================================================================
-# SANITY CHECK
-# =============================================================================
-def sanity_check(model, train_loader, criterion, device, steps=50):
-    """Verify model can overfit a single batch — catches broken pipelines fast."""
-    print("\n--- Sanity Check: Overfit One Batch ---")
-    model.train()
-    batch = next(iter(train_loader))
-    inputs, targets = batch[0].to(device), batch[1].to(device)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    for step in range(steps):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
-
-    _, predicted = outputs.max(1)
-    acc = predicted.eq(targets).float().mean().item()
-    logger.debug("After %d steps -> loss: %.4f, acc: %.4f", steps, loss.item(), acc)
-
-    if acc < 0.8:
-        raise RuntimeError(
-            f"Sanity check FAILED: model can't overfit one batch (acc={acc:.2f}). "
-            "Check model architecture, loss function, or data transforms."
-        )
-    logger.info("✅ Sanity check PASSED — model can learn")
-
-
-# =============================================================================
-# TRAINING FUNCTIONS
-# =============================================================================
-def train_epoch(model, loader, criterion, optimizer, device):
-    """Train model for one epoch."""
-    model.train()
-    total_loss = 0
-    correct = 0
-    total = 0
-
-    for inputs, targets in tqdm(loader, desc="Training"):
-        inputs, targets = inputs.to(device), targets.to(device)
-
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
-
-        total_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
-
-    return total_loss / len(loader), correct / total
-
-
-def validate(model, loader, criterion, device):
-    """Evaluate model on validation set."""
-    model.eval()
-    total_loss = 0
-    correct = 0
-    total = 0
-
-    with torch.no_grad():
-        for inputs, targets in tqdm(loader, desc="Validating"):
-            inputs, targets = inputs.to(device), targets.to(device)
-
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-
-            total_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
-
-    return total_loss / len(loader), correct / total
-
-
-# =============================================================================
-# POST-TRAINING EVALUATION
-# =============================================================================
-def evaluate(model, val_loader, device, config, mlflow, class_names=None):
-    """Full post-training evaluation: confusion matrix, per-class F1."""
-    print("\n--- Post-Training Evaluation ---")
-    model.eval()
-    all_preds = []
-    all_labels = []
-
-    with torch.no_grad():
-        for inputs, targets in tqdm(val_loader, desc="Evaluating"):
-            outputs = model(inputs.to(device))
-            _, preds = outputs.max(1)
-            all_preds.append(preds.cpu())
-            all_labels.append(targets)
-
-    all_preds = torch.cat(all_preds)
-    all_labels = torch.cat(all_labels)
-
-    # Weighted metrics
-    precision, recall, f1 = precision_recall_f1(all_labels, all_preds, average="weighted")
-    logger.info("Weighted — Precision: %.4f, Recall: %.4f, F1: %.4f", precision, recall, f1)
-    mlflow.log_metrics({"precision": precision, "recall": recall, "f1": f1})
-
-    # Confusion matrix
-    cm = get_confusion_matrix(all_labels, all_preds)
-    eval_dir = TRAINED / config["experiment"]["name"]
-    eval_dir.mkdir(parents=True, exist_ok=True)
-
-    cm_path = eval_dir / "confusion_matrix.png"
-    plot_confusion_matrix(cm, class_names, save_path=cm_path)
-    mlflow.log_artifact(str(cm_path))
-    logger.info("Confusion matrix saved to %s", cm_path)
-
-
-# =============================================================================
-# OPTIMIZER / SCHEDULER / EARLY STOPPING FACTORIES
-# =============================================================================
-def create_optimizer(model, config):
-    """Create optimizer from config."""
-    lr = config["training"]["learning_rate"]
-    opt_name = config["training"].get("optimizer", "adam").lower()
-    if opt_name == "sgd":
-        return torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4), opt_name
-    elif opt_name == "adamw":
-        return torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-2), opt_name
-    else:  # adam (default)
-        return torch.optim.Adam(model.parameters(), lr=lr), "adam"
-
-
-def create_scheduler(optimizer, config):
-    """Create LR scheduler from config."""
-    sched_name = config["training"].get("scheduler", "null")
-    if sched_name and sched_name != "null":
-        sched_name = str(sched_name).lower()
-    else:
-        sched_name = "null"
-
-    if sched_name == "cosine":
-        return torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, T_max=config["training"]["epochs"]
-        ), sched_name
-    elif sched_name == "step":
-        return torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1), sched_name
-    return None, sched_name
+def compute_dice(pred_mask: np.ndarray, gt_mask: np.ndarray) -> float:
+    """Compute Dice coefficient between two binary masks."""
+    intersection = np.logical_and(pred_mask, gt_mask).sum()
+    return float(2 * intersection / (pred_mask.sum() + gt_mask.sum() + 1e-8))
 
 
 # =============================================================================
@@ -331,160 +130,191 @@ def create_scheduler(optimizer, config):
 def main():
     config = load_config()
     start_time = time.time()
-    best_acc = 0
 
     logger.info("=" * 60)
-    logger.info("Experiment: %s", config['experiment']['name'])
+    logger.info("Experiment: %s", config["experiment"]["name"])
+    logger.info("Pipeline: YOLO Detector → MobileSAM Segmentation")
     logger.info("=" * 60)
-
-    # ------------------------------------------------------------------
-    # Reproducibility — set seed before anything else
-    # ------------------------------------------------------------------
-    seed = config["training"].get("seed")
-    if seed is not None:
-        random.seed(seed)
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(seed)
-            torch.backends.cudnn.deterministic = True
-            torch.backends.cudnn.benchmark = False
-        logger.info("Random seed: %s", seed)
 
     try:
         mlflow = setup_mlflow()
         mlflow.set_experiment(config["mlflow"]["experiment_name"])
 
-        # Device
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info("Using device: %s", device)
-        if device.type == "cuda":
+        if torch.cuda.is_available():
             logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
-        # Model & Data
-        model = get_model(config).to(device)
-        train_loader, val_loader = get_dataloaders(config)
+        dataset_yaml = config["data"]["dataset_yaml"]
+        imgsz = config["data"]["imgsz"]
+        save_dir = Path(config["paths"]["project"])
+        save_dir.mkdir(parents=True, exist_ok=True)
 
-        # Training setup
-        criterion = nn.CrossEntropyLoss()
-        lr = config["training"]["learning_rate"]
-        optimizer, opt_name = create_optimizer(model, config)
-        scheduler, sched_name = create_scheduler(optimizer, config)
-
-        # Early stopping
-        patience = config["training"].get("early_stopping_patience")
-        early_stopping = None
-        if patience:
-            early_stopping = EarlyStopping(patience=patience, mode="min")
-
-        # Sanity check — verify model can learn before committing
-        sanity_check(model, train_loader, criterion, device, steps=50)
-
-        # Re-initialize model after sanity check
-        model = get_model(config).to(device)
-        optimizer, opt_name = create_optimizer(model, config)
-        scheduler, sched_name = create_scheduler(optimizer, config)
-
-        # MLflow run
         run_name = config["mlflow"].get("run_name")
         if not run_name or str(run_name).lower() in ("none", "null"):
-            arch = config.get("model", {}).get("architecture", "model")
-            run_name = f"{arch}_{opt_name}_lr{lr}_ep{config['training']['epochs']}"
+            run_name = f"mobilesam_yolo_prompt_ep{config['training'].get('detector_epochs', 25)}"
 
         with mlflow.start_run(run_name=run_name):
-            # Log all hyperparameters + environment
-            num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
             mlflow.log_params({
-                "model": config["model"]["architecture"],
-                "epochs": config["training"]["epochs"],
-                "lr": lr,
-                "optimizer": opt_name,
-                "scheduler": sched_name,
-                "batch_size": config["data"]["batch_size"],
-                "seed": seed,
-                "early_stopping_patience": patience,
-                "trainable_params": num_params,
+                "model": "mobilesam",
+                "box_detector": config["model"].get("box_detector", "yolo11n-seg"),
+                "detector_epochs": config["training"].get("detector_epochs", 25),
+                "imgsz": imgsz,
+                "dataset": config["data"].get("dataset", "polyp"),
+                "seed": config["training"].get("seed", 42),
                 "python_version": sys.version.split()[0],
                 "torch_version": torch.__version__,
-                "cuda_available": torch.cuda.is_available(),
                 "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A",
             })
 
-            # Validate data
-            validate_data(train_loader, val_loader, mlflow)
+            # ══════════════════════════════════════════════════════
+            # STAGE 1: Fine-tune YOLO detector for box proposals
+            # ══════════════════════════════════════════════════════
+            logger.info("─" * 40)
+            logger.info("STAGE 1: Fine-tuning YOLO box detector")
+            logger.info("─" * 40)
 
-            best_epoch = 0
-            save_dir = TRAINED / config["experiment"]["name"]
-            save_dir.mkdir(parents=True, exist_ok=True)
+            from ultralytics import YOLO
 
-            for epoch in range(config["training"]["epochs"]):
-                epoch_start = time.time()
-                logger.info("Epoch %d/%d", epoch + 1, config['training']['epochs'])
+            box_model_name = config["model"].get("box_detector", "yolo11n-seg")
+            detector = YOLO(f"{box_model_name}.pt")
 
-                train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
-                val_loss, val_acc = validate(model, val_loader, criterion, device)
+            det_epochs = config["training"].get("detector_epochs", 25)
+            det_results = detector.train(
+                data=dataset_yaml,
+                epochs=det_epochs,
+                batch=config["data"].get("batch_size", 8),
+                imgsz=imgsz,
+                lr0=config["training"].get("learning_rate", 0.001),
+                seed=config["training"].get("seed", 42),
+                device=0 if torch.cuda.is_available() else "cpu",
+                project=str(save_dir / "detector"),
+                name="yolo_boxes",
+                exist_ok=True,
+                verbose=True,
+            )
 
-                epoch_time = time.time() - epoch_start
+            # Log detector metrics
+            det_metrics = {}
+            if hasattr(det_results, "box"):
+                det_metrics = {
+                    "detector_mAP50": round(det_results.box.map50, 4),
+                    "detector_mAP50-95": round(det_results.box.map, 4),
+                    "detector_precision": round(det_results.box.mp, 4),
+                    "detector_recall": round(det_results.box.mr, 4),
+                }
+            mlflow.log_metrics(det_metrics)
+            logger.info("Detector metrics: %s", det_metrics)
 
-                mlflow.log_metrics({
-                    "train_loss": train_loss, "train_acc": train_acc,
-                    "val_loss": val_loss, "val_acc": val_acc,
-                    "lr": optimizer.param_groups[0]["lr"],
-                    "epoch_time_sec": epoch_time,
-                }, step=epoch)
+            det_best = save_dir / "detector" / "yolo_boxes" / "weights" / "best.pt"
 
-                logger.info("Train — loss: %.4f, acc: %.4f", train_loss, train_acc)
-                logger.info("Val   — loss: %.4f, acc: %.4f", val_loss, val_acc)
-                logger.debug("Batch stats — lr: %.6f, time: %.1fs", optimizer.param_groups[0]['lr'], epoch_time)
+            # ══════════════════════════════════════════════════════
+            # STAGE 2: MobileSAM zero-shot segmentation
+            # ══════════════════════════════════════════════════════
+            logger.info("─" * 40)
+            logger.info("STAGE 2: MobileSAM zero-shot evaluation")
+            logger.info("─" * 40)
 
-                if scheduler:
-                    scheduler.step()
+            from ultralytics import SAM
 
-                # Save best model (full checkpoint)
-                if val_acc > best_acc:
-                    best_acc = val_acc
-                    best_epoch = epoch + 1
-                    best_path = save_dir / "best_model.pt"
-                    save_checkpoint(
-                        model, optimizer, epoch, best_path,
-                        scheduler=scheduler,
-                        metrics={"val_acc": val_acc, "val_loss": val_loss},
-                    )
-                    logger.info("✓ New best! (acc: %.4f)", best_acc)
-                    mlflow.log_artifact(str(best_path))
+            sam_model = SAM("mobile_sam.pt")
+            logger.info("Loaded MobileSAM")
 
-                # Always save last checkpoint (for crash recovery)
-                last_path = save_dir / "last_model.pt"
-                save_checkpoint(
-                    model, optimizer, epoch, last_path,
-                    scheduler=scheduler,
-                    metrics={"val_acc": val_acc, "val_loss": val_loss},
+            # Load fine-tuned detector for box proposals
+            if det_best.exists():
+                detector = YOLO(str(det_best))
+                logger.info("Using fine-tuned detector: %s", det_best)
+            else:
+                logger.warning("Fine-tuned detector not found, using pretrained")
+
+            # Parse dataset.yaml for val images
+            with open(dataset_yaml) as f:
+                ds_config = yaml.safe_load(f)
+            ds_root = Path(dataset_yaml).parent
+            val_img_dir = ds_root / ds_config.get("val", "val/images")
+            val_label_dir = val_img_dir.parent.parent / "labels"
+
+            val_images = sorted(val_img_dir.glob("*.*"))
+            logger.info("Evaluating on %d validation images", len(val_images))
+
+            ious = []
+            dices = []
+
+            for img_path in val_images:
+                img = cv2.imread(str(img_path))
+                if img is None:
+                    continue
+                img_h, img_w = img.shape[:2]
+
+                # Get GT mask
+                label_path = val_label_dir / (img_path.stem + ".txt")
+                gt_mask = yolo_polygon_to_mask(label_path, img_h, img_w)
+
+                if gt_mask.sum() == 0:
+                    continue  # Skip images with no polyps
+
+                # Detect boxes with YOLO
+                det_preds = detector.predict(
+                    str(img_path), conf=0.25, verbose=False, device=device
                 )
 
-                # Early stopping check
-                if early_stopping:
-                    if early_stopping(val_loss):
-                        logger.info("⏹️ Early stopping triggered at epoch %d", epoch + 1)
-                        mlflow.log_param("early_stopped_epoch", epoch + 1)
-                        break
-                    elif early_stopping.counter > 0:
-                        logger.debug("Early stopping counter: %d/%d", early_stopping.counter, patience)
+                if len(det_preds) == 0 or len(det_preds[0].boxes) == 0:
+                    ious.append(0.0)
+                    dices.append(0.0)
+                    continue
 
-            mlflow.log_metrics({
-                "best_val_acc": best_acc,
-                "best_epoch": best_epoch,
-            })
-            logger.info("✅ Training complete! Best val_acc: %.4f (epoch %d)", best_acc, best_epoch)
+                # Use detected boxes as prompts for MobileSAM
+                boxes = det_preds[0].boxes.xyxy.cpu().numpy()
 
-            # Post-training evaluation
-            evaluate(model, val_loader, device, config, mlflow)
+                sam_results = sam_model.predict(
+                    str(img_path), bboxes=boxes, verbose=False, device=device
+                )
+
+                # Merge all SAM masks into one binary mask
+                pred_mask = np.zeros((img_h, img_w), dtype=np.uint8)
+                if len(sam_results) > 0 and sam_results[0].masks is not None:
+                    for m in sam_results[0].masks.data:
+                        resized = cv2.resize(
+                            m.cpu().numpy().astype(np.uint8),
+                            (img_w, img_h),
+                            interpolation=cv2.INTER_NEAREST
+                        )
+                        pred_mask = np.maximum(pred_mask, resized)
+
+                ious.append(compute_iou(pred_mask, gt_mask))
+                dices.append(compute_dice(pred_mask, gt_mask))
+
+            # ── Aggregate Metrics ─────────────────────────────────
+            metrics = {
+                "sam_mean_iou": round(float(np.mean(ious)), 4) if ious else 0.0,
+                "sam_mean_dice": round(float(np.mean(dices)), 4) if dices else 0.0,
+                "sam_median_iou": round(float(np.median(ious)), 4) if ious else 0.0,
+                "sam_num_evaluated": len(ious),
+                **det_metrics,
+            }
+            mlflow.log_metrics(metrics)
+
+            logger.info("=" * 40)
+            logger.info("MobileSAM Results:")
+            logger.info("  Mean IoU:  %.4f", metrics["sam_mean_iou"])
+            logger.info("  Mean Dice: %.4f", metrics["sam_mean_dice"])
+            logger.info("  Images:    %d", metrics["sam_num_evaluated"])
+            logger.info("=" * 40)
+
+            # Save detector weights to TRAINED
+            trained_dir = TRAINED / config["experiment"]["name"]
+            trained_dir.mkdir(parents=True, exist_ok=True)
+            if det_best.exists():
+                shutil.copy2(det_best, trained_dir / "detector_best.pt")
 
         duration = time.time() - start_time
-        write_completion_marker(config, best_acc, duration, success=True)
+        write_completion_marker(config, metrics, duration, success=True)
+        logger.info("✅ Pipeline complete in %.1f minutes", duration / 60)
 
     except Exception as e:
         duration = time.time() - start_time
-        write_completion_marker(config, best_acc, duration, success=False, error=str(e))
+        write_completion_marker(config, {}, duration, success=False, error=str(e))
+        logger.error("❌ Pipeline failed: %s", e)
         raise
 
 
