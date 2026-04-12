@@ -130,6 +130,9 @@ def get_all_bronze_paths() -> list:
     """Return list of all bronze category paths."""
     return list(_BRONZE_CATEGORY_PATHS.values())
 
+# Generic backward compatibility alias
+BRONZE = DATA_LAKE / "01_bronze"
+
 SILVER = DATA_LAKE / "02_silver"
 GOLD = DATA_LAKE / "03_gold"
 
