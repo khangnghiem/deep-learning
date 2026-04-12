@@ -25,7 +25,7 @@ training:
   early_stopping_patience: 10
   seed: 42
 mlflow:
-  018_polyp_mobilesam: deep-learning
+  experiment_name: polyp-mobilesam
   run_name: null
 paths:
   data_dir: null

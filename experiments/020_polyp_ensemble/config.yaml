@@ -25,7 +25,7 @@ training:
   early_stopping_patience: 10
   seed: 42
 mlflow:
-  020_polyp_ensemble: deep-learning
+  experiment_name: polyp-ensemble
   run_name: null
 paths:
   data_dir: null

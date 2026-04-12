@@ -25,7 +25,7 @@ training:
   early_stopping_patience: 10
   seed: 42
 mlflow:
-  019_polyp_yolact: deep-learning
+  experiment_name: polyp-yolact
   run_name: null
 paths:
   data_dir: null
