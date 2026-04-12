@@ -1,13 +1,13 @@
-# 003 — Polyp Detection (Mask R-CNN / Detectron2)
+# 016 — Polyp Fast-Diag (YOLO11-seg)
 
-Polyp detection and instance segmentation for colonoscopy images using Mask R-CNN.
+Polyp detection and instance segmentation for colonoscopy images using YOLO11-seg.
 
 ## Architecture
 
-- **Model**: Mask R-CNN R50-FPN (pretrained on COCO, fine-tuned on polyp datasets)
-- **Training format**: COCO JSON (native — matches labeling tool export)
+- **Model**: YOLO11n-seg (pretrained on COCO-seg, fine-tuned on polyp datasets)
+- **Training format**: YOLO segmentation (normalized polygon labels)
 - **Output**: Bounding boxes + segmentation masks + confidence scores
-- **Deployment**: Modal.com serverless GPU (T4)
+- **Deployment**: Modal.com serverless GPU (L4)
 
 ## Datasets (6 polyp datasets, unified)
 

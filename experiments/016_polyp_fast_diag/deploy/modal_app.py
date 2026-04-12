@@ -94,7 +94,7 @@ def process_results(results_list) -> list[list[Detection]]:
                 if len(poly) >= 3:
                     flat = []
                     for px, py in poly:
-                        flat.extend([float(px * w), float(py * h)])
+                        flat.extend([float(px), float(py)])
                     segmentation.append(flat)
 
             detections.append(Detection(
@@ -143,7 +143,7 @@ def infer_gpu_batched(images_b64: list[str]) -> list[dict]:
     
     for detections in batch_detections:
         output.append({
-            "detections": [d.dict() for d in detections],
+            "detections": [d.model_dump() for d in detections],
             "inference_ms": ms_per_image,
             "model_source": "gpu-l4-batched" if os.path.exists(PT_WEIGHTS) else "gpu-fallback-batched",
         })
