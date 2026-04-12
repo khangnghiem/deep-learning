@@ -1,32 +1,17 @@
 experiment:
   name: 020_polyp_ensemble
-  description: Brief description
+  description: Ensemble Evaluation of RT-DETR and MobileSAM
 data:
   dataset: polyp
-  train_split: 0.8
-  val_split: 0.1
-  test_split: 0.1
-  batch_size: 32
-  num_workers: 4
-  silver: null
-  gold:
-    transform: gold.segmentation_gold
-  sources:
-  - name: polyp
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
 model:
   architecture: ensemble
-  pretrained: true
-  num_classes: 10
+  model1_path: /content/drive/MyDrive/models/trained/017_polyp_rtdetr/best.pt
+  model2_path: /content/drive/MyDrive/models/trained/018_polyp_mobilesam/detector_best.pt
 training:
-  epochs: 50
-  learning_rate: 0.001
-  optimizer: adam
-  scheduler: cosine
-  early_stopping_patience: 10
-  seed: 42
+  epochs: 0
 mlflow:
   experiment_name: polyp-ensemble
   run_name: null
 paths:
-  data_dir: null
-  output_dir: null
+  project: /content/drive/MyDrive/models/trained/020_polyp_ensemble
