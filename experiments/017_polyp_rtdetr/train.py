@@ -112,7 +112,8 @@ def main():
             logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
         # ── Ultralytics RT-DETR ───────────────────────────────────
-        from ultralytics import RTDETR
+        from ultralytics import RTDETR, settings
+        settings.update({'mlflow': False})
 
         model_variant = config["model"]["architecture"]  # e.g. "rtdetr-l"
         model = RTDETR(f"{model_variant}.pt")

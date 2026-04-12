@@ -174,7 +174,8 @@ def main():
             logger.info("STAGE 1: Fine-tuning YOLO box detector")
             logger.info("─" * 40)
 
-            from ultralytics import YOLO
+            from ultralytics import YOLO, settings
+            settings.update({'mlflow': False})
 
             box_model_name = config["model"].get("box_detector", "yolo11n-seg")
             detector = YOLO(f"{box_model_name}.pt")
