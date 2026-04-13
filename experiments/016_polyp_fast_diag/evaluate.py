@@ -29,6 +29,12 @@ def main() -> None:
         required=True,
         help="Path to prepared dataset directory (containing dataset.yaml)",
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="",
+        help="Device to use for evaluation (e.g., '0', 'cpu'). Default is auto-detect.",
+    )
     args = parser.parse_args()
 
     print("📊 Polyp Detection — Model Evaluation")
@@ -41,8 +47,12 @@ def main() -> None:
 
     model = YOLO(args.model)
     
-    print("\n📋 Evaluating test split...")
-    results = model.val(data=str(yaml_path.absolute()), split="test")
+    print(f"\n📋 Evaluating test split on device: {args.device or 'auto'}...")
+    results = model.val(
+        data=str(yaml_path.absolute()), 
+        split="test",
+        device=args.device if args.device else None
+    )
     
     print(f"\n✅ mAP50(B): {results.box.map50:.3f}")
     if hasattr(results, 'seg') and results.seg is not None:

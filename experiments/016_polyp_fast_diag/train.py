@@ -99,6 +99,8 @@ def main() -> None:
             data=str(yaml_path.absolute()),
             epochs=args.epochs,
             iterations=args.iterations,
+            batch=args.batch_size,
+            workers=8,  # L4 GPU has plenty of CPU RAM and cores, 8 is optimal
             optimizer='AdamW',
             plots=False,
             save=False,
@@ -114,6 +116,7 @@ def main() -> None:
         data=str(yaml_path.absolute()),
         epochs=args.epochs,
         batch=args.batch_size,
+        workers=8,  # Plenty of resources on L4!
         imgsz=args.img_size,
         project=str(args.output),
         name="run",
