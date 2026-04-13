@@ -8,13 +8,13 @@ data:
   num_workers: 8
   imgsz: 640
 model:
-  architecture: yolo11n-seg
+  architecture: yolo11s-seg
   pretrained: true
   num_classes: 1
 training:
-  epochs: 50
+  epochs: 100
   learning_rate: 0.001
-  patience: 10
+  patience: 20
   seed: 42
 mlflow:
   experiment_name: polyp-yolact
