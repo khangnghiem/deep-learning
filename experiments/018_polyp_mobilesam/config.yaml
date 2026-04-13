@@ -5,7 +5,7 @@ data:
   dataset: polyp
   dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
   batch_size: 1
-  num_workers: 4
+  num_workers: 8
   imgsz: 640
 model:
   architecture: mobilesam
