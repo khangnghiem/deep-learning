@@ -8,8 +8,9 @@ model:
   architecture: rtdetr-x
 training:
   epochs: 50
-  learning_rate: 0.001
+  learning_rate: 0.0001
   patience: 15
+  amp: false
 mlflow:
   experiment_name: polyp-rfdetr
 paths:

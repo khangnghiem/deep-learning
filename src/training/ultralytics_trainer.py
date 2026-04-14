@@ -26,6 +26,7 @@ def train_with_tta(cfg_path='config.yaml'):
             name='train',
             patience=cfg['training'].get('patience', 15),
             lr0=cfg['training'].get('learning_rate', 0.001),
+            amp=cfg['training'].get('amp', True),
             exist_ok=True
         )
         
