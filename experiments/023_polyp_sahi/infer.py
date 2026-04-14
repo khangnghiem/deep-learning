@@ -33,6 +33,8 @@ def run_sahi():
     
     print(f"Running SAHI inference on {len(test_img_paths)} images...")
     for i, test_img in enumerate(test_img_paths):
+        if i > 0 and i % 50 == 0:
+            print(f"Processed {i}/{len(test_img_paths)}")
         result = get_sliced_prediction(
             test_img,
             model,
