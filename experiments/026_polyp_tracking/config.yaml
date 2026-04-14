@@ -1,0 +1,16 @@
+experiment:
+  name: 022_polyp_yolov12x
+data:
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  batch_size: 16
+  imgsz: 640
+model:
+  architecture: yolo11x
+training:
+  epochs: 50
+  learning_rate: 0.001
+  patience: 15
+mlflow:
+  experiment_name: polyp-yolo11x
+paths:
+  project: /content/drive/MyDrive/models/trained/022_polyp_yolov12x

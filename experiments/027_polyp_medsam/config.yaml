@@ -1,0 +1,25 @@
+experiment:
+  name: 018_polyp_mobilesam
+  description: MobileSAM zero-shot polyp segmentation with YOLO box proposals
+data:
+  dataset: polyp
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  batch_size: 1
+  num_workers: 8
+  imgsz: 640
+model:
+  architecture: mobilesam
+  box_detector: yolo11n-seg
+  pretrained: true
+  num_classes: 1
+training:
+  # MobileSAM is zero-shot; we do box-detector finetuning + SAM evaluation
+  detector_epochs: 25
+  epochs: 0
+  learning_rate: 0.001
+  seed: 42
+mlflow:
+  experiment_name: polyp-mobilesam
+  run_name: null
+paths:
+  project: /content/drive/MyDrive/models/trained/018_polyp_mobilesam
