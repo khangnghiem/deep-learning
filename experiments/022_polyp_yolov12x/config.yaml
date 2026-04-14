@@ -11,6 +11,6 @@ training:
   learning_rate: 0.001
   patience: 15
 mlflow:
-  experiment_name: polyp-sota
+  experiment_name: polyp-yolo11x
 paths:
   project: /content/drive/MyDrive/models/trained/022_polyp_yolov12x
