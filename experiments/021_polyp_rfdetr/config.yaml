@@ -1,0 +1,16 @@
+experiment:
+  name: 021_polyp_rfdetr
+data:
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  batch_size: 16
+  imgsz: 640
+model:
+  architecture: rtdetr-x
+training:
+  epochs: 50
+  learning_rate: 0.001
+  patience: 15
+mlflow:
+  experiment_name: polyp-sota
+paths:
+  project: /content/drive/MyDrive/models/trained/021_polyp_rfdetr
