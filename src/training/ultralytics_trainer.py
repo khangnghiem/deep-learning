@@ -33,5 +33,10 @@ def train_with_tta(cfg_path='config.yaml'):
         best_model = ModelClass(best_weights)
         val_res = best_model.val(data=cfg['data']['dataset_yaml'], augment=True)
         if hasattr(val_res, 'results_dict'):
-            metrics = {f"tta_{k}": v for k, v in val_res.results_dict.items() if isinstance(v, (int, float))}
+            import re
+            metrics = {}
+            for k, v in val_res.results_dict.items():
+                if isinstance(v, (int, float)):
+                    safe_key = re.sub(r'[^a-zA-Z0-9_\\-\\.\\s:/]', '_', f"tta_{k}")
+                    metrics[safe_key] = v
             mlflow.log_metrics(metrics)
