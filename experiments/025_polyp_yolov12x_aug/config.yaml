@@ -1,0 +1,19 @@
+experiment:
+  name: 025_polyp_yolov12x_aug
+data:
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/ldpolypvideo_yolo/dataset.yaml
+  batch_size: 16
+  imgsz: 640
+model:
+  architecture: yolo11x
+training:
+  epochs: 50
+  learning_rate: 0.001
+  patience: 15
+  mosaic: 1.0
+  mixup: 0.1
+  copy_paste: 0.2
+mlflow:
+  experiment_name: polyp-yolo11x-aug
+paths:
+  project: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug
