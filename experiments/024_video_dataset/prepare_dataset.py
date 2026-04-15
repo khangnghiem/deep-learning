@@ -42,7 +42,7 @@ def convert_to_yolo_bbox(bbox, img_w, img_h):
 def prepare_dataset(val_split=0.2, seed=42):
     random.seed(seed)
     
-    silver_dir = SILVER / 'polyp' / 'ldpolypvideo'
+    silver_dir = SILVER.parent / '01_silver' / 'polyp' / 'ldpolypvideo'
     gold_dir = GOLD / 'ldpolypvideo_yolo'
     
     if not silver_dir.exists():
