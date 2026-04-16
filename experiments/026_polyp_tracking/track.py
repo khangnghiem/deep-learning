@@ -19,7 +19,7 @@ def track_videos(cfg_path='config.yaml'):
     # We can use predict() or track() over the directory.
     print(f"Tracking using {cfg['model']['tracker']}...")
     val_res = model.track(
-        source=os.path.join(cfg['data']['test_videos_dir'], 'images'),
+        source=cfg['data']['test_videos_dir'],
         tracker=cfg['model']['tracker'],
         conf=cfg['tracking']['conf'],
         iou=cfg['tracking']['iou'],
