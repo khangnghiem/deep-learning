@@ -9,8 +9,11 @@ def train_with_tta(cfg_path='config.yaml'):
         
     settings.update({'mlflow': False, 'wandb': False})
     
-    ModelClass = YOLO if 'yolo' in cfg['model']['architecture'] else RTDETR
-    model = ModelClass(f"{cfg['model']['architecture']}.pt")
+    arch = cfg['model']['architecture']
+    ModelClass = YOLO if 'yolo' in arch.lower() else RTDETR
+    if not arch.endswith('.pt') and not arch.endswith('.yaml'):
+        arch = f"{arch}.pt"
+    model = ModelClass(arch)
     
     mlflow = setup_mlflow()
     mlflow.set_experiment(cfg['mlflow']['experiment_name'])
@@ -27,6 +30,7 @@ def train_with_tta(cfg_path='config.yaml'):
             patience=cfg['training'].get('patience', 15),
             lr0=cfg['training'].get('learning_rate', 0.001),
             amp=cfg['training'].get('amp', True),
+            resume=cfg['training'].get('resume', False),
             exist_ok=True
         )
         

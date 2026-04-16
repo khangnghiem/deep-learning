@@ -5,9 +5,10 @@ data:
   batch_size: 16
   imgsz: 640
 model:
-  architecture: yolo11x
+  architecture: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/last.pt
 training:
   epochs: 50
+  resume: True
   learning_rate: 0.001
   patience: 15
   mosaic: 1.0
