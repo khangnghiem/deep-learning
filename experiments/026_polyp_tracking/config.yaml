@@ -1,0 +1,18 @@
+experiment:
+  name: 026_polyp_tracking
+
+data:
+  test_videos_dir: /content/drive/MyDrive/data_lake/03_gold/ldpolypvideo_yolo/test
+  output_dir: /content/drive/MyDrive/models/tracked/026_polyp_tracking
+
+model:
+  # The model to use for tracking must be the trained YOLO weights from 025
+  weights: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/best.pt
+  tracker: bytetrack.yaml # options: bytetrack.yaml or botsort.yaml
+
+tracking:
+  conf: 0.25
+  iou: 0.45
+  show: False
+  save: True
+  save_txt: True
