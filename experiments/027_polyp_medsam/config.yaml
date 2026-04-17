@@ -1,0 +1,19 @@
+experiment:
+  name: 027_polyp_medsam
+  description: MedSAM Domain Adaptation via parameter-efficient fine-tuning
+data:
+  dataset: polyp
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  batch_size: 4
+  num_workers: 8
+model:
+  architecture: wanglab/medsam-vit-b
+training:
+  epochs: 10
+  learning_rate: 1.0e-4
+  seed: 42
+mlflow:
+  experiment_name: polyp-medsam
+  run_name: null
+paths:
+  output_dir: /content/drive/MyDrive/models/trained/027_polyp_medsam
