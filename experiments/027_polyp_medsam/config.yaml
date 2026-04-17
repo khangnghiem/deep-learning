@@ -7,7 +7,7 @@ data:
   batch_size: 4
   num_workers: 8
 model:
-  architecture: wanglab/medsam-vit-b
+  architecture: flaviagiammarino/medsam-vit-base
 training:
   epochs: 10
   learning_rate: 1.0e-4
