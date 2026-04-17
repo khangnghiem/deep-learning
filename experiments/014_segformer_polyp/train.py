@@ -141,7 +141,7 @@ def main():
             train_loss = 0.0
             train_dice = 0.0
             
-            pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs} [Train]")
+            pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs} [Train]", leave=False, unit="batch")
             for images, masks in pbar:
                 images, masks = images.to(device), masks.to(device)
                 
@@ -179,7 +179,7 @@ def main():
             val_iou = 0.0
             
             with torch.no_grad():
-                pbar_val = tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Val]")
+                pbar_val = tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Val]", leave=False, unit="batch")
                 for images, masks in pbar_val:
                     images, masks = images.to(device), masks.to(device)
                     
