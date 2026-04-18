@@ -611,11 +611,13 @@ def _download_torchvision(name, info, bronze_dir):
 def _download_kaggle(name, info, landing_dir, bronze_dir):
     """Download from Kaggle datasets or competitions."""
     import subprocess
+    from src.data.kaggle import _validate_kaggle_id
     
     kaggle_id = info["kaggle_id"]
     
     if kaggle_id.startswith("competitions/"):
         comp = kaggle_id.replace("competitions/", "")
+        _validate_kaggle_id(comp)
         result = subprocess.run(
             ["kaggle", "competitions", "download", "-c", comp, "-p", str(landing_dir)],
             capture_output=True, text=True
@@ -629,6 +631,7 @@ def _download_kaggle(name, info, landing_dir, bronze_dir):
             print(f"  ⚠️  Kaggle download failed: {output[:200]}")
             return False
     else:
+        _validate_kaggle_id(kaggle_id)
         result = subprocess.run(
             ["kaggle", "datasets", "download", "-d", kaggle_id, "-p", str(landing_dir)],
             capture_output=True, text=True
