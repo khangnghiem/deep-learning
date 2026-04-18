@@ -2,7 +2,7 @@ experiment:
   name: 026_polyp_tracking
 
 data:
-  test_videos_dir: /content/drive/MyDrive/data_lake/03_gold/ldpolypvideo_yolo/images/test
+  test_videos_dir: /content/drive/MyDrive/data_lake/03_gold/ldpolypvideo_yolo/images/val
   output_dir: /content/drive/MyDrive/models/tracked/026_polyp_tracking
 
 model:
