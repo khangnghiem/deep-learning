@@ -109,8 +109,9 @@ class YOLOToSAMDataset(Dataset):
         inputs = self.processor(image, input_boxes=[[[prompt_box]]], return_tensors="pt")
         inputs = {k: v.squeeze(0) for k, v in inputs.items()}
         
-        # Add labels
-        inputs["ground_truth_mask"] = torch.tensor(gt_mask, dtype=torch.float32).unsqueeze(0)
+        # Add labels (resize to 256x256 to allow batch stacking and match SAM pred_masks shape)
+        gt_mask_resized = cv2.resize(gt_mask, (256, 256), interpolation=cv2.INTER_NEAREST)
+        inputs["ground_truth_mask"] = torch.tensor(gt_mask_resized, dtype=torch.float32).unsqueeze(0)
         return inputs
 
 def collate_fn(batch):
@@ -202,12 +203,8 @@ def main():
                 # Output logits shape: (B, 1, 1, H, W). Squeeze the extra dim.
                 pred_masks = outputs.pred_masks.squeeze(1) # now (B, 1, H, W)
                 
-                # Resize pred_masks to original mask size if needed.
-                # Sam processor handles target size inside the model, pred_masks are 256x256
-                # We need to compute loss against 256x256 GT for efficiency or interpolate pred
-                gt_resized = F.interpolate(gt, size=pred_masks.shape[-2:], mode="nearest")
-
-                loss = seg_loss(pred_masks, gt_resized)
+                # We resized GT to 256x256 in __getitem__, matching pred_masks shape.
+                loss = seg_loss(pred_masks, gt)
                 
                 optimizer.zero_grad()
                 loss.backward()
@@ -229,8 +226,7 @@ def main():
                     
                     outputs = model(pixel_values=pixel_values, input_boxes=input_boxes, multimask_output=False)
                     pred_masks = outputs.pred_masks.squeeze(1)
-                    gt_resized = F.interpolate(gt, size=pred_masks.shape[-2:], mode="nearest")
-                    v_loss = seg_loss(pred_masks, gt_resized)
+                    v_loss = seg_loss(pred_masks, gt)
                     val_loss += v_loss.item()
             
             avg_val_loss = val_loss / len(val_loader)
