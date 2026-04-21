@@ -76,10 +76,11 @@ def main():
                 sam_results = sam_model(img, bboxes=box.tolist(), points=neg_pts, labels=labels, verbose=False)[0]
                 if sam_results.masks is not None:
                     mask_data = sam_results.masks.data.cpu().numpy()
-                    if mask_data.ndim == 3: mask_data = mask_data[0]
-                    if mask_data.shape != (h, w):
-                        mask_data = cv2.resize(mask_data.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
-                    pred_mask = np.logical_or(pred_mask, mask_data > 0).astype(np.uint8)
+                    if mask_data.size > 0:
+                        if mask_data.ndim == 3: mask_data = mask_data[0]
+                        if mask_data.shape != (h, w):
+                            mask_data = cv2.resize(mask_data.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
+                        pred_mask = np.logical_or(pred_mask, mask_data > 0).astype(np.uint8)
             
             # Post-processing: Morphological Closing
             pred_mask = cv2.morphologyEx(pred_mask, cv2.MORPH_CLOSE, kernel)

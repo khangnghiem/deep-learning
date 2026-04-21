@@ -60,9 +60,10 @@ def main():
                 res1 = sam_model(img, bboxes=box.tolist(), verbose=False)[0]
                 if res1.masks is not None:
                     md1 = res1.masks.data.cpu().numpy()
-                    if md1.ndim == 3: md1 = md1[0]
-                    if md1.shape != (h, w): md1 = cv2.resize(md1.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
-                    mask1 = (md1 > 0).astype(np.uint8)
+                    if md1.size > 0:
+                        if md1.ndim == 3: md1 = md1[0]
+                        if md1.shape != (h, w): md1 = cv2.resize(md1.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
+                        mask1 = (md1 > 0).astype(np.uint8)
                 
                 # inference 2: horizontal flip
                 img_flipped = cv2.flip(img, 1)
@@ -71,9 +72,10 @@ def main():
                 res2 = sam_model(img_flipped, bboxes=box_flipped, verbose=False)[0]
                 if res2.masks is not None:
                     md2 = res2.masks.data.cpu().numpy()
-                    if md2.ndim == 3: md2 = md2[0]
-                    if md2.shape != (h, w): md2 = cv2.resize(md2.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
-                    mask2 = cv2.flip((md2 > 0).astype(np.uint8), 1)
+                    if md2.size > 0:
+                        if md2.ndim == 3: md2 = md2[0]
+                        if md2.shape != (h, w): md2 = cv2.resize(md2.astype(np.float32), (w, h), interpolation=cv2.INTER_NEAREST)
+                        mask2 = cv2.flip((md2 > 0).astype(np.uint8), 1)
 
                 # Union of the two TTA inferences
                 combined = np.logical_or(mask1, mask2).astype(np.uint8)
