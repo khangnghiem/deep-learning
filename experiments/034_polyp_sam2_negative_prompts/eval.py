@@ -68,12 +68,13 @@ def main():
         pred_mask = np.zeros((h, w), dtype=np.uint8)
         if len(boxes) > 0:
             for box in boxes:
-                # Calculate negative background points
-                neg_pts = get_negative_points(box, 0.15, h, w)
-                labels = [0, 0, 0, 0] # 0 = negative prompt
+                # Pass point-only sequence: center (positive) + corners (negative)
+                x1, y1, x2, y2 = box.tolist()
+                cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+                all_pts = [[cx, cy]] + neg_pts
+                labels = [1, 0, 0, 0, 0] # 1 positive, 4 negative
 
-                # Pass bbox + negative points to SAM2
-                sam_results = sam_model(img, bboxes=box.tolist(), points=neg_pts, labels=labels, verbose=False)[0]
+                sam_results = sam_model(img, bboxes=None, points=all_pts, labels=labels, verbose=False)[0]
                 if sam_results.masks is not None:
                     mask_data = sam_results.masks.data.cpu().numpy()
                     if mask_data.size > 0:
