@@ -1,0 +1,24 @@
+# Base requirements for all deep learning experiments
+# Colab already has torch/torchvision installed — these are extras.
+#
+# Usage in Colab:
+#   %pip install -q -r requirements.txt
+#
+# Add experiment-specific packages below the base section.
+
+# =============================================================================
+# BASE (required for all experiments)
+# =============================================================================
+mlflow
+pyyaml
+tqdm
+albumentations
+
+# =============================================================================
+# EXPERIMENT-SPECIFIC (add your extras here)
+# =============================================================================
+# segmentation-models-pytorch  # for UNet, FPN, etc.
+# transformers                 # for HuggingFace models
+# timm                         # for vision transformers
+# opencv-python-headless       # for image processing
+# scikit-learn                 # for evaluation metrics

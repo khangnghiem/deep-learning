@@ -1,0 +1,23 @@
+experiment:
+  name: 038_polyp_sam2_adaptive_morphology
+  description: YOLOv12x (TTA) + SAM2 + Adaptive Scale Morphology
+
+data:
+  dataset: polyp
+  dataset_yaml: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/dataset.yaml
+  test_images_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/images
+  test_labels_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/labels
+
+model:
+  yolo_weights: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/best.pt
+  sam_weights: sam2_b.pt # Ultralytics automatically downloads SAM2-base if needed
+
+evaluation:
+  conf_threshold: 0.25 # minimum YOLO confidence to pass boxes to SAM2
+
+mlflow:
+  experiment_name: polyp-sam2-adaptive-morph
+  run_name: null
+
+paths:
+  output_dir: /content/drive/MyDrive/models/trained/038_polyp_sam2_adaptive_morphology
