@@ -23,6 +23,7 @@ def yolo_to_mask(label_path, h, w):
     return mask
 
 def get_feedback_points(mask):
+    mask = mask * 255
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not contours:
         return []

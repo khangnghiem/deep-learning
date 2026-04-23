@@ -23,6 +23,7 @@ def yolo_to_mask(label_path, h, w):
     return mask
 
 def refine_watershed(img, mask, kernel_size=11):
+    mask = mask * 255
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
     
     # Noise removal
