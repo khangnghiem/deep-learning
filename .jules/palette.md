@@ -1,0 +1,3 @@
+## 2024-04-25 - Prevent Terminal Clutter with tqdm
+**Learning:** Progress bars using `tqdm` that iterate over individual batches can cause significant terminal or notebook output clutter, leading to readability and scrolling issues during training epochs.
+**Action:** Always append `leave=False` and `unit="batch"` to `tqdm` progress bars during training and validation loops to keep the terminal output clean and clear.
