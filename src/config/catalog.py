@@ -13,6 +13,9 @@ Usage:
 
 import sys
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 import zipfile
 import tarfile
 import urllib.request
@@ -41,11 +44,11 @@ def with_retry(max_retries=MAX_RETRIES, delay=RETRY_DELAY):
                     last_exception = e
                     if attempt < max_retries - 1:
                         wait_time = delay * (2 ** attempt)
-                        print(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed: {str(e)[:80]}")
-                        print(f"     Retrying in {wait_time}s...")
+                        logger.error(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed: {str(e)[:80]}")
+                        logger.info(f"     Retrying in {wait_time}s...")
                         time.sleep(wait_time)
                     else:
-                        print(f"  ❌ All {max_retries} attempts failed: {str(e)[:100]}")
+                        logger.error(f"  ❌ All {max_retries} attempts failed: {str(e)[:100]}")
             return None  # All retries failed
         return wrapper
     return decorator
@@ -442,9 +445,9 @@ TOTAL_DATASETS = len(DATASETS)
 
 def list_datasets(category=None):
     """List all or filtered datasets."""
-    print(f"\n{'='*70}")
-    print(f"Deep Learning Dataset Catalog - {TOTAL_DATASETS} Datasets")
-    print(f"{'='*70}\n")
+    logger.info(f"\n{'='*70}")
+    logger.info(f"Deep Learning Dataset Catalog - {TOTAL_DATASETS} Datasets")
+    logger.info(f"{'='*70}\n")
     
     categories = {}
     for name, info in DATASETS.items():
@@ -457,21 +460,21 @@ def list_datasets(category=None):
         if category and cat != category:
             continue
         datasets = categories[cat]
-        print(f"\n## {cat.upper()} ({len(datasets)} datasets)")
-        print("-" * 50)
+        logger.info(f"\n## {cat.upper()} ({len(datasets)} datasets)")
+        logger.info("-" * 50)
         for name, info in sorted(datasets):
             size = info.get("size", "?")
             source = info.get("source", "?")
             classes = info.get("classes", "")
             cls_str = f" ({classes} classes)" if classes else ""
-            print(f"  {name:25} {size:>8}  [{source}]{cls_str}")
+            logger.info(f"  {name:25} {size:>8}  [{source}]{cls_str}")
 
 
 def download_dataset(name: str):
     """Download a specific dataset."""
     if name not in DATASETS:
-        print(f"Unknown dataset: {name}")
-        print("Use --list to see available datasets")
+        logger.info(f"Unknown dataset: {name}")
+        logger.info("Use --list to see available datasets")
         return False
     
     info = DATASETS[name]
@@ -482,13 +485,13 @@ def download_dataset(name: str):
     
     # Skip if exists and has content
     if bronze_dir.exists() and any(bronze_dir.iterdir()):
-        print(f"⏭️  {name} already exists in {category}, skipping...")
+        logger.info(f"⏭️  {name} already exists in {category}, skipping...")
         return "skipped"
     
     # Only create landing dir upfront (bronze created after success)
     landing_dir.mkdir(parents=True, exist_ok=True)
     
-    print(f"Downloading {name} ({info.get('size', '?')}) via {source}...")
+    logger.info(f"Downloading {name} ({info.get('size', '?')}) via {source}...")
     
     # Track success for proper cleanup
     success = False
@@ -517,32 +520,32 @@ def download_dataset(name: str):
             bronze_dir.mkdir(parents=True, exist_ok=True)
             success = _download_sklearn(name, info, bronze_dir)
         else:
-            print(f"⚠️  Unknown source: {source}")
+            logger.warning(f"⚠️  Unknown source: {source}")
             return False
     except Exception as e:
-        print(f"❌ Error downloading {name}: {e}")
+        logger.error(f"❌ Error downloading {name}: {e}")
         success = False
     
     # Cleanup empty directories on failure
     if not success:
         _cleanup_empty_dir(bronze_dir)
         _cleanup_empty_dir(landing_dir)
-        print(f"❌ {name} download failed")
+        logger.error(f"❌ {name} download failed")
         return False
     
     # Verify bronze has content
     if bronze_dir.exists() and any(bronze_dir.iterdir()):
-        print(f"✅ {name} ingested to {bronze_dir}")
+        logger.info(f"✅ {name} ingested to {bronze_dir}")
         # Keep MANIFEST.json in sync
         try:
             from src.config.manifest import update_manifest_entry
             update_manifest_entry(name, category, bronze_dir)
         except Exception as e:
-            print(f"⚠️  MANIFEST update skipped: {e}")
+            logger.warning(f"⚠️  MANIFEST update skipped: {e}")
         return True
     else:
         _cleanup_empty_dir(bronze_dir)
-        print(f"⚠️  {name} completed but no files in bronze")
+        logger.warning(f"⚠️  {name} completed but no files in bronze")
         return False
 
 
@@ -577,7 +580,7 @@ def _download_torchvision(name, info, bronze_dir):
     }
     
     if name not in dataset_map:
-        print(f"  ⚠️  No torchvision loader for {name}")
+        logger.warning(f"  ⚠️  No torchvision loader for {name}")
         return
     
     try:
@@ -601,8 +604,8 @@ def _download_torchvision(name, info, bronze_dir):
         return True
     except RuntimeError as e:
         if "File not found or corrupted" in str(e):
-            print(f"  ❌ Download failed: Server unavailable or file corrupted")
-            print(f"     This is a known issue with {name}. Try again later or download manually.")
+            logger.error(f"  ❌ Download failed: Server unavailable or file corrupted")
+            logger.info(f"     This is a known issue with {name}. Try again later or download manually.")
             return False
         else:
             raise
@@ -622,11 +625,11 @@ def _download_kaggle(name, info, landing_dir, bronze_dir):
         )
         output = result.stdout + result.stderr
         if "401" in output or "403" in output or "Unauthorized" in output or "Forbidden" in output:
-            print(f"  ⚠️  Competition requires rule acceptance. Visit:")
-            print(f"     https://www.kaggle.com/c/{comp}/rules")
+            logger.warning(f"  ⚠️  Competition requires rule acceptance. Visit:")
+            logger.info(f"     https://www.kaggle.com/c/{comp}/rules")
             return False
         elif result.returncode != 0:
-            print(f"  ⚠️  Kaggle download failed: {output[:200]}")
+            logger.error(f"  ⚠️  Kaggle download failed: {output[:200]}")
             return False
     else:
         result = subprocess.run(
@@ -635,15 +638,15 @@ def _download_kaggle(name, info, landing_dir, bronze_dir):
         )
         output = result.stdout + result.stderr
         if "401" in output or "403" in output:
-            print(f"  ⚠️  Dataset access denied: {output[:100]}")
+            logger.warning(f"  ⚠️  Dataset access denied: {output[:100]}")
             return False
         elif result.returncode != 0:
-            print(f"  ⚠️  Kaggle download failed: {output[:200]}")
+            logger.error(f"  ⚠️  Kaggle download failed: {output[:200]}")
             return False
         # Show download progress from stdout
         if result.stdout:
             for line in result.stdout.strip().split('\n')[-3:]:
-                print(f"  {line}")
+                logger.info(f"  {line}")
     
     # Extract zips
     extracted = False
@@ -686,8 +689,8 @@ def _download_huggingface(name, info, bronze_dir):
     # Get token for authenticated datasets
     token = _get_hf_token() if requires_auth else None
     if requires_auth and not token:
-        print(f"⚠️  {name} requires HuggingFace authentication.")
-        print("   Set HF_TOKEN env var or copy token to ~/.cache/huggingface/token")
+        logger.warning(f"⚠️  {name} requires HuggingFace authentication.")
+        logger.info("   Set HF_TOKEN env var or copy token to ~/.cache/huggingface/token")
         return False
     
     kwargs = {
@@ -705,19 +708,19 @@ def _download_huggingface(name, info, bronze_dir):
     except ValueError as e:
         # Handle "Config name is missing" error
         if "Config name is missing" in str(e) or "config" in str(e).lower():
-            print(f"  ⚠️  {hf_id} requires a config name, trying to find one...")
+            logger.warning(f"  ⚠️  {hf_id} requires a config name, trying to find one...")
             try:
                 configs = get_dataset_config_names(hf_id)
                 if configs:
                     # Try first available config
                     default_config = configs[0]
-                    print(f"  📋 Found configs: {configs[:5]}...")
-                    print(f"  ➡️  Using config: {default_config}")
+                    logger.info(f"  📋 Found configs: {configs[:5]}...")
+                    logger.info(f"  ➡️  Using config: {default_config}")
                     load_dataset(hf_id, default_config, **kwargs)
                 else:
                     raise e
             except Exception as inner_e:
-                print(f"  ❌ Could not find valid config: {inner_e}")
+                logger.error(f"  ❌ Could not find valid config: {inner_e}")
                 raise e
         else:
             raise e
@@ -731,7 +734,7 @@ def _download_url(name, info, landing_dir, bronze_dir):
     filepath = landing_dir / filename
     
     if not filepath.exists():
-        print(f"  Downloading from {url}...")
+        logger.info(f"  Downloading from {url}...")
         urllib.request.urlretrieve(url, filepath)
     
     # Extract
@@ -751,7 +754,7 @@ def _download_uci(name, info, bronze_dir):
     try:
         from ucimlrepo import fetch_ucirepo
     except ImportError:
-        print("  ⚠️  Install ucimlrepo: pip install ucimlrepo")
+        logger.warning("  ⚠️  Install ucimlrepo: pip install ucimlrepo")
         return False
     
     import json
@@ -785,7 +788,7 @@ def _download_tfds(name, info, bronze_dir):
     try:
         import tensorflow_datasets as tfds
     except ImportError:
-        print("  ⚠️  Install tensorflow-datasets: pip install tensorflow-datasets")
+        logger.warning("  ⚠️  Install tensorflow-datasets: pip install tensorflow-datasets")
         return False
     
     tfds.load(info["tfds_id"], data_dir=str(bronze_dir), download=True)
@@ -798,7 +801,7 @@ def _download_openml(name, info, bronze_dir):
     try:
         import openml
     except ImportError:
-        print("  ⚠️  Install openml: pip install openml")
+        logger.warning("  ⚠️  Install openml: pip install openml")
         return
     
     dataset = openml.datasets.get_dataset(info["openml_id"])
@@ -848,7 +851,7 @@ def download_small():
     """Download all datasets under 500MB."""
     small = [n for n, i in DATASETS.items() 
              if _parse_size(i.get("size", "0")) < 500]
-    print(f"Downloading {len(small)} small datasets (<500MB)...")
+    logger.info(f"Downloading {len(small)} small datasets (<500MB)...")
     for name in small:
         download_dataset(name)
 
@@ -866,10 +869,11 @@ def _parse_size(size_str):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     if len(sys.argv) < 2 or sys.argv[1] == "--list":
         category = sys.argv[2] if len(sys.argv) > 2 else None
         list_datasets(category)
-        print(f"\nTotal: {TOTAL_DATASETS} datasets")
+        logger.info(f"\nTotal: {TOTAL_DATASETS} datasets")
     elif sys.argv[1] == "--all-small":
         download_small()
     else:

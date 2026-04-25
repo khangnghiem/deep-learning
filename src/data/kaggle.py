@@ -20,6 +20,9 @@ Usage:
 """
 
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 import subprocess
 from pathlib import Path
 import sys
@@ -89,7 +92,7 @@ def download_dataset(
     if unzip:
         cmd.append("--unzip")
     
-    print(f"Downloading {dataset} to {output_dir}")
+    logger.info(f"Downloading {dataset} to {output_dir}")
     subprocess.run(cmd, check=True)
     
     return output_dir
@@ -128,7 +131,7 @@ def download_competition(
     if unzip:
         cmd.append("--unzip")
     
-    print(f"Downloading {competition} to {output_dir}")
+    logger.info(f"Downloading {competition} to {output_dir}")
     subprocess.run(cmd, check=True)
     
     return output_dir
@@ -146,9 +149,10 @@ def list_popular_competitions() -> list[str]:
 
 
 if __name__ == "__main__":
-    print("Checking Kaggle authentication...")
+    logging.basicConfig(level=logging.INFO)
+    logger.info("Checking Kaggle authentication...")
     try:
         check_kaggle_auth()
-        print("✓ Kaggle API configured")
+        logger.info("✓ Kaggle API configured")
     except FileNotFoundError as e:
-        print(f"✗ {e}")
+        logger.info(f"✗ {e}")

@@ -14,6 +14,9 @@ Usage:
 
 import sys
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -79,8 +82,8 @@ try:
             cf = yaml.safe_load(f)
             if cf and "data" in cf and "root" in cf["data"]:
                 data_lake_root = cf["data"]["root"]
-except Exception:
-    pass
+except Exception as e:
+    logger.debug(f"Failed to load data_lake_root from config: {e}")
 
 if "DATA_LAKE_DIR" in os.environ:
     data_lake_root = os.environ["DATA_LAKE_DIR"]
@@ -190,6 +193,7 @@ def get_env_info() -> dict:
     }
 
 if __name__ == "__main__":
-    print("Environment Configuration:")
+    logging.basicConfig(level=logging.INFO)
+    logger.info("Environment Configuration:")
     for k, v in get_env_info().items():
-        print(f"  {k}: {v}")
+        logger.info(f"  {k}: {v}")
