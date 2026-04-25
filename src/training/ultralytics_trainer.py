@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 import yaml
 import re
 from ultralytics import RTDETR, YOLO, settings
@@ -34,7 +37,7 @@ def train_with_tta(cfg_path='config.yaml'):
             exist_ok=True
         )
         
-        print("Running TTA Validation...")
+        logger.info("Running TTA Validation...")
         best_weights = f"{cfg['paths']['project']}/train/weights/best.pt"
         best_model = ModelClass(best_weights)
         val_res = best_model.val(data=cfg['data']['dataset_yaml'], augment=True)

@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 """
 HuggingFace Datasets Helper
 
@@ -98,6 +101,7 @@ def get_image_classification_datasets() -> dict:
 
 
 if __name__ == "__main__":
-    print("Popular datasets:")
+    logging.basicConfig(level=logging.INFO)
+    logger.info("Popular datasets:")
     for ds in list_popular_datasets():
-        print(f"  - {ds}")
+        logger.info(f"  - {ds}")
