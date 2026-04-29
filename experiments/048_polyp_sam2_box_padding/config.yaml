@@ -1,0 +1,13 @@
+experiment:
+  name: 048_polyp_sam2_box_padding
+  description: SAM2 + Bounding Box Padding (10%)
+data:
+  test_images_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/images
+  test_labels_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/labels
+model:
+  yolo_weights: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/best.pt
+  sam_weights: sam2_b.pt
+evaluation:
+  conf_threshold: 0.40
+paths:
+  output_dir: /content/drive/MyDrive/models/trained/048_polyp_sam2_box_padding
