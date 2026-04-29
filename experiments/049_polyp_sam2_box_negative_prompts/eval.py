@@ -65,7 +65,8 @@ def main():
                 ]
                 labels = [0, 0, 0, 0] # 0 = background
                 
-                res = sam_model(img, bboxes=box.tolist(), points=pts, labels=labels, verbose=False)[0]
+                # Wrap in extra list to match batch dimension of 1 box
+                res = sam_model(img, bboxes=box.tolist(), points=[pts], labels=[labels], verbose=False)[0]
                 pred_mask = np.logical_or(pred_mask, extract_mask(res, h, w)).astype(np.uint8)
 
         
