@@ -1,0 +1,13 @@
+experiment:
+  name: 052_polyp_sam2_grid_points
+  description: SAM2 + 3x3 Grid Positive Prompts
+data:
+  test_images_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/images
+  test_labels_dir: /content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset/test/labels
+model:
+  yolo_weights: /content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/best.pt
+  sam_weights: sam2_b.pt
+evaluation:
+  conf_threshold: 0.40
+paths:
+  output_dir: /content/drive/MyDrive/models/trained/052_polyp_sam2_grid_points
