@@ -110,7 +110,7 @@ def get_dataloaders(config):
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0
-    for inputs, targets in tqdm(loader, desc="Training"):
+    for inputs, targets in tqdm(loader, desc="Training", leave=False, unit="batch"):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
         outputs = model(inputs)
@@ -128,7 +128,7 @@ def validate(model, loader, criterion, device):
     model.eval()
     total_loss, correct, total = 0, 0, 0
     with torch.no_grad():
-        for inputs, targets in tqdm(loader, desc="Validating"):
+        for inputs, targets in tqdm(loader, desc="Validating", leave=False, unit="batch"):
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -162,7 +162,7 @@ def evaluate(model, val_loader, device, config, mlflow):
     model.eval()
     all_preds, all_labels = [], []
     with torch.no_grad():
-        for inputs, targets in tqdm(val_loader, desc="Evaluating"):
+        for inputs, targets in tqdm(val_loader, desc="Evaluating", leave=False, unit="batch"):
             preds = model(inputs.to(device)).argmax(1).cpu()
             all_preds.append(preds)
             all_labels.append(targets)
