@@ -1,3 +1,4 @@
+from typing import Optional
 """
 Custom loss functions.
 
@@ -28,7 +29,7 @@ class FocalLoss(nn.Module):
     def __init__(
         self,
         gamma: float = 2.0,
-        alpha: torch.Tensor = None,
+        alpha: Optional[torch.Tensor] = None,
         reduction: str = "mean"
     ):
         super().__init__()

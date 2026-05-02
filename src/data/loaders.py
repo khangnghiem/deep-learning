@@ -77,7 +77,7 @@ def create_dataloaders(
 def get_class_weights(
     dataset: Dataset,
     num_classes: int,
-    label_key: str = None,
+    label_key: Optional[str] = None,
 ) -> torch.Tensor:
     """
     Calculate class weights for imbalanced datasets.
