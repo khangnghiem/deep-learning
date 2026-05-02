@@ -30,6 +30,19 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config.paths import get_bronze_path
 
+import re
+
+def _validate_kaggle_id(identifier: str) -> None:
+    """Validate Kaggle identifier to prevent argument injection."""
+    if not identifier:
+        raise ValueError("Identifier cannot be empty")
+    parts = identifier.split("/")
+    pattern = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$")
+    for part in parts:
+        if not pattern.match(part):
+            raise ValueError(f"Invalid kaggle identifier part: {part}")
+
+
 
 def check_kaggle_auth():
     """Check if Kaggle API is configured. Checks .secrets first, then .kaggle."""
@@ -74,6 +87,7 @@ def download_dataset(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(dataset)
     
     dataset_name = dataset.split("/")[-1]
     if output_dir is None:
@@ -114,6 +128,7 @@ def download_competition(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(competition)
     
     if output_dir is None:
         output_dir = get_bronze_path(category) / competition
