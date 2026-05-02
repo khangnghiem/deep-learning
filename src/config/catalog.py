@@ -611,8 +611,10 @@ def _download_torchvision(name, info, bronze_dir):
 def _download_kaggle(name, info, landing_dir, bronze_dir):
     """Download from Kaggle datasets or competitions."""
     import subprocess
+    from src.data.kaggle import _validate_kaggle_id
     
     kaggle_id = info["kaggle_id"]
+    _validate_kaggle_id(kaggle_id)
     
     if kaggle_id.startswith("competitions/"):
         comp = kaggle_id.replace("competitions/", "")

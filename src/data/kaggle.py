@@ -23,6 +23,7 @@ import os
 import subprocess
 from pathlib import Path
 import sys
+import re
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -55,6 +56,15 @@ def check_kaggle_auth():
     )
 
 
+def _validate_kaggle_id(identifier: str) -> None:
+    if not identifier:
+        raise ValueError("Identifier cannot be empty")
+    pattern = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$")
+    for part in identifier.split("/"):
+        if not pattern.match(part):
+            raise ValueError(f"Invalid Kaggle identifier format: {identifier}")
+
+
 def download_dataset(
     dataset: str,
     output_dir: Path = None,
@@ -73,6 +83,7 @@ def download_dataset(
     Returns:
         Path to downloaded data
     """
+    _validate_kaggle_id(dataset)
     check_kaggle_auth()
     
     dataset_name = dataset.split("/")[-1]
@@ -113,6 +124,7 @@ def download_competition(
     Returns:
         Path to downloaded data
     """
+    _validate_kaggle_id(competition)
     check_kaggle_auth()
     
     if output_dir is None:
