@@ -8,6 +8,7 @@ from tqdm import tqdm
 from ultralytics import YOLO
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
+from peft import PeftModel
 
 def yolo_to_mask(txt_path, h, w):
     mask = np.zeros((h, w), dtype=np.uint8)
@@ -31,9 +32,10 @@ def main():
     model_cfg = "sam2_hiera_s.yaml"
     sam2_model = build_sam2(model_cfg, sam2_checkpoint, device="cuda")
     
-    # Load finetuned weights
-    state_dict = torch.load("weights/finetuned.pt")
-    sam2_model.load_state_dict(state_dict, strict=False)
+    # Load LoRA adapter into the mask decoder
+    # Note: PeftModel.from_pretrained wraps the module and loads the adapter weights
+    sam2_model.sam_mask_decoder = PeftModel.from_pretrained(sam2_model.sam_mask_decoder, "weights/lora_finetuned")
+    sam2_model.sam_mask_decoder.eval()
     
     predictor = SAM2ImagePredictor(sam2_model)
     
@@ -45,13 +47,15 @@ def main():
         gt_mask = yolo_to_mask(os.path.join(test_dir, "labels", Path(img_path).stem + ".txt"), h, w)
         
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = yolo_model(img, conf=0.25, verbose=False)[0]
-        boxes = results.boxes.xyxy.cpu().numpy()
+        with torch.no_grad():
+            results = yolo_model(img, conf=0.25, verbose=False)[0]
+            boxes = results.boxes.xyxy.cpu().numpy()
         
         pred_mask = np.zeros((h, w), dtype=np.uint8)
         if len(boxes) > 0:
-            predictor.set_image(img_rgb)
-            masks, _, _ = predictor.predict(box=boxes, multimask_output=False)
+            with torch.no_grad():
+                predictor.set_image(img_rgb)
+                masks, _, _ = predictor.predict(box=boxes, multimask_output=False)
             for m in masks:
                 pred_mask = np.logical_or(pred_mask, m[0]).astype(np.uint8)
                 

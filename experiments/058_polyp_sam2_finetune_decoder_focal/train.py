@@ -8,6 +8,7 @@ from tqdm import tqdm
 from ultralytics import YOLO
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
+from peft import LoraConfig, get_peft_model
 
 def yolo_to_mask(txt_path, h, w):
     mask = np.zeros((h, w), dtype=np.uint8)
@@ -33,9 +34,26 @@ def main():
     sam2_model = build_sam2(model_cfg, sam2_checkpoint, device="cuda")
     predictor = SAM2ImagePredictor(sam2_model)
     
+    # FREEZE all SAM2 base parameters
+    for param in predictor.model.parameters():
+        param.requires_grad = False
+    
+    # Configure LoRA for SAM2 Mask Decoder
+    lora_config = LoraConfig(
+        r=16,
+        lora_alpha=32,
+        target_modules="all-linear",
+        lora_dropout=0.05,
+        bias="none"
+    )
+    predictor.model.sam_mask_decoder = get_peft_model(predictor.model.sam_mask_decoder, lora_config)
+    print("Trainable parameters in Mask Decoder:")
+    predictor.model.sam_mask_decoder.print_trainable_parameters()
+    
+    # Ensure gradients are enabled for the LoRA adapter
     predictor.model.sam_mask_decoder.train(True)
-    predictor.model.sam_prompt_encoder.train(True)
-    optimizer = torch.optim.AdamW(params=predictor.model.parameters(), lr=1e-5, weight_decay=4e-5)
+    
+    optimizer = torch.optim.AdamW(params=predictor.model.sam_mask_decoder.parameters(), lr=1e-4, weight_decay=1e-4)
     scaler = torch.cuda.amp.GradScaler()
     
     epochs = 5
@@ -57,18 +75,21 @@ def main():
             if len(boxes) == 0: continue
             
             with torch.cuda.amp.autocast():
-                predictor.set_image(img_rgb)
+                # predictor.set_image modifies internal features; requires no_grad
+                with torch.no_grad():
+                    predictor.set_image(img_rgb)
+                    box_tensor = torch.tensor(boxes, dtype=torch.float32, device="cuda")
+                    sparse_embeddings, dense_embeddings = predictor.model.sam_prompt_encoder(
+                        points=None, boxes=box_tensor, masks=None
+                    )
+                    high_res_features = [feat_level[-1].unsqueeze(0) for feat_level in predictor._features["high_res_feats"]]
+                    image_embeddings = predictor._features["image_embed"][-1].unsqueeze(0)
+                    image_pe = predictor.model.sam_prompt_encoder.get_dense_pe()
                 
-                # prepare prompts (using yolo boxes)
-                box_tensor = torch.tensor(boxes, dtype=torch.float32, device="cuda")
-                sparse_embeddings, dense_embeddings = predictor.model.sam_prompt_encoder(
-                    points=None, boxes=box_tensor, masks=None
-                )
-                
-                high_res_features = [feat_level[-1].unsqueeze(0) for feat_level in predictor._features["high_res_feats"]]
+                # Forward pass through LoRA-enabled mask decoder requires gradient tracking
                 low_res_masks, prd_scores, _, _ = predictor.model.sam_mask_decoder(
-                    image_embeddings=predictor._features["image_embed"][-1].unsqueeze(0),
-                    image_pe=predictor.model.sam_prompt_encoder.get_dense_pe(),
+                    image_embeddings=image_embeddings,
+                    image_pe=image_pe,
                     sparse_prompt_embeddings=sparse_embeddings,
                     dense_prompt_embeddings=dense_embeddings,
                     multimask_output=False,
@@ -78,7 +99,6 @@ def main():
                 prd_masks = predictor._transforms.postprocess_masks(low_res_masks, predictor._orig_hw[-1])
                 
                 gt_mask = torch.tensor(gt_mask_np, dtype=torch.float32, device="cuda").unsqueeze(0)
-                # Expand gt_mask if multiple boxes (for simplicity, we assume one combined mask)
                 if prd_masks.shape[0] > 1:
                     prd_masks = prd_masks.max(dim=0, keepdim=True)[0]
                 
@@ -88,7 +108,7 @@ def main():
                 
                 loss = seg_loss
             
-            predictor.model.zero_grad()
+            optimizer.zero_grad()
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -97,8 +117,9 @@ def main():
             pbar.set_postfix({"loss": loss.item()})
             
     os.makedirs("weights", exist_ok=True)
-    torch.save(predictor.model.state_dict(), "weights/finetuned.pt")
-    print("Training complete, weights saved.")
+    # Save only the LoRA weights
+    predictor.model.sam_mask_decoder.save_pretrained("weights/lora_finetuned")
+    print("Training complete, LoRA adapter weights saved.")
 
 if __name__ == "__main__":
     main()
