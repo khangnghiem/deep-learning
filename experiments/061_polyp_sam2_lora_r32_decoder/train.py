@@ -77,17 +77,6 @@ def main():
             if len(boxes) == 0: continue
             
             with torch.cuda.amp.autocast():
-                # predictor.set_image modifies internal features
-                with torch.no_grad():
-                    # If target is full model, image encoder is trained, so we CANNOT use no_grad for image encoder
-                    pass
-                    
-                # To be safe for both full model and decoder only, we run the full forward pass natively
-                # SAM2 requires set_image for prompt encoder to work cleanly, but if we need gradients 
-                # through image encoder we shouldn't use the standard set_image which uses no_grad.
-                # However, for 060, using set_image with no_grad might block image encoder gradients!
-                pass
-                
                 # We will handle it by just running the components manually if full model
                 if "predictor.model.sam_mask_decoder" == "predictor.model":
                     image_tensor = torch.tensor(img_rgb.transpose(2, 0, 1), dtype=torch.float32, device="cuda").unsqueeze(0) / 255.0
