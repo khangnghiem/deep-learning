@@ -1,0 +1,5 @@
+## 2024-06-25 - Avoid Multiple Dataset Passes in PyTorch Dataloading
+
+**Learning:** During DataLoader or Sampler initialization (like for `WeightedRandomSampler`), computing global statistics first (e.g., class frequencies for imbalanced datasets) and then iterating the dataset again to build sample mappings causes N dataset passes. Because `__getitem__` often involves expensive disk I/O, heavy transformations, or cloud storage fetching, these redundant passes are major performance bottlenecks. Additionally, PyTorch dataloading code often inefficiently converts lists of scalar values into tensors using `torch.tensor([list_comprehension])` which allocates a new python list then iterates to build a tensor.
+
+**Action:** Whenever possible, fuse passes over datasets when computing statistics and mappings (e.g., track counts and save labels simultaneously). Furthermore, avoid list-to-tensor construction by using native advanced tensor indexing (like `class_weights[labels_tensor]`) to map computed values onto each sample without an intermediate list.
