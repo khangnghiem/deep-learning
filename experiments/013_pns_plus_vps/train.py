@@ -16,6 +16,7 @@ import segmentation_models_pytorch as smp
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.training.losses import StructureLoss
 from src.config.paths import setup_mlflow
+from src.data.transforms import IMAGENET_MEAN, IMAGENET_STD
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -65,13 +66,13 @@ def main():
         A.VerticalFlip(p=0.5),
         A.RandomRotate90(p=0.5),
         A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2, hue=0.1, p=0.5),
-        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ToTensorV2(),
     ])
     
     val_transform = A.Compose([
         A.Resize(352, 352),
-        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ToTensorV2(),
     ])
     
