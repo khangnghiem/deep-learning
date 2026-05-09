@@ -1,0 +1,3 @@
+## 2024-05-18 - Single-pass dataloader sampler initialization
+**Learning:** Initializing an imbalanced sampler by passing over the dataset multiple times to collect frequency and map weights causes severe latency, as `__getitem__` is often computationally expensive. Avoid unidiomatic Python list loops to build the final weights array.
+**Action:** Always process sequence loops together—compute frequencies and accumulate labels in a single pass. Map weights using PyTorch advanced indexing (`weights[torch.tensor(labels)]`) instead of appending via Python loops to leverage underlying C++ array routines.
