@@ -123,17 +123,28 @@ def create_imbalanced_sampler(
     Returns:
         WeightedRandomSampler
     """
-    class_weights = get_class_weights(dataset, num_classes)
+    # ⚡ Bolt Optimization: Single pass over the dataset to compute class counts
+    # and collect labels simultaneously to avoid expensive repeated __getitem__ calls.
+    class_counts = torch.zeros(num_classes)
+    labels = []
     
-    sample_weights = []
     for item in dataset:
         if isinstance(item, tuple):
             label = item[1]
         else:
             raise ValueError("Expected (input, label) format")
-        sample_weights.append(class_weights[label])
+
+        labels.append(label)
+        class_counts[label] += 1
+
+    # Calculate inverse frequency weighting
+    class_weights = 1.0 / (class_counts + 1e-6)
+    class_weights = class_weights / class_weights.sum() * num_classes
     
-    sample_weights = torch.tensor(sample_weights)
+    # ⚡ Bolt Optimization: Use advanced tensor indexing instead of list comprehensions
+    # to efficiently map labels to their corresponding weights
+    labels_tensor = torch.tensor(labels, dtype=torch.long)
+    sample_weights = class_weights[labels_tensor]
     
     return torch.utils.data.WeightedRandomSampler(
         weights=sample_weights,
