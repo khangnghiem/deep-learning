@@ -36,6 +36,7 @@ from tqdm import tqdm
 # Import shared utilities
 from src.config.paths import SILVER, TRAINED, setup_mlflow
 from src.models.medical import get_medical_resnet
+from src.data.transforms import IMAGENET_MEAN, IMAGENET_STD
 
 
 # =============================================================================
@@ -85,13 +86,13 @@ def get_transforms(config: dict):
         transforms.RandomRotation(15),
         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
     ])
 
     val_transform = transforms.Compose([
         transforms.Resize((img_size, img_size)),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
     ])
 
     return train_transform, val_transform

@@ -57,6 +57,7 @@ from src.config.paths import MLFLOW_TRACKING_URI, BRONZE, TRAINED, setup_mlflow
 from src.training import EarlyStopping, save_checkpoint, load_checkpoint
 from src.utils.metrics import precision_recall_f1, get_confusion_matrix
 from src.utils.visualization import plot_confusion_matrix, show_predictions
+from src.data.transforms import CIFAR_MEAN, CIFAR_STD
 # TODO: Import your model and transforms
 # from src.models import YourModel
 # from src.data.transforms import get_transforms
@@ -136,12 +137,12 @@ def get_dataloaders(config: dict) -> tuple[DataLoader, DataLoader]:
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
     ])
     
     transform_test = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
     ])
     
     # Using local ephemeral /content/data so no downloading to Drive happens
