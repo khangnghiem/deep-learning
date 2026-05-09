@@ -31,6 +31,25 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.config.paths import get_bronze_path
 
 
+import re
+
+def _validate_kaggle_id(identifier: str) -> None:
+    """
+    Validate Kaggle identifier to prevent argument injection.
+    Must not start with a dash and only contain safe characters.
+    """
+    if not identifier:
+        raise ValueError("Kaggle identifier cannot be empty")
+
+    parts = identifier.split("/")
+    pattern = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$")
+
+    for part in parts:
+        if not part:
+            raise ValueError("Kaggle identifier cannot contain empty parts")
+        if not pattern.match(part):
+            raise ValueError(f"Invalid Kaggle identifier part: {part}. Must match {pattern.pattern}")
+
 def check_kaggle_auth():
     """Check if Kaggle API is configured. Checks .secrets first, then .kaggle."""
     # Check .secrets folder first (copied from Drive in Colab)
@@ -73,6 +92,7 @@ def download_dataset(
     Returns:
         Path to downloaded data
     """
+    _validate_kaggle_id(dataset)
     check_kaggle_auth()
     
     dataset_name = dataset.split("/")[-1]
@@ -113,6 +133,7 @@ def download_competition(
     Returns:
         Path to downloaded data
     """
+    _validate_kaggle_id(competition)
     check_kaggle_auth()
     
     if output_dir is None:
