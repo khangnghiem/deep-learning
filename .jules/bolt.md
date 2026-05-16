@@ -1,0 +1,3 @@
+## 2024-05-18 - Single-Pass Dataset Iterations and Tensor Indexing
+**Learning:** In PyTorch `DataLoader` / `Sampler` initializations, making multiple passes over datasets using `__getitem__` is expensive due to frequent I/O operations or data augmentations. Additionally, using list comprehensions to build weights and casting them to tensors via `torch.tensor(list_of_tensors)` is unidiomatic and slow.
+**Action:** Always compute labels and frequencies in a single pass. Map dataset labels to weights efficiently using advanced PyTorch tensor indexing like `class_weights[labels_tensor]` instead of iterating with list comprehensions.
