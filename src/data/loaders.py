@@ -78,6 +78,7 @@ def get_class_weights(
     dataset: Dataset,
     num_classes: int,
     label_key: str = None,
+    precomputed_labels: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     """
     Calculate class weights for imbalanced datasets.
@@ -86,21 +87,23 @@ def get_class_weights(
         dataset: Dataset with labels
         num_classes: Number of classes
         label_key: Key to access labels if dataset returns dict
+        precomputed_labels: Optional tensor of all labels, to skip iterating dataset.
     
     Returns:
         Tensor of class weights (inversely proportional to frequency)
     """
-    class_counts = torch.zeros(num_classes)
-    
-    for item in dataset:
-        if isinstance(item, tuple):
-            label = item[1]  # Assume (input, label) format
-        elif isinstance(item, dict) and label_key:
-            label = item[label_key]
-        else:
-            raise ValueError("Cannot extract label from dataset item")
-        
-        class_counts[label] += 1
+    if precomputed_labels is not None:
+        class_counts = torch.bincount(precomputed_labels, minlength=num_classes).float()
+    else:
+        class_counts = torch.zeros(num_classes)
+        for item in dataset:
+            if isinstance(item, tuple):
+                label = item[1]  # Assume (input, label) format
+            elif isinstance(item, dict) and label_key:
+                label = item[label_key]
+            else:
+                raise ValueError("Cannot extract label from dataset item")
+            class_counts[label] += 1
     
     # Inverse frequency weighting
     weights = 1.0 / (class_counts + 1e-6)
@@ -123,17 +126,28 @@ def create_imbalanced_sampler(
     Returns:
         WeightedRandomSampler
     """
-    class_weights = get_class_weights(dataset, num_classes)
-    
-    sample_weights = []
+    # ⚡ Bolt Optimization: Extract labels in a single pass to prevent
+    # redundant, expensive dataset iterations during sampler initialization.
+    labels = []
     for item in dataset:
         if isinstance(item, tuple):
             label = item[1]
         else:
             raise ValueError("Expected (input, label) format")
-        sample_weights.append(class_weights[label])
+        labels.append(label)
+
+    labels_tensor = torch.tensor(labels, dtype=torch.long)
+
+    class_weights = get_class_weights(
+        dataset,
+        num_classes,
+        precomputed_labels=labels_tensor
+    )
     
-    sample_weights = torch.tensor(sample_weights)
+    # ⚡ Bolt Optimization: Use advanced PyTorch tensor indexing instead of list
+    # comprehensions and unidiomatic list-to-tensor conversions to efficiently
+    # map sample labels to their corresponding weights.
+    sample_weights = class_weights[labels_tensor]
     
     return torch.utils.data.WeightedRandomSampler(
         weights=sample_weights,
