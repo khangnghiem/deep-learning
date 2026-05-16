@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 """
 Data Lake MANIFEST.json management.
 
@@ -83,7 +86,7 @@ def load_manifest(max_age_hours: int = 24) -> dict:
                         "Run generate_manifest() to refresh."
                     )
             except (ValueError, TypeError):
-                pass  # Can't parse timestamp — skip check
+                logger.debug("Can't parse timestamp — skip check")
 
     return manifest
 
@@ -97,7 +100,7 @@ def generate_manifest() -> dict:
     Returns:
         The generated manifest dict.
     """
-    print("=== Generating MANIFEST.json ===")
+    logger.info("=== Generating MANIFEST.json ===")
 
     manifest = {
         "generated_at": datetime.now().isoformat(),
@@ -162,7 +165,7 @@ def generate_manifest() -> dict:
             "dataset_count": len(category_datasets),
             "datasets": category_datasets,
         }
-        print(f"  {bronze_dir.name}: {len(category_datasets)} datasets")
+        logger.info(f"  {bronze_dir.name}: {len(category_datasets)} datasets")
 
     manifest["summary"] = {
         "total_datasets": total_datasets,
@@ -176,12 +179,12 @@ def generate_manifest() -> dict:
     with open(MANIFEST_PATH, "w") as f:
         json.dump(manifest, f, indent=2)
 
-    print(f"\n✅ MANIFEST.json written to {MANIFEST_PATH}")
-    print(f"\n📊 Summary:")
-    print(f"   Total datasets: {total_datasets}")
-    print(f"   Total files: {total_files:,}")
-    print(f"   Total size: {total_size_bytes / (1024**3):.2f} GB")
-    print(f"   Empty datasets: {manifest['summary']['empty_datasets']}")
+    logger.info(f"\n✅ MANIFEST.json written to {MANIFEST_PATH}")
+    logger.info(f"\n📊 Summary:")
+    logger.info(f"   Total datasets: {total_datasets}")
+    logger.info(f"   Total files: {total_files:,}")
+    logger.info(f"   Total size: {total_size_bytes / (1024**3):.2f} GB")
+    logger.info(f"   Empty datasets: {manifest['summary']['empty_datasets']}")
 
     return manifest
 
@@ -274,7 +277,7 @@ def update_manifest_entry(dataset_name: str, category: str, bronze_dir: Path) ->
         with open(MANIFEST_PATH, "w") as f:
             json.dump(manifest, f, indent=2)
 
-        print(f"📋 MANIFEST.json updated: {dataset_name} ({ds_info['file_count']} files, {ds_info['size_mb']:.1f} MB)")
+        logger.info(f"📋 MANIFEST.json updated: {dataset_name} ({ds_info['file_count']} files, {ds_info['size_mb']:.1f} MB)")
 
 
 def get_manifest_datasets() -> set:

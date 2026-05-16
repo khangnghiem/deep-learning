@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 import json, os, glob, argparse
 import xml.etree.ElementTree as ET
 
@@ -34,7 +37,7 @@ def convert(root, out):
         'images':imgs,'annotations':anns}
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out,'w') as f: json.dump(coco,f)
-    print(f'Wrote {len(imgs)} images, {len(anns)} annotations')
+    logger.info(f'Wrote {len(imgs)} images, {len(anns)} annotations')
 
 if __name__=='__main__':
     import sys
@@ -45,10 +48,10 @@ if __name__=='__main__':
         from src.config.catalog import download_dataset
         from src.config.paths import get_bronze_path, SILVER
         
-        print("📥 Downloading PolypGen via src.config...")
+        logger.info("📥 Downloading PolypGen via src.config...")
         success = download_dataset("polypgen")
         if success is False:
-            print("❌ Download failed. Make sure ~/.kaggle/kaggle.json exists.")
+            logger.error("❌ Download failed. Make sure ~/.kaggle/kaggle.json exists.")
             sys.exit(1)
             
         root = str(get_bronze_path('medical') / "polypgen")
@@ -62,5 +65,5 @@ if __name__=='__main__':
         a = p.parse_args()
         root, out = a.root, a.out
 
-    print(f"🔄 Converting {root} to COCO format at {out}...")
+    logger.info(f"🔄 Converting {root} to COCO format at {out}...")
     convert(root, out)

@@ -1,6 +1,7 @@
 import os, json, yaml, sys, cv2
 import torch
 import numpy as np
+import subprocess
 from ultralytics import YOLO
 from PIL import Image
 from tqdm import tqdm
@@ -20,7 +21,7 @@ try:
     from sam2.sam2_image_predictor import SAM2ImagePredictor
     if not SAM2_CHECKPOINT.exists():
         print(f"Checkpoint not found at {SAM2_CHECKPOINT}, downloading...")
-        os.system(f"wget -q https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt -O {SAM2_CHECKPOINT}")
+        subprocess.run(["wget", "-q", "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt", "-O", str(SAM2_CHECKPOINT)], check=True)
     sam2_model = build_sam2("sam2_hiera_l.yaml", str(SAM2_CHECKPOINT), device="cuda")
     predictor = SAM2ImagePredictor(sam2_model)
 except Exception as e:
