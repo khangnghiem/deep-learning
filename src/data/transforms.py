@@ -11,6 +11,15 @@ Usage:
 import torch
 from torchvision import transforms
 
+IMAGENET_MEAN = [0.485, 0.456, 0.406]
+IMAGENET_STD = [0.229, 0.224, 0.225]
+
+CIFAR_MEAN = [0.4914, 0.4822, 0.4465]
+CIFAR_STD = [0.2470, 0.2435, 0.2616]
+
+MNIST_MEAN = (0.1307,)
+MNIST_STD = (0.3081,)
+
 
 def get_train_transforms(
     image_size: int = 224,
@@ -57,8 +66,8 @@ def get_train_transforms(
     if normalize:
         transform_list.append(
             transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],  # ImageNet stats
-                std=[0.229, 0.224, 0.225]
+                mean=IMAGENET_MEAN,
+                std=IMAGENET_STD
             )
         )
     
@@ -87,8 +96,8 @@ def get_val_transforms(
     if normalize:
         transform_list.append(
             transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
+                mean=IMAGENET_MEAN,
+                std=IMAGENET_STD
             )
         )
     
@@ -103,16 +112,16 @@ def get_cifar_transforms(train: bool = True) -> transforms.Compose:
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.4914, 0.4822, 0.4465],
-                std=[0.2470, 0.2435, 0.2616]
+                mean=CIFAR_MEAN,
+                std=CIFAR_STD
             ),
         ])
     else:
         return transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.4914, 0.4822, 0.4465],
-                std=[0.2470, 0.2435, 0.2616]
+                mean=CIFAR_MEAN,
+                std=CIFAR_STD
             ),
         ])
 
@@ -123,10 +132,10 @@ def get_mnist_transforms(train: bool = True) -> transforms.Compose:
         return transforms.Compose([
             transforms.RandomRotation(10),
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ])
     else:
         return transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ])
