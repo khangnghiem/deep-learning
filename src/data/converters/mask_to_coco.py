@@ -1,4 +1,8 @@
-import json, os, glob, cv2, argparse
+import json
+import os
+import glob
+import cv2
+import argparse
 import numpy as np
 
 def mask_to_polygons(mask):
@@ -15,7 +19,8 @@ def convert(mask_dir, output_json, dataset_name):
     files = sorted(glob.glob(os.path.join(mask_dir, "*.*")))
     for i, path in enumerate(files):
         mask = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-        if mask is None: continue
+        if mask is None:
+            continue
         h, w = mask.shape
         img_id = i + 1
         images.append({"id": img_id, "file_name": os.path.basename(path), "width": w, "height": h, "metadata": {"source_dataset": dataset_name}})

@@ -33,12 +33,12 @@ def with_retry(max_retries=MAX_RETRIES, delay=RETRY_DELAY):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            last_exception = None
+            last_exception = None  # noqa: F841
             for attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    last_exception = e
+                    last_exception = e  # noqa: F841
                     if attempt < max_retries - 1:
                         wait_time = delay * (2 ** attempt)
                         print(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed: {str(e)[:80]}")
@@ -601,7 +601,7 @@ def _download_torchvision(name, info, bronze_dir):
         return True
     except RuntimeError as e:
         if "File not found or corrupted" in str(e):
-            print(f"  ❌ Download failed: Server unavailable or file corrupted")
+            print("  ❌ Download failed: Server unavailable or file corrupted")
             print(f"     This is a known issue with {name}. Try again later or download manually.")
             return False
         else:
@@ -622,7 +622,7 @@ def _download_kaggle(name, info, landing_dir, bronze_dir):
         )
         output = result.stdout + result.stderr
         if "401" in output or "403" in output or "Unauthorized" in output or "Forbidden" in output:
-            print(f"  ⚠️  Competition requires rule acceptance. Visit:")
+            print("  ⚠️  Competition requires rule acceptance. Visit:")
             print(f"     https://www.kaggle.com/c/{comp}/rules")
             return False
         elif result.returncode != 0:
