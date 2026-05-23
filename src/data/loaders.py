@@ -6,9 +6,8 @@ Usage:
 """
 
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split, Subset
-from typing import Optional, Tuple
-import numpy as np
+from torch.utils.data import DataLoader, Dataset, random_split
+from typing import Tuple
 
 
 def create_dataloaders(
