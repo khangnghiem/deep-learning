@@ -77,7 +77,8 @@ def create_dataloaders(
 def get_class_weights(
     dataset: Dataset,
     num_classes: int,
-    label_key: str = None,
+    label_key: Optional[str] = None,
+    labels: Optional[list] = None,
 ) -> torch.Tensor:
     """
     Calculate class weights for imbalanced datasets.
@@ -86,21 +87,26 @@ def get_class_weights(
         dataset: Dataset with labels
         num_classes: Number of classes
         label_key: Key to access labels if dataset returns dict
+        labels: Optional precomputed list of labels
     
     Returns:
         Tensor of class weights (inversely proportional to frequency)
     """
     class_counts = torch.zeros(num_classes)
     
-    for item in dataset:
-        if isinstance(item, tuple):
-            label = item[1]  # Assume (input, label) format
-        elif isinstance(item, dict) and label_key:
-            label = item[label_key]
-        else:
-            raise ValueError("Cannot extract label from dataset item")
-        
-        class_counts[label] += 1
+    if labels is not None:
+        for label in labels:
+            class_counts[label] += 1
+    else:
+        for item in dataset:
+            if isinstance(item, tuple):
+                label = item[1]  # Assume (input, label) format
+            elif isinstance(item, dict) and label_key:
+                label = item[label_key]
+            else:
+                raise ValueError("Cannot extract label from dataset item")
+
+            class_counts[label] += 1
     
     # Inverse frequency weighting
     weights = 1.0 / (class_counts + 1e-6)
@@ -123,17 +129,16 @@ def create_imbalanced_sampler(
     Returns:
         WeightedRandomSampler
     """
-    class_weights = get_class_weights(dataset, num_classes)
-    
-    sample_weights = []
+    labels = []
     for item in dataset:
         if isinstance(item, tuple):
             label = item[1]
         else:
             raise ValueError("Expected (input, label) format")
-        sample_weights.append(class_weights[label])
+        labels.append(label)
     
-    sample_weights = torch.tensor(sample_weights)
+    class_weights = get_class_weights(dataset, num_classes, labels=labels)
+    sample_weights = class_weights[torch.tensor(labels)]
     
     return torch.utils.data.WeightedRandomSampler(
         weights=sample_weights,
