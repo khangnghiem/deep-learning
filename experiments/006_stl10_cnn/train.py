@@ -50,7 +50,8 @@ def train_epoch(model, loader, criterion, optimizer, device):
     total_loss, correct, total = 0, 0, 0
     for x, y in tqdm(loader, desc="Training"):
         x, y = x.to(device), y.to(device)
-        optimizer.zero_grad()
+        # Optimize memory bandwidth and footprint
+        optimizer.zero_grad(set_to_none=True)
         out = model(x)
         loss = criterion(out, y)
         loss.backward()

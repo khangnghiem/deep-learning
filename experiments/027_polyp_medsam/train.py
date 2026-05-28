@@ -206,7 +206,8 @@ def main():
                 # We resized GT to 256x256 in __getitem__, matching pred_masks shape.
                 loss = seg_loss(pred_masks, gt)
                 
-                optimizer.zero_grad()
+                # Optimize memory bandwidth and footprint
+                optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 optimizer.step()
                 
