@@ -3,7 +3,7 @@ Environment-aware path configuration for multi-environment ML workflows.
 
 Supports:
 - Google Colab (Web)
-- Google Colab VSCode Extension  
+- Google Colab VSCode Extension
 - Local MacOS development
 
 Usage:
@@ -26,6 +26,7 @@ load_dotenv(_REPO_ROOT / ".env", override=False)
 # Environment Detection
 # =============================================================================
 
+
 def _is_colab() -> bool:
     """Detect if running in Google Colab."""
     # Check sys.modules (works after google.colab is imported)
@@ -36,14 +37,16 @@ def _is_colab() -> bool:
         return True
     return False
 
+
 IN_COLAB = _is_colab()
+
 
 def get_drive_root() -> Path:
     """Determine the Google Drive root based on execution environment."""
     # 1. Explicit override always wins
     if "DRIVE_ROOT" in os.environ:
         return Path(os.environ["DRIVE_ROOT"])
-        
+
     # 2. Colab
     if IN_COLAB:
         colab_drive = Path("/content/drive/MyDrive")
@@ -52,16 +55,17 @@ def get_drive_root() -> Path:
         raise FileNotFoundError(
             "Drive not mounted. Run: from google.colab import drive; drive.mount('/content/drive')"
         )
-        
+
     # 3. Windows default fallback
     win_path = Path("G:/My Drive")
     if win_path.exists():
         return win_path
-        
+
     raise FileNotFoundError(
         "Google Drive not found at default locations. "
         "Set DRIVE_ROOT in .env or environment variable."
     )
+
 
 # Allow override via environment variable
 DRIVE = get_drive_root()
@@ -75,6 +79,7 @@ try:
     config_path = _REPO_ROOT / "config.yaml"
     if config_path.exists():
         import yaml
+
         with open(config_path) as f:
             cf = yaml.safe_load(f)
             if cf and "data" in cf and "root" in cf["data"]:
@@ -114,21 +119,24 @@ _BRONZE_CATEGORY_PATHS = {
     "vision": BRONZE_VISION,
 }
 
+
 def get_bronze_path(category: str) -> Path:
     """Get the bronze layer path for a given category.
-    
+
     Args:
         category: Dataset category (vision, audio, nlp, etc.)
-        
+
     Returns:
         Path to the category-specific bronze folder.
         Defaults to BRONZE_VISION if category not recognized.
     """
     return _BRONZE_CATEGORY_PATHS.get(category.lower(), BRONZE_VISION)
 
+
 def get_all_bronze_paths() -> list:
     """Return list of all bronze category paths."""
     return list(_BRONZE_CATEGORY_PATHS.values())
+
 
 # Backward compatibility — defaults to medical (most common legacy consumer)
 BRONZE = BRONZE_MEDICAL
@@ -174,11 +182,14 @@ REPOS = DRIVE / "repos"
 # Utility Functions
 # =============================================================================
 
+
 def setup_mlflow():
     """Configure MLflow with Drive-based tracking."""
     import mlflow
+
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     return mlflow
+
 
 def get_env_info() -> dict:
     """Return current environment configuration."""
@@ -188,6 +199,7 @@ def get_env_info() -> dict:
         "data_lake": str(DATA_LAKE),
         "mlflow_uri": MLFLOW_TRACKING_URI,
     }
+
 
 if __name__ == "__main__":
     print("Environment Configuration:")
