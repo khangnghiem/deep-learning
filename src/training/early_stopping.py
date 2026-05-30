@@ -24,12 +24,7 @@ class EarlyStopping:
         mode: "min" (lower is better, e.g. loss) or "max" (higher is better, e.g. accuracy).
     """
 
-    def __init__(
-        self,
-        patience: int = 10,
-        min_delta: float = 0.0,
-        mode: str = "min"
-    ):
+    def __init__(self, patience: int = 10, min_delta: float = 0.0, mode: str = "min"):
         self.patience = patience
         self.min_delta = min_delta
         self.mode = mode
