@@ -17,7 +17,6 @@ import sys
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.config.paths import TRAINED
 
 
 def save_checkpoint(
@@ -78,7 +77,7 @@ def load_checkpoint(
     Returns:
         Tuple of (model, optimizer, epoch, metrics)
     """
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=True)
     
     model.load_state_dict(checkpoint["model_state_dict"])
     
