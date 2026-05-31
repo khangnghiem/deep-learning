@@ -179,7 +179,7 @@ def sanity_check(model, train_loader, criterion, device, steps=50):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     for step in range(steps):
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
@@ -210,7 +210,7 @@ def train_epoch(model, loader, criterion, optimizer, device):
     for inputs, targets in tqdm(loader, desc="Training"):
         inputs, targets = inputs.to(device), targets.to(device)
 
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()

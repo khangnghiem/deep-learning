@@ -18,8 +18,7 @@ def convert(json_path, output_dir):
                 poly[:, 1] /= h
                 line = f"{cat_id} " + " ".join([f"{x: .6f} {y: .6f}" for x, y in poly])
                 with open(txt_path, 'a') as f:
-                    f.write(line + "
-")
+                    f.write(line + "\n")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", required=True)
