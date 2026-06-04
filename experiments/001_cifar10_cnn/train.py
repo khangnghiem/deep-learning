@@ -227,7 +227,7 @@ def train_epoch(model, loader, criterion, optimizer, device):
     correct = 0
     total = 0
 
-    for inputs, targets in tqdm(loader, desc="Training"):
+    for inputs, targets in tqdm(loader, desc="Training", leave=False, unit="batch"):
         inputs, targets = inputs.to(device), targets.to(device)
 
         optimizer.zero_grad()
@@ -252,7 +252,7 @@ def validate(model, loader, criterion, device):
     total = 0
 
     with torch.no_grad():
-        for inputs, targets in tqdm(loader, desc="Validating"):
+        for inputs, targets in tqdm(loader, desc="Validating", leave=False, unit="batch"):
             inputs, targets = inputs.to(device), targets.to(device)
 
             outputs = model(inputs)
@@ -278,7 +278,7 @@ def evaluate(model, val_loader, device, config, mlflow):
     all_images = []
 
     with torch.no_grad():
-        for inputs, targets in tqdm(val_loader, desc="Evaluating"):
+        for inputs, targets in tqdm(val_loader, desc="Evaluating", leave=False, unit="batch"):
             outputs = model(inputs.to(device))
             _, preds = outputs.max(1)
             all_preds.append(preds.cpu())
