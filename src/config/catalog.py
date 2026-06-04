@@ -19,6 +19,7 @@ import urllib.request
 import time
 import functools
 from pathlib import Path
+from src.data.kaggle import _validate_kaggle_id
 
 from src.config.paths import LANDING, get_bronze_path
 
@@ -613,6 +614,10 @@ def _download_kaggle(name, info, landing_dir, bronze_dir):
     import subprocess
     
     kaggle_id = info["kaggle_id"]
+    if kaggle_id.startswith("competitions/"):
+        _validate_kaggle_id(kaggle_id.replace("competitions/", ""))
+    else:
+        _validate_kaggle_id(kaggle_id)
     
     if kaggle_id.startswith("competitions/"):
         comp = kaggle_id.replace("competitions/", "")
