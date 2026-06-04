@@ -1,0 +1,3 @@
+## 2024-06-25 - Avoid Multiple Dataset Passes During Initialization
+**Learning:** Initializing PyTorch DataLoaders or Samplers by iterating over a `Dataset` multiple times is a severe performance bottleneck. Many datasets apply expensive transformations (e.g., image decoding, augmentations) or I/O operations inside `__getitem__`. Performing multiple passes (e.g., one pass to count class frequencies, another to assign sample weights) multiplies these costs unnecessarily.
+**Action:** Always compute necessary dataset statistics (like class weights or label distributions) in a single pass. Store intermediate results (like extracted labels) in memory during the first pass to avoid calling `__getitem__` again when constructing indices or weights.
