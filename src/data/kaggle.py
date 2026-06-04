@@ -22,6 +22,7 @@ Usage:
 import os
 import subprocess
 from pathlib import Path
+from typing import Optional
 import sys
 
 # Add project root
@@ -55,9 +56,23 @@ def check_kaggle_auth():
     )
 
 
+
+def _validate_kaggle_id(kaggle_id: str) -> None:
+    """Validate Kaggle ID to prevent command injection."""
+    import re
+    if not kaggle_id:
+        raise ValueError("Kaggle ID cannot be empty.")
+
+    parts = kaggle_id.split('/')
+    pattern = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$')
+
+    for part in parts:
+        if not pattern.match(part):
+            raise ValueError(f"Invalid Kaggle ID format: {kaggle_id}")
+
 def download_dataset(
     dataset: str,
-    output_dir: Path = None,
+    output_dir: Optional[Path] = None,
     unzip: bool = True,
     category: str = "tabular"
 ) -> Path:
@@ -74,6 +89,7 @@ def download_dataset(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(dataset)
     
     dataset_name = dataset.split("/")[-1]
     if output_dir is None:
@@ -97,7 +113,7 @@ def download_dataset(
 
 def download_competition(
     competition: str,
-    output_dir: Path = None,
+    output_dir: Optional[Path] = None,
     unzip: bool = True,
     category: str = "tabular"
 ) -> Path:
@@ -114,6 +130,7 @@ def download_competition(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(competition)
     
     if output_dir is None:
         output_dir = get_bronze_path(category) / competition

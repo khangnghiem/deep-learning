@@ -14,6 +14,7 @@ Usage:
 """
 
 from pathlib import Path
+from typing import Optional
 from datasets import load_dataset
 import sys
 
@@ -26,8 +27,8 @@ from src.config.paths import get_bronze_path
 
 def load_hf_dataset(
     name: str,
-    split: str = None,
-    cache_dir: Path = None,
+    split: Optional[str] = None,
+    cache_dir: Optional[Path] = None,
     category: str = "vision",
     **kwargs
 ):
