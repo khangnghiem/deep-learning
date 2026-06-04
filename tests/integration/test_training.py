@@ -30,7 +30,7 @@ class TestTrainingLoop:
         model.train()
         for batch in loader:
             inputs, targets = batch
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss.backward()
@@ -52,7 +52,7 @@ class TestTrainingLoop:
             epoch_loss = 0
             for batch in loader:
                 inputs, targets = batch
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 loss.backward()

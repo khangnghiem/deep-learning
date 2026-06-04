@@ -1,0 +1,3 @@
+## 2025-01-20 - Optimize zero_grad in PyTorch
+**Learning:** PyTorch's default `optimizer.zero_grad()` iterates over all parameters and sets their gradients to a tensor of zeros, which consumes memory and memory bandwidth. Using `set_to_none=True` changes the behavior to set gradients to `None`, which reduces memory allocation and minimizes GPU-to-CPU overhead during the backward pass.
+**Action:** When working with PyTorch optimization steps, especially in custom training loops or Jupyter notebooks within this codebase, I should prefer replacing `optimizer.zero_grad()` with `optimizer.zero_grad(set_to_none=True)` for better performance and reduced memory footprint.
