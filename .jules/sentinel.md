@@ -1,0 +1,4 @@
+## 2024-05-15 - Argument Injection via Dash-Prefixed Inputs in Subprocess
+**Vulnerability:** Even when `shell=False` is used in `subprocess.run`, passing unsanitized user inputs that start with dashes can inject unintended flags (argument injection).
+**Learning:** In `src/data/kaggle.py` and `src/config/catalog.py`, `subprocess.run` calls pass the user-provided `dataset` or `competition` identifier as an argument. An identifier starting with a dash (e.g. `-v` or `--help`) could alter the command's behavior, leading to argument injection vulnerabilities.
+**Prevention:** Strict regex validation (e.g., `^[a-zA-Z0-9_][a-zA-Z0-9_-]*$`) must be applied to user-provided identifiers before command execution, and they must not start with a dash. For dataset paths containing slashes, each part should be split and validated individually.

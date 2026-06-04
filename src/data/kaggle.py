@@ -20,6 +20,7 @@ Usage:
 """
 
 import os
+import re
 import subprocess
 from pathlib import Path
 import sys
@@ -29,6 +30,24 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config.paths import get_bronze_path
+
+
+def _validate_kaggle_id(identifier: str) -> None:
+    """Validate a Kaggle identifier to prevent argument injection."""
+    if not identifier:
+        raise ValueError("Kaggle identifier cannot be empty")
+
+    # Split by / for dataset ids like 'uciml/iris'
+    parts = identifier.split("/")
+    if len(parts) > 2:
+        raise ValueError("Invalid Kaggle identifier format")
+
+    # Regex ensures it starts with an alphanumeric char (preventing dash flags)
+    # and only contains safe characters.
+    pattern = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$")
+    for part in parts:
+        if not pattern.match(part):
+            raise ValueError(f"Invalid characters in identifier part: {part}")
 
 
 def check_kaggle_auth():
@@ -74,6 +93,7 @@ def download_dataset(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(dataset)
     
     dataset_name = dataset.split("/")[-1]
     if output_dir is None:
@@ -114,6 +134,7 @@ def download_competition(
         Path to downloaded data
     """
     check_kaggle_auth()
+    _validate_kaggle_id(competition)
     
     if output_dir is None:
         output_dir = get_bronze_path(category) / competition
