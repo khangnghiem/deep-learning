@@ -8,7 +8,6 @@ Usage:
     val_transform = get_val_transforms(image_size=224)
 """
 
-import torch
 from torchvision import transforms
 
 

@@ -21,7 +21,7 @@ import sys
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.config.paths import get_bronze_path
+from src.config.paths import get_bronze_path  # noqa: E402
 
 
 def load_hf_dataset(
