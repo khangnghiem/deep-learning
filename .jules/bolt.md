@@ -1,0 +1,4 @@
+## 2025-02-12 - Optimized Dataset Passes in WeightedRandomSampler
+
+**Learning:** When generating a `WeightedRandomSampler` for imbalanced datasets, iterating over the dataset twice (once to get counts for weights, once to assign weights to each instance) is inefficient and can cause significant bottlenecks, particularly if `__getitem__` involves expensive I/O or transformations.
+**Action:** When calculating weights or other statistics that require iterating over the dataset, compute them in a single pass. If multiple helper functions require iterating over the dataset, refactor them to share pre-computed extracted labels instead of repeatedly looping over the dataset, and avoid instantiating unneeded lists if tensor mapping via advanced indexing (e.g. `class_weights[labels]`) works natively in PyTorch.
