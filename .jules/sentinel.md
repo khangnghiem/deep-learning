@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Fix insecure deserialization in torch.load
+**Vulnerability:** Found multiple instances of `torch.load` used without `weights_only=True` parameter. This allows arbitrary code execution via Python `pickle` module during deserialization if a malicious model file is loaded.
+**Learning:** `torch.load` relies on `pickle` by default, which is inherently insecure and can execute code. The vulnerability existed across multiple notebooks, training scripts, and checkpoint loading mechanisms where external weights could be loaded.
+**Prevention:** Always use `weights_only=True` when calling `torch.load()` to restrict unpickling to standard primitives and tensors. Ensure this pattern is followed for model, optimizer, and scheduler state dictionaries across all PyTorch deserialization logic.
