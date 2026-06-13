@@ -1,0 +1,3 @@
+## 2024-05-18 - Single-Pass Dataset Iteration
+**Learning:** Initializing DataLoaders or Samplers that require analyzing dataset distributions (e.g. `create_imbalanced_sampler`) can cause severe performance bottlenecks if they iterate over the dataset multiple times. `__getitem__` often involves expensive I/O operations and data transformations.
+**Action:** When building samplers or calculating statistics, collect labels in a single pass over the dataset. Pass precomputed labels to helper utilities instead of allowing them to re-iterate over the dataset. Use advanced tensor indexing (`class_weights[labels]`) instead of list comprehensions when mapping statistics back to individual elements.
