@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 import torch
 from torch.utils.data import Dataset
 from torchvision.datasets import ImageFolder

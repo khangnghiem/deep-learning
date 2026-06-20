@@ -19,33 +19,35 @@ class SimpleCNN(nn.Module):
     def __init__(self, num_classes: int = 10, in_channels: int = 3):
         super().__init__()
         
+        C1, C2, C3, C4 = 32, 64, 128, 256
+
         self.features = nn.Sequential(
             # Block 1
-            nn.Conv2d(in_channels, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels, C1, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(32, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(C1, C1, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
             
             # Block 2
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(C1, C2, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C2),
             nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(C2, C2, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
             
             # Block 3
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(C2, C3, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C3),
             nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(C3, C3, kernel_size=3, padding=1),
+            nn.BatchNorm2d(C3),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
@@ -54,10 +56,10 @@ class SimpleCNN(nn.Module):
         self.classifier = nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)),
             nn.Flatten(),
-            nn.Linear(128, 256),
+            nn.Linear(C3, C4),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Linear(256, num_classes),
+            nn.Linear(C4, num_classes),
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
