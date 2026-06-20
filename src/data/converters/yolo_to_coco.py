@@ -1,4 +1,7 @@
-import json, os, glob, argparse
+import json
+import os
+import glob
+import argparse
 from PIL import Image
 import numpy as np
 

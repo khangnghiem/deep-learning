@@ -10,7 +10,6 @@ Usage:
 import torch
 import torch.nn as nn
 from torchvision import models
-from typing import Optional
 
 
 class MedicalCNN(nn.Module):
@@ -31,53 +30,55 @@ class MedicalCNN(nn.Module):
     ):
         super().__init__()
         
+        C1, C2, C3, C4 = 64, 128, 256, 512
+
         self.features = nn.Sequential(
             # Block 1
-            nn.Conv2d(in_channels, 64, 3, padding=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels, C1, 3, padding=1),
+            nn.BatchNorm2d(C1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(C1, C1, 3, padding=1),
+            nn.BatchNorm2d(C1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
             
             # Block 2
-            nn.Conv2d(64, 128, 3, padding=1),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(C1, C2, 3, padding=1),
+            nn.BatchNorm2d(C2),
             nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, 3, padding=1),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(C2, C2, 3, padding=1),
+            nn.BatchNorm2d(C2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
             
             # Block 3
-            nn.Conv2d(128, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
+            nn.Conv2d(C2, C3, 3, padding=1),
+            nn.BatchNorm2d(C3),
             nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.BatchNorm2d(256),
+            nn.Conv2d(C3, C3, 3, padding=1),
+            nn.BatchNorm2d(C3),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, 2),
             nn.Dropout(0.25),
             
             # Block 4
-            nn.Conv2d(256, 512, 3, padding=1),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(C3, C4, 3, padding=1),
+            nn.BatchNorm2d(C4),
             nn.ReLU(inplace=True),
-            nn.Conv2d(512, 512, 3, padding=1),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(C4, C4, 3, padding=1),
+            nn.BatchNorm2d(C4),
             nn.ReLU(inplace=True),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
         
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512, 256),
+            nn.Linear(C4, C3),
             nn.ReLU(inplace=True),
             nn.Dropout(dropout),
-            nn.Linear(256, num_classes),
+            nn.Linear(C3, num_classes),
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
