@@ -6,9 +6,8 @@ Usage:
 """
 
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split, Subset
-from typing import Optional, Tuple
-import numpy as np
+from torch.utils.data import DataLoader, Dataset, random_split
+from typing import Tuple
 
 
 def create_dataloaders(
@@ -75,32 +74,43 @@ def create_dataloaders(
 
 
 def get_class_weights(
-    dataset: Dataset,
-    num_classes: int,
+    dataset: Dataset = None,
+    num_classes: int = None,
     label_key: str = None,
+    labels: list = None,
 ) -> torch.Tensor:
     """
     Calculate class weights for imbalanced datasets.
     
     Args:
-        dataset: Dataset with labels
+        dataset: Dataset with labels (optional if labels provided)
         num_classes: Number of classes
         label_key: Key to access labels if dataset returns dict
+        labels: Pre-extracted labels to avoid redundant dataset iteration
     
     Returns:
         Tensor of class weights (inversely proportional to frequency)
     """
+    if num_classes is None:
+        raise ValueError("num_classes must be provided")
+
     class_counts = torch.zeros(num_classes)
     
-    for item in dataset:
-        if isinstance(item, tuple):
-            label = item[1]  # Assume (input, label) format
-        elif isinstance(item, dict) and label_key:
-            label = item[label_key]
-        else:
-            raise ValueError("Cannot extract label from dataset item")
-        
-        class_counts[label] += 1
+    if labels is not None:
+        for label in labels:
+            class_counts[label] += 1
+    elif dataset is not None:
+        for item in dataset:
+            if isinstance(item, tuple):
+                label = item[1]  # Assume (input, label) format
+            elif isinstance(item, dict) and label_key:
+                label = item[label_key]
+            else:
+                raise ValueError("Cannot extract label from dataset item")
+
+            class_counts[label] += 1
+    else:
+        raise ValueError("Must provide either dataset or labels")
     
     # Inverse frequency weighting
     weights = 1.0 / (class_counts + 1e-6)
@@ -112,6 +122,7 @@ def get_class_weights(
 def create_imbalanced_sampler(
     dataset: Dataset,
     num_classes: int,
+    label_key: str = None,
 ) -> torch.utils.data.WeightedRandomSampler:
     """
     Create a weighted sampler for imbalanced datasets.
@@ -119,21 +130,25 @@ def create_imbalanced_sampler(
     Args:
         dataset: Dataset with labels
         num_classes: Number of classes
+        label_key: Key to access labels if dataset returns dict
     
     Returns:
         WeightedRandomSampler
     """
-    class_weights = get_class_weights(dataset, num_classes)
-    
-    sample_weights = []
+    labels = []
     for item in dataset:
         if isinstance(item, tuple):
             label = item[1]
+        elif isinstance(item, dict) and label_key:
+            label = item[label_key]
         else:
-            raise ValueError("Expected (input, label) format")
-        sample_weights.append(class_weights[label])
+            raise ValueError("Expected (input, label) format or dict with label_key")
+        labels.append(int(label))
+
+    class_weights = get_class_weights(None, num_classes, labels=labels)
     
-    sample_weights = torch.tensor(sample_weights)
+    # Use advanced tensor indexing to efficiently map labels to weights
+    sample_weights = class_weights[labels]
     
     return torch.utils.data.WeightedRandomSampler(
         weights=sample_weights,
