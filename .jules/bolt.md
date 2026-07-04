@@ -1,0 +1,3 @@
+## 2024-05-24 - Single-Pass Dataset Iteration
+**Learning:** Initializing `WeightedRandomSampler` via `get_class_weights` and `create_imbalanced_sampler` caused two full iterations over the PyTorch `Dataset` because both functions individually extracted labels. This is highly inefficient for datasets with expensive `__getitem__` operations (like disk I/O or augmentations).
+**Action:** Extract labels in a single pass into a list, compute class counts, and map them to sample weights using vectorized tensor indexing (`class_weights[torch.as_tensor(labels, dtype=torch.long)]`). Furthermore, optionally accept precomputed labels in utilities like `get_class_weights` to prevent redundant iteration when composed.
