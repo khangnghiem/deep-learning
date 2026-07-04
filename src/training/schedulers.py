@@ -9,6 +9,8 @@ import math
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
 
+EPSILON = 1e-6
+
 
 class WarmupCosineScheduler(_LRScheduler):
     """
@@ -26,7 +28,7 @@ class WarmupCosineScheduler(_LRScheduler):
         optimizer: torch.optim.Optimizer,
         warmup_epochs: int,
         total_epochs: int,
-        min_lr: float = 1e-6,
+        min_lr: float = EPSILON,
         last_epoch: int = -1,
     ):
         self.warmup_epochs = warmup_epochs
