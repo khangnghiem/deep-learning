@@ -233,7 +233,8 @@ def main():
                 
         # --- Testing Phase ---
         if checkpoint_callback.best_path and os.path.exists(checkpoint_callback.best_path):
-            checkpoint = torch.load(checkpoint_callback.best_path, map_location=device)
+            # Use weights_only=True to prevent arbitrary code execution during deserialization
+            checkpoint = torch.load(checkpoint_callback.best_path, map_location=device, weights_only=True)
             model.load_state_dict(checkpoint["model_state_dict"])
             logger.info(f"Loaded best model for testing.")
 

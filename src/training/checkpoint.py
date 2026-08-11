@@ -78,7 +78,8 @@ def load_checkpoint(
     Returns:
         Tuple of (model, optimizer, epoch, metrics)
     """
-    checkpoint = torch.load(path, map_location=device)
+    # Use weights_only=True to prevent arbitrary code execution during deserialization
+    checkpoint = torch.load(path, map_location=device, weights_only=True)
     
     model.load_state_dict(checkpoint["model_state_dict"])
     
