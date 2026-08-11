@@ -112,7 +112,7 @@ def train_epoch(model, loader, criterion, optimizer, device):
     total_loss, correct, total = 0, 0, 0
     for inputs, targets in tqdm(loader, desc="Training"):
         inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
@@ -146,7 +146,7 @@ def sanity_check(model, train_loader, criterion, device, steps=50):
     inputs, targets = inputs.to(device), targets.to(device)
     opt = torch.optim.Adam(model.parameters(), lr=0.001)
     for _ in range(steps):
-        opt.zero_grad()
+        opt.zero_grad(set_to_none=True)
         loss = criterion(model(inputs), targets)
         loss.backward()
         opt.step()

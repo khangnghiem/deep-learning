@@ -105,7 +105,7 @@ def main():
             for images, masks in pbar:
                 images, masks = images.to(device), masks.to(device)
                 
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 preds = model(images)
                 
                 loss = criterion(preds, masks)
