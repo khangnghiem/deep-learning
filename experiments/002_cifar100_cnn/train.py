@@ -111,8 +111,8 @@ def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0
     for inputs, targets in tqdm(loader, desc="Training"):
-        inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
+        inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
@@ -129,7 +129,7 @@ def validate(model, loader, criterion, device):
     total_loss, correct, total = 0, 0, 0
     with torch.no_grad():
         for inputs, targets in tqdm(loader, desc="Validating"):
-            inputs, targets = inputs.to(device), targets.to(device)
+            inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             total_loss += loss.item()
@@ -143,7 +143,7 @@ def sanity_check(model, train_loader, criterion, device, steps=50):
     print("\n--- Sanity Check ---")
     model.train()
     inputs, targets = next(iter(train_loader))
-    inputs, targets = inputs.to(device), targets.to(device)
+    inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
     opt = torch.optim.Adam(model.parameters(), lr=0.001)
     for _ in range(steps):
         opt.zero_grad()
@@ -163,7 +163,7 @@ def evaluate(model, val_loader, device, config, mlflow):
     all_preds, all_labels = [], []
     with torch.no_grad():
         for inputs, targets in tqdm(val_loader, desc="Evaluating"):
-            preds = model(inputs.to(device)).argmax(1).cpu()
+            preds = model(inputs.to(device, non_blocking=True)).argmax(1).cpu()
             all_preds.append(preds)
             all_labels.append(targets)
     all_preds, all_labels = torch.cat(all_preds), torch.cat(all_labels)
@@ -207,7 +207,7 @@ def main():
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Device: {device}")
 
-        model = get_model(config).to(device)
+        model = get_model(config).to(device, non_blocking=True)
         train_loader, val_loader = get_dataloaders(config)
         criterion = nn.CrossEntropyLoss()
 
@@ -232,7 +232,7 @@ def main():
         early_stopping = EarlyStopping(patience=patience, mode="min") if patience else None
 
         sanity_check(model, train_loader, criterion, device)
-        model = get_model(config).to(device)
+        model = get_model(config).to(device, non_blocking=True)
         if opt_name == "sgd":
             optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4)
         elif opt_name == "adamw":

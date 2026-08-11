@@ -67,8 +67,8 @@ def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0
     for x, y in tqdm(loader, desc="Training"):
-        x, y = x.to(device), y.to(device)
-        optimizer.zero_grad()
+        x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+        optimizer.zero_grad(set_to_none=True)
         out = model(x)
         loss = criterion(out, y)
         loss.backward()
@@ -84,7 +84,7 @@ def validate(model, loader, criterion, device):
     total_loss, correct, total = 0, 0, 0
     with torch.no_grad():
         for x, y in tqdm(loader, desc="Validating"):
-            x, y = x.to(device), y.to(device)
+            x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
             out = model(x)
             loss = criterion(out, y)
             total_loss += loss.item()
@@ -105,7 +105,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
     
-    model = SimpleCNN(num_classes=10).to(device)
+    model = SimpleCNN(num_classes=10).to(device, non_blocking=True)
     train_loader, val_loader = get_dataloaders(config)
     
     criterion = nn.CrossEntropyLoss()

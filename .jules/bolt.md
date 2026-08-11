@@ -1,0 +1,3 @@
+## 2024-04-11 - PyTorch Memory & Data Transfer Optimizations
+**Learning:** PyTorch memory footprint and data transfer efficiency can be improved by specific codebase patterns. First, `optimizer.zero_grad(set_to_none=True)` significantly reduces memory bandwidth usage compared to `optimizer.zero_grad()`. Second, setting `non_blocking=True` in `.to(device)` calls enables asynchronous data transfers to the GPU, speeding up training loops.
+**Action:** When implementing new training loops or maintaining existing ones, consistently apply `set_to_none=True` on `zero_grad()` calls and `non_blocking=True` when shifting tensors to the target device.

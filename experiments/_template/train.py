@@ -174,12 +174,12 @@ def sanity_check(model, train_loader, criterion, device, steps=50):
     print("\n--- Sanity Check: Overfit One Batch ---")
     model.train()
     batch = next(iter(train_loader))
-    inputs, targets = batch[0].to(device), batch[1].to(device)
+    inputs, targets = batch[0].to(device, non_blocking=True), batch[1].to(device, non_blocking=True)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     for step in range(steps):
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
@@ -208,9 +208,9 @@ def train_epoch(model, loader, criterion, optimizer, device):
     total = 0
 
     for inputs, targets in tqdm(loader, desc="Training"):
-        inputs, targets = inputs.to(device), targets.to(device)
+        inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
 
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
@@ -233,7 +233,7 @@ def validate(model, loader, criterion, device):
 
     with torch.no_grad():
         for inputs, targets in tqdm(loader, desc="Validating"):
-            inputs, targets = inputs.to(device), targets.to(device)
+            inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
 
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -258,7 +258,7 @@ def evaluate(model, val_loader, device, config, mlflow, class_names=None):
 
     with torch.no_grad():
         for inputs, targets in tqdm(val_loader, desc="Evaluating"):
-            outputs = model(inputs.to(device))
+            outputs = model(inputs.to(device, non_blocking=True))
             _, preds = outputs.max(1)
             all_preds.append(preds.cpu())
             all_labels.append(targets)
@@ -351,7 +351,7 @@ def main():
             logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
         # Model & Data
-        model = get_model(config).to(device)
+        model = get_model(config).to(device, non_blocking=True)
         train_loader, val_loader = get_dataloaders(config)
 
         # Training setup
@@ -370,7 +370,7 @@ def main():
         sanity_check(model, train_loader, criterion, device, steps=50)
 
         # Re-initialize model after sanity check
-        model = get_model(config).to(device)
+        model = get_model(config).to(device, non_blocking=True)
         optimizer, opt_name = create_optimizer(model, config)
         scheduler, sched_name = create_scheduler(optimizer, config)
 
