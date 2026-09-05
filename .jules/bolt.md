@@ -1,0 +1,3 @@
+## 2024-05-15 - Redundant Dataset Iterations in PyTorch Samplers
+**Learning:** In PyTorch, iteratively calling helper functions (like `get_class_weights` followed by calculating instance weights in `create_imbalanced_sampler`) that individually iterate over `Dataset` objects causes extreme performance bottlenecks due to repeated I/O and data augmentations (`__getitem__`). Furthermore, using Python list comprehensions for tensor mapping is suboptimal.
+**Action:** Always extract needed metadata (like labels) in a single unified pass over the dataset. Pass pre-extracted labels to downstream helper utilities, and use PyTorch advanced tensor indexing (e.g., `class_weights[torch.as_tensor(labels, dtype=torch.long)]`) to map weights in O(1) time rather than looping in Python.
