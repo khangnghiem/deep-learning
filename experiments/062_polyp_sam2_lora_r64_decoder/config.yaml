@@ -1,0 +1,19 @@
+experiment_name: "062_polyp_sam2_lora_r64_decoder"
+model:
+  type: "sam2_hiera_small"
+  checkpoint: "sam2_hiera_small.pt"
+  model_cfg: "sam2_hiera_s.yaml"
+lora:
+  target: "mask_decoder"
+  r: 64
+  lora_alpha: 128
+  target_modules: "all-linear"
+  lora_dropout: 0.05
+training:
+  epochs: 5
+  lr: 0.0001
+  weight_decay: 0.0001
+  loss: "bce_dice"
+data:
+  dataset_dir: "/content/drive/MyDrive/data_lake/03_gold/016_polyp_fast_diag_dataset"
+  yolo_model: "/content/drive/MyDrive/models/trained/025_polyp_yolov12x_aug/train/weights/best.pt"
