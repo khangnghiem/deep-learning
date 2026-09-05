@@ -1,0 +1,4 @@
+{
+  "databricks.logs.enabled": false,
+  "databricks.overrideDatabricksConfigFile": "/dev/null"
+}
