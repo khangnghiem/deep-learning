@@ -117,15 +117,15 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
     # ----------------------------------------------------------------
     # Create mapped exploration notebook
     # ----------------------------------------------------------------
-    EXPLORATIONS_DIR = PROJECT_ROOT / "explorations"
-    template_nb = EXPLORATIONS_DIR / "_template.ipynb"
-    target_nb = EXPLORATIONS_DIR / f"{exp_name}.ipynb"
+    NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
+    template_nb = NOTEBOOKS_DIR / "_template.ipynb"
+    target_nb = NOTEBOOKS_DIR / f"{exp_name}.ipynb"
     
     if template_nb.exists() and not target_nb.exists():
         nb_text = template_nb.read_text(encoding="utf-8")
         nb_text = nb_text.replace("{DATASET_NAME}", dataset_name)
         target_nb.write_text(nb_text, encoding="utf-8")
-        print(f"Created paired exploration -> explorations/{target_nb.name}")
+        print(f"Created paired notebook -> notebooks/{target_nb.name}")
 
     # ----------------------------------------------------------------
     # Patch config.yaml

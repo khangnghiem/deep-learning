@@ -28,7 +28,7 @@ new_setup_source = [
     "except ImportError:\n",
     "    # Local Environment\n",
     "    cur = Path().resolve()\n",
-    "    REPO_ROOT = cur.parent if cur.name in ('explorations', 'experiments') else cur.parents[1]\n",
+    "    REPO_ROOT = cur.parent if cur.name in ('notebooks', 'experiments') else cur.parents[1]\n",
     "    if str(REPO_ROOT) not in sys.path:\n",
     "        sys.path.insert(0, str(REPO_ROOT))\n",
     "\n",

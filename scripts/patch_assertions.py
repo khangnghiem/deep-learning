@@ -48,7 +48,7 @@ def fix_assertions(filepath):
     return False
 
 if __name__ == '__main__':
-    files = glob.glob('experiments/**/*.ipynb', recursive=True) + glob.glob('explorations/*.ipynb')
+    files = glob.glob('experiments/**/*.ipynb', recursive=True) + glob.glob('notebooks/*.ipynb')
     count = 0
     for f in files:
         if fix_assertions(f):

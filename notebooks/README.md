@@ -1,4 +1,4 @@
-# Explorations
+# Notebooks
 
 Interactive Jupyter notebooks for research and development work.
 
@@ -24,8 +24,8 @@ This folder is your **sketchpad** — use it for:
 > The exploratory notebook must exist BEFORE its formal experiment folder is created. The filename must exactly match.
 
 ```
-experiments/001_cifar10_cnn/  <--->  explorations/001_cifar10_cnn.ipynb
-experiments/007_polyp_unet/   <--->  explorations/007_polyp_unet.ipynb
+experiments/001_cifar10_cnn/  <--->  notebooks/001_cifar10_cnn.ipynb
+experiments/007_polyp_unet/   <--->  notebooks/007_polyp_unet.ipynb
 ```
 
 When you run `python scripts/create_experiment.py <dataset>`, the script will automatically generate the formal experiment folder and its paired `.ipynb` template here.

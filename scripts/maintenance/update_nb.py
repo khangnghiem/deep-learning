@@ -39,4 +39,4 @@ update_notebook('experiments/016_polyp_fast_diag/016_polyp_fast_diag_pipeline.ip
 explore_reps = [
     ("    batch=16,\\n", "    batch=32,\\n    workers=8,  # L4 High RAM capacity\\n")
 ]
-update_notebook('explorations/016_polyp_fast_diag.ipynb', explore_reps)
+update_notebook('notebooks/016_polyp_fast_diag.ipynb', explore_reps)

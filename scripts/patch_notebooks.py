@@ -15,9 +15,9 @@ BOILERPLATE_SOURCE = [
     "    drive.mount('/content/drive')\n",
     "    REPO_ROOT = Path('/content/drive/MyDrive/repos/deep-learning')\n",
     "except ImportError:\n",
-    "    # Local fallback (assumes running from explorations/ or experiments/)\n",
+    "    # Local fallback (assumes running from notebooks/ or experiments/)\n",
     "    cur = Path().resolve()\n",
-    "    REPO_ROOT = cur.parent if cur.name in ('explorations', 'experiments') else cur.parents[1]\n",
+    "    REPO_ROOT = cur.parent if cur.name in ('notebooks', 'experiments') else cur.parents[1]\n",
     "\n",
     "if str(REPO_ROOT) not in sys.path:\n",
     "    sys.path.insert(0, str(REPO_ROOT))\n",
@@ -82,7 +82,7 @@ def process_notebook(filepath):
     return False
 
 if __name__ == '__main__':
-    files = glob.glob('experiments/**/*.ipynb', recursive=True) + glob.glob('explorations/*.ipynb')
+    files = glob.glob('experiments/**/*.ipynb', recursive=True) + glob.glob('notebooks/*.ipynb')
     count = 0
     for f in files:
         if process_notebook(f):

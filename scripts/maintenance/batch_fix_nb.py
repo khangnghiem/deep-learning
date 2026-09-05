@@ -24,7 +24,7 @@ new_setup_source = [
     "except ImportError:\n",
     "    # Local Environment\n",
     "    cur = Path().resolve()\n",
-    "    REPO_ROOT = cur.parent if cur.name in ('explorations', 'experiments') else cur.parents[1]\n",
+    "    REPO_ROOT = cur.parent if cur.name in ('notebooks', 'experiments') else cur.parents[1]\n",
     "\n",
     "if str(REPO_ROOT) not in sys.path:\n",
     "    sys.path.insert(0, str(REPO_ROOT))\n",
@@ -70,8 +70,8 @@ for exp in exps:
         with open(conf_path, 'w', encoding='utf-8') as f:
             f.write(text)
             
-    # Fix explorations
-    exp_nb = os.path.join(repo, f"explorations/{exp}.ipynb")
+    # Fix notebooks
+    exp_nb = os.path.join(repo, f"notebooks/{exp}.ipynb")
     if os.path.exists(exp_nb):
         with open(exp_nb, 'r', encoding='utf-8') as f:
             nb = json.load(f)
