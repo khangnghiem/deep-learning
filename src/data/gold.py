@@ -6,6 +6,9 @@ from torchvision.datasets import ImageFolder
 from PIL import Image
 import numpy as np
 
+MAX_PIXEL_VALUE = 255.0
+BINARIZATION_THRESHOLD = 0.5
+
 # We assume this script lives in g:/My Drive/repos/deep-learning/src/data
 # so we locate GOLD relative to this, or use the centralized paths module.
 from src.config.paths import GOLD
@@ -79,13 +82,13 @@ class GoldSegmentationDataset(Dataset):
                     
         # Ensure mask is a tensor if it isn't already, e.g. albumentations with ToTensorV2
         if not isinstance(mask, torch.Tensor):
-            mask = torch.tensor(mask, dtype=torch.float32) / 255.0
+            mask = torch.tensor(mask, dtype=torch.float32) / MAX_PIXEL_VALUE
         else:
             if mask.max() > 1.5:  # e.g., max is 255
-                mask = mask / 255.0
+                mask = mask / MAX_PIXEL_VALUE
                 
         # Binarize
-        mask = (mask > 0.5).float()
+        mask = (mask > BINARIZATION_THRESHOLD).float()
         
         # Add channel dimension if 2D
         if mask.dim() == 2:

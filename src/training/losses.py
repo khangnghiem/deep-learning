@@ -12,6 +12,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+BOUNDARY_WEIGHT_MULTIPLIER = 5.0
+STRUCTURE_LOSS_KERNEL_SIZE = 31
+STRUCTURE_LOSS_PADDING = 15
+
 
 class FocalLoss(nn.Module):
     """
@@ -151,7 +155,7 @@ class StructureLoss(nn.Module):
     def forward(self, pred: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         # pred and mask shape: [B, 1, H, W]
         # Weight map generation (higher weights at boundaries)
-        weit = 1 + 5 * torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)
+        weit = 1 + BOUNDARY_WEIGHT_MULTIPLIER * torch.abs(F.avg_pool2d(mask, kernel_size=STRUCTURE_LOSS_KERNEL_SIZE, stride=1, padding=STRUCTURE_LOSS_PADDING) - mask)
         
         # Weighted BCE
         wbce = F.binary_cross_entropy_with_logits(pred, mask, reduction='none')
