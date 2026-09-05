@@ -6,7 +6,8 @@ This file provides guidance when working with code in this repository.
 
 ### Environment setup
 
-- Install dependencies: `pip install -r requirements.txt`
+- Install dependencies: `pip install -e ".[test]"`
+- All dependencies are defined in `pyproject.toml` (single source of truth)
 
 ### Running experiments
 
@@ -36,20 +37,22 @@ This file provides guidance when working with code in this repository.
 - `src/training/` — `Trainer` class, `EarlyStopping`, checkpoint utilities. Uses `src.config.paths` for MLflow and model saving.
 - `src/utils/` — Metrics, visualization.
 - `experiments/` — **Reproducible training runs**. Each has `config.yaml`, `train.py` (source of truth), thin `train.ipynb` (Colab launcher), `README.md`.
-- `explorations/` — **Interactive notebooks** for EDA, prototyping, visualization, and architecture search. No MLflow logging or checkpoints.
-- `scripts/` — `create_experiment.py` (generates new experiments), `batch_train.py`.
+- `notebooks/` — **Interactive notebooks** for EDA, prototyping, visualization, and architecture search. No MLflow logging or checkpoints.
+- `scripts/` — `create_experiment.py` (generates new experiments), `batch_train.py`, `data/` (ingestion).
 - `tests/` — Unit tests for models/losses, integration tests for training loop.
+- `deploy/` — Deployment configs (Modal.com SAM2 inference).
+- `docs/` — Design docs, data source references.
 
 ## Agent usage notes
 
 - Import paths/MLflow from `src.config.paths`, never hardcode.
 - Import `DATASETS` from `src.config.catalog` when needed by `create_experiment.py`.
 - **NEVER run training locally** — use Google Colab.
-- **Naming Convention:** All experiments, explorations, and folders MUST strictly follow the format `{NNN}_{dataset}_{model}` (e.g., `001_cifar10_cnn.ipynb` matching `experiments/001_cifar10_cnn/`).
+- **Naming Convention:** All experiments, notebooks, and folders MUST strictly follow the format `{NNN}_{dataset}_{model}` (e.g., `001_cifar10_cnn.ipynb` matching `experiments/001_cifar10_cnn/`).
   - `{NNN}`: 3-digit zero-padded sequential number.
   - `{dataset}`: The dataset or generic domain used.
   - `{model}`: The primary architecture or algorithm.
 - When creating new experiments, follow patterns in `experiments/001_cifar10_cnn` and `_template/`.
 - **`experiments/` = `.py` scripts** (train.py is the source of truth). Notebooks here are thin Colab launchers only.
-- **`explorations/` = `.ipynb` notebooks** mapped 1:1 to `experiments/`. **Every experiment must be explored first here.** The exploration notebook MUST exist before the formal experiment directory is created. Put EDA, prototyping, and visualization work here. **Important:** Any processed or modified data generated during exploration MUST simply be held in memory or written to Colab's ephemeral `/content/` disk, NEVER directly to Bronze/Silver.
+- **`notebooks/` = `.ipynb` notebooks** mapped 1:1 to `experiments/`. **Every experiment must be explored first here.** The exploration notebook MUST exist before the formal experiment directory is created. Put EDA, prototyping, and visualization work here. **Important:** Any processed or modified data generated during exploration MUST simply be held in memory or written to Colab's ephemeral `/content/` disk, NEVER directly to Bronze/Silver.
 - When exploration work matures, graduate reusable code to `src/` and create a formal experiment via `create_experiment.py`.
