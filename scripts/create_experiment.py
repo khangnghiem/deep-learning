@@ -21,8 +21,7 @@ from pathlib import Path
 import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(PROJECT_ROOT))
+
 
 if os.name == "nt" and "DRIVE_ROOT" not in os.environ:
     os.environ["DRIVE_ROOT"] = "G:\\My Drive"

@@ -22,11 +22,6 @@ Usage:
 import os
 import subprocess
 from pathlib import Path
-import sys
-
-# Add project root
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config.paths import get_bronze_path
 

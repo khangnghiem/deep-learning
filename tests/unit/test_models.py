@@ -6,11 +6,6 @@ Run with: pytest tests/unit/test_models.py -v
 
 import pytest
 import torch
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models import SimpleCNN, MLP, get_pretrained_resnet
 from src.models.medical import MedicalCNN, get_medical_resnet, GeneExpressionMLP, UNet

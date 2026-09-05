@@ -7,9 +7,12 @@ import torch
 import sys
 from pathlib import Path
 
+import os
+
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+os.environ.setdefault("DRIVE_ROOT", str(PROJECT_ROOT / ".test_drive"))
 
 
 @pytest.fixture
