@@ -10,6 +10,7 @@ Usage:
 
 import torch
 from torchvision import transforms
+from src.config.constants import IMAGENET_MEAN, IMAGENET_STD, CIFAR_MEAN, CIFAR_STD, MNIST_MEAN, MNIST_STD
 
 
 def get_train_transforms(
@@ -57,8 +58,8 @@ def get_train_transforms(
     if normalize:
         transform_list.append(
             transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],  # ImageNet stats
-                std=[0.229, 0.224, 0.225]
+                mean=IMAGENET_MEAN,  # ImageNet stats
+                std=IMAGENET_STD
             )
         )
     
@@ -87,8 +88,8 @@ def get_val_transforms(
     if normalize:
         transform_list.append(
             transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
+                mean=IMAGENET_MEAN,
+                std=IMAGENET_STD
             )
         )
     
@@ -103,16 +104,16 @@ def get_cifar_transforms(train: bool = True) -> transforms.Compose:
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.4914, 0.4822, 0.4465],
-                std=[0.2470, 0.2435, 0.2616]
+                mean=CIFAR_MEAN,
+                std=CIFAR_STD
             ),
         ])
     else:
         return transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.4914, 0.4822, 0.4465],
-                std=[0.2470, 0.2435, 0.2616]
+                mean=CIFAR_MEAN,
+                std=CIFAR_STD
             ),
         ])
 
@@ -123,10 +124,10 @@ def get_mnist_transforms(train: bool = True) -> transforms.Compose:
         return transforms.Compose([
             transforms.RandomRotation(10),
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ])
     else:
         return transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ])

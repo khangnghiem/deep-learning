@@ -1,3 +1,4 @@
+from src.config.constants import IMAGENET_MEAN, IMAGENET_STD
 import os
 import sys
 import yaml
@@ -78,13 +79,13 @@ def main():
         A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.2, rotate_limit=30, p=0.5),
         A.CoarseDropout(max_holes=8, max_height=32, max_width=32, p=0.3),
         A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2, hue=0.1, p=0.5),
-        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ToTensorV2(),
     ])
     
     val_transform = A.Compose([
         A.Resize(352, 352),
-        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ToTensorV2(),
     ])
     
