@@ -168,10 +168,43 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
         readme = readme.replace("experiment_name", exp_name)
         readme_path.write_text(readme, encoding="utf-8")
 
+    # ----------------------------------------------------------------
+    # Generate REQUIREMENTS.md from template
+    # ----------------------------------------------------------------
+    req_template = PROJECT_ROOT / "docs" / "requirements" / "REQUIREMENTS_TEMPLATE.md"
+    req_path = exp_dir / "REQUIREMENTS.md"
+    if req_template.exists():
+        req_text = req_template.read_text(encoding="utf-8")
+        req_text = req_text.replace("{EXPERIMENT_ID}", exp_name)
+        req_text = req_text.replace("{DATASET_NAME}", dataset_name)
+        req_text = req_text.replace("{NUM_CLASSES}", str(info.get("classes", 10)))
+        req_text = req_text.replace("{OPTIMIZER}", hp["optimizer"])
+        req_text = req_text.replace("{LR}", str(hp["lr"]))
+        req_text = req_text.replace("{BATCH_SIZE}", str(hp["batch_size"]))
+        req_text = req_text.replace("{EPOCHS}", str(hp["epochs"]))
+        req_text = req_text.replace("{MLFLOW_EXP_NAME}", dataset_name.replace("_", "-"))
+        req_path.write_text(req_text, encoding="utf-8")
+        print(f"Created requirements -> {exp_dir.name}/REQUIREMENTS.md")
+
+    # ----------------------------------------------------------------
+    # Patch and rename Colab launcher notebook
+    # ----------------------------------------------------------------
+    template_launcher = exp_dir / "template_reference_train.ipynb"
+    target_launcher = exp_dir / f"{exp_name}_train.ipynb"
+    if template_launcher.exists():
+        nb_content = template_launcher.read_text(encoding="utf-8")
+        nb_content = nb_content.replace("{EXPERIMENT_NAME}", exp_name)
+        nb_content = nb_content.replace("experiments/_template", f"experiments/{exp_name}")
+        target_launcher.write_text(nb_content, encoding="utf-8")
+        template_launcher.unlink()
+        print(f"Created Colab launcher -> {exp_dir.name}/{target_launcher.name}")
+
+    launcher_name = target_launcher.name if target_launcher.exists() else "train.ipynb"
     print(f"\nNext steps:")
-    print(f"  1. Edit {exp_name}/train.py — implement get_model() and get_dataloaders()")
-    print(f"  2. Edit {exp_name}/requirements.txt — add experiment-specific packages")
-    print(f"  3. Run via Colab: open {exp_name}/template_reference_train.ipynb")
+    print(f"  1. Define hypothesis in {exp_name}/REQUIREMENTS.md")
+    print(f"  2. Prototype in notebooks/{exp_name}.ipynb")
+    print(f"  3. Implement {exp_name}/train.py (model, dataloaders, loss)")
+    print(f"  4. Run on Google Colab Pro+: open {exp_name}/{launcher_name}")
 
     return exp_dir
 

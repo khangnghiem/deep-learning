@@ -30,16 +30,16 @@ Traditional TDD doesn't fit ML perfectly because:
 ## TDD Workflow for ML
 
 ```
-1. Write requirements (REQUIREMENTS.md)
-2. Design architecture (docs/designs/*.drawio)
-3. Write tests for data pipeline
-4. Implement data pipeline → tests pass
-5. Write tests for model shape/forward pass
-6. Implement model → tests pass
-7. Write integration test for training loop
-8. Implement training → tests pass
-9. Train on real data, evaluate
-10. Document results
+1. Write experiment requirements (REQUIREMENTS.md via docs/requirements/REQUIREMENTS_TEMPLATE.md)
+2. Explore & prototype in notebooks/ (ephemeral data on Colab /content/)
+3. Write unit tests for data transforms (tests/unit/test_transforms.py)
+4. Implement data pipeline in src/data/ → tests pass
+5. Write unit tests for model forward pass & loss (tests/unit/test_models.py, test_losses.py)
+6. Graduate architecture into src/models/ → tests pass
+7. Write integration test for training loop (tests/integration/test_training.py)
+8. Execute formal training on Google Colab Pro+ via experiments/
+9. Evaluate on held-out test split, log to SQLite MLflow, save checkpoint to Drive
+10. Document results in experiments/{NNN}_*/README.md
 ```
 
 ## Test Structure
@@ -54,8 +54,7 @@ tests/
 ├── integration/
 │   ├── test_training.py
 │   └── test_data_pipeline.py
-├── conftest.py          # Fixtures
-└── pytest.ini
+└── conftest.py          # Fixtures (configured via pyproject.toml)
 ```
 
 ## Running Tests
