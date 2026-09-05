@@ -30,6 +30,13 @@ experiments/007_polyp_unet/   <--->  notebooks/007_polyp_unet.ipynb
 
 When you run `python scripts/create_experiment.py <dataset>`, the script will automatically generate the formal experiment folder and its paired `.ipynb` template here.
 
+> [!NOTE]
+> **Not every notebook graduates to an experiment.** Many notebooks (e.g., 028–056) are
+> exploration-only — quick hypothesis tests, ablation studies, or dead-end experiments that
+> didn't warrant a formal `experiments/` directory. Number gaps between `notebooks/` and
+> `experiments/` are expected and intentional.
+
+
 ## Base Templates
 
 Standalone exploration templates are kept here for quick reuse. They are prefixed with an underscore so they don't get confused with formal experiments:
