@@ -153,7 +153,7 @@ OBSERVABILITY = OPS / "observability"
 # =============================================================================
 
 MLFLOW_DIR = OPS / "mlflow"
-MLFLOW_TRACKING_URI = f"file://{MLFLOW_DIR / 'mlruns'}"
+MLFLOW_TRACKING_URI = f"sqlite:///{MLFLOW_DIR / 'mlflow.db'}"
 MLFLOW_ARTIFACTS = MLFLOW_DIR / "artifacts"
 
 # =============================================================================
@@ -177,7 +177,10 @@ REPOS = DRIVE / "repos"
 def setup_mlflow():
     """Configure MLflow with Drive-based tracking."""
     import mlflow
+    MLFLOW_DIR.mkdir(parents=True, exist_ok=True)
+    MLFLOW_ARTIFACTS.mkdir(parents=True, exist_ok=True)
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    os.environ.setdefault("MLFLOW_DEFAULT_ARTIFACT_ROOT", str(MLFLOW_ARTIFACTS))
     return mlflow
 
 def get_env_info() -> dict:

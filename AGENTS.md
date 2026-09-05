@@ -21,13 +21,13 @@ This file provides guidance when working with code in this repository.
 
 ### MLflow UI
 
-- `cd "/path/to/My Drive/mlflow" && mlflow ui --backend-store-uri file://./mlruns --port 5000`
+- `mlflow ui --backend-store-uri sqlite:///<path>/mlflow.db --port 5000`
 
 ## High-level architecture
 
 ### Dependencies
 
-- Data ingestion scripts live in **`../../data_lake/scripts`**.
+- Data ingestion scripts live in **`scripts/data/`** and dataset definitions in **`src/config/catalog.py`**.
 
 ### Repository layout
 

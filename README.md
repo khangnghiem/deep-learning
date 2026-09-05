@@ -11,18 +11,18 @@ python train.py
 
 # View MLflow results
 cd /path/to/My\ Drive/ops/mlflow
-mlflow ui --backend-store-uri file://./mlruns
+mlflow ui --backend-store-uri sqlite:///path/to/My\ Drive/ops/mlflow/mlflow.db --port 5000
 ```
 
 ## Structure
 
 ```
 deep-learning/
-├── config/           # Path configs, MLflow setup
-├── experiments/      # Reproducible training runs (train.py + config.yaml)
+├── pyproject.toml    # PEP 621 package metadata (%pip install -e .)
+├── src/              # Shared library code (models, transforms, training utils, config)
+├── experiments/      # Reproducible training runs (train.py + config.yaml + _train.ipynb)
 ├── explorations/     # Interactive notebooks (EDA, prototyping, visualization)
-├── src/              # Shared library code (models, transforms, training utils)
-├── scripts/          # Utility scripts (create_experiment, batch_train)
+├── scripts/          # Utility scripts (create_experiment, batch_download)
 └── tests/            # Unit & integration tests
 ```
 
@@ -39,7 +39,7 @@ All data lives in `My Drive/data_lake/`:
 | Telemetry  | `07_telemetry/`  | Exported DuckDB logs / system telemetry           |
 | Monitoring | `08_monitoring/` | Data drift reports & model health snapshots       |
 
-See [`config/paths.py`](config/paths.py) for path constants.
+See [`src/config/paths.py`](src/config/paths.py) for path constants.
 
 ## Experiments
 

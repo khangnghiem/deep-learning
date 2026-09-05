@@ -216,5 +216,7 @@ experiments/**/*.pt
 experiments/**/*.pth
 experiments/**/*.onnx
 
-# MLflow local tracking (canonical store is at root mlflow/)
+# MLflow local tracking (canonical store is on Drive ops/mlflow/mlflow.db)
 mlruns/
+mlflow.db
+*.db
