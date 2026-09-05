@@ -1,12 +1,12 @@
 <!--
-  Feature Low-Level Design (LLD) Template: ML Engineering & Architecture Spec
-  Location: docs/epics/E-<epic>-<slug>/F-<n>-<feature-slug>.md
+  Module Design Specification (LLD) Template: ML Engineering & Architecture Spec
+  Location: docs/designs/<module-slug>.md
   Reference: SE4ML (Software Engineering for Machine Learning) & Google Rules of ML
 -->
 
-# Feature F-NNN: <Feature or Module Name>
+# Module Design: <Module or Component Name>
 
-> **Parent Epic**: [Epic E-NNN](../README.md)  
+> **Parent Track**: [Research Track Title](RESEARCH_TRACK_TEMPLATE.md) (optional)  
 > **Target Module**: `src/<subpackage>/<module_name>.py` (e.g. `src/models/sam2_lora.py`)  
 > **Author**: Khang Nghiem  
 > **Status**: Draft | In-Review | Approved | Implemented | Graduated to `src/`  
@@ -158,6 +158,6 @@ Reusable engineering modules follow the graduation lifecycle:
 
 ## 9. References & Linked Experiments
 
-- **Parent Epic**: [Epic E-NNN](../README.md)
+- **Parent Track**: [Research Track](RESEARCH_TRACK_TEMPLATE.md) (optional)
 - **Consuming Experiment**: `experiments/{NNN}_{dataset}_{model}/`
 - **Exploration Notebook**: `notebooks/{NNN}_{dataset}_{model}.ipynb`

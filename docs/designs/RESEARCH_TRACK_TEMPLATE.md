@@ -1,10 +1,10 @@
 <!--
-  Epic High-Level Design (HLD) Template: Research Track / ML Subsystem
-  Location: docs/epics/E-<NNN>-<slug>/README.md
+  Strategic Design Template: Research Track / ML Subsystem RFC
+  Location: docs/designs/<track-slug>.md (or docs/designs/<NNN>-<slug>.md)
   Reference: Eugene Yan's ML Design Docs & Chip Huyen's ML Systems Design
 -->
 
-# Epic E-NNN: <Title of Research Track or Model Subsystem>
+# Research Track: <Title of Research Track or Model Subsystem>
 
 > **Status**: Draft | In-Review | Approved | In-Progress | Completed  
 > **Lead**: Khang Nghiem  
@@ -15,7 +15,7 @@
 
 ## 1. Executive Summary
 
-<1–2 paragraphs: What deep learning capability or research hypothesis does this Epic deliver? What is the clinical or real-world impact, and why is this being addressed now?>
+<1–2 paragraphs: What deep learning capability or research hypothesis does this research track deliver? What is the clinical or real-world impact, and why is this being addressed now?>
 
 ---
 
@@ -36,7 +36,7 @@
 - <Inference optimization and deployment target (e.g. Modal.com microservice)>
 
 ### Out-of-Scope
-- <Explicit exclusions, e.g., Real-time edge hardware quantization (deferred to E-NNN)>
+- <Explicit exclusions, e.g., Real-time edge hardware quantization (deferred to future track)>
 - <Clinical production EHR integration (handled in Fast-Diag)>
 
 ### Key Dependencies & Upstream Requirements
@@ -117,12 +117,12 @@ flowchart TD
 
 ## 7. Work Breakdown & Roadmap
 
-### Reusable Modules (Features / LLDs in `src/`)
-| Feature | Module Target | Description | Status |
+### Reusable Modules (`src/`)
+| Module Design | Module Target | Description | Status |
 | :--- | :--- | :--- | :--- |
-| **[F-001](F-001-<slug>.md)** | `src/models/` | Base model wrapper & LoRA adapter integration | Planned |
-| **[F-002](F-002-<slug>.md)** | `src/data/` | Medallion Gold dataset loader & Albumentations pipeline | Planned |
-| **[F-003](F-003-<slug>.md)** | `src/training/` | Composite loss (BCE + Dice) & early stopping callback | Done |
+| **[Model Wrapper](MODULE_DESIGN_TEMPLATE.md)** | `src/models/` | Base model wrapper & LoRA adapter integration | Planned |
+| **[Dataset Loader](MODULE_DESIGN_TEMPLATE.md)** | `src/data/` | Medallion Gold dataset loader & Albumentations pipeline | Planned |
+| **[Loss & Callbacks](MODULE_DESIGN_TEMPLATE.md)** | `src/training/` | Composite loss (BCE + Dice) & early stopping callback | Done |
 
 ### Experiments Roadmap (`experiments/`)
 | Exp ID | Architecture / Model | Key Variation / Hypothesis | Target Metric | Status |
@@ -135,7 +135,7 @@ flowchart TD
 
 ## 8. Definition of Done (DoD)
 
-To close this Epic, the following criteria must be satisfied:
+To close this Research Track, the following criteria must be satisfied:
 
 - [ ] **Benchmark Verified**: Best model candidate exceeds the baseline by the target margin on the held-out test split.
 - [ ] **Exploration Preceded Formalization**: All architectures prototyped first in `notebooks/` before committing to `experiments/`.
@@ -149,6 +149,8 @@ To close this Epic, the following criteria must be satisfied:
 
 ## 9. Related Documents
 
+- **Module Design Template**: [docs/designs/MODULE_DESIGN_TEMPLATE.md](MODULE_DESIGN_TEMPLATE.md)
+- **Experiment Requirements Template**: [docs/requirements/REQUIREMENTS_TEMPLATE.md](../requirements/REQUIREMENTS_TEMPLATE.md)
 - **Dataset Catalog**: [src/config/catalog.py](../../src/config/catalog.py)
 - **Path Resolver**: [src/config/paths.py](../../src/config/paths.py)
 - **ML Testing Guide**: [docs/TDD_GUIDE.md](../TDD_GUIDE.md)
