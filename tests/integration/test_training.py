@@ -6,11 +6,6 @@ import pytest
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models import SimpleCNN
 from src.training import EarlyStopping

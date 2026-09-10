@@ -36,12 +36,14 @@ cd deploy && modal deploy modal_app.py
 ## File Structure
 
 ```
-003_polyp_detection/
+016_polyp_fast_diag/
 ├── prepare_dataset.py    # Unify 6 datasets → COCO JSON
-├── train.py              # Detectron2 training script
-├── train.ipynb           # Colab notebook
+├── train.py              # Detectron2/YOLO training script
+├── 016_polyp_fast_diag_pipeline.ipynb # Colab notebook
 ├── evaluate.py           # Cross-dataset evaluation
 └── deploy/
     ├── modal_app.py      # Modal.com serverless deployment
     └── requirements.txt  # Deployment dependencies
 ```
+
+> **Note**: Test sample images reside in Google Drive gold layer (`data_lake/03_gold/016_polyp_fast_diag_dataset/test_images/`) and are not committed to git.

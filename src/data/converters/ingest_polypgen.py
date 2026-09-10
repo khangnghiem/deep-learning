@@ -51,7 +51,7 @@ if __name__=='__main__':
             print("❌ Download failed. Make sure ~/.kaggle/kaggle.json exists.")
             sys.exit(1)
             
-        root = str(get_bronze_path('medical') / "polypgen")
+        root = str(get_bronze_path('vision') / "polypgen")
         out = str(SILVER / "polypgen_coco" / "annotations.json")
         
     except ImportError:

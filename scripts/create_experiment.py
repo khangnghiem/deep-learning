@@ -21,13 +21,8 @@ from pathlib import Path
 import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(PROJECT_ROOT))
 
-if os.name == "nt" and "DRIVE_ROOT" not in os.environ:
-    os.environ["DRIVE_ROOT"] = "G:\\My Drive"
-
-from src.config.catalog import DATASETS
+from src.config.catalog import DATASETS, _parse_size
 
 EXPERIMENTS_DIR = PROJECT_ROOT / "experiments"
 TEMPLATE_DIR = EXPERIMENTS_DIR / "_template"
@@ -50,29 +45,18 @@ def get_next_experiment_number() -> int:
 
 def _smart_hyperparams(info: dict) -> dict:
     """Pick sensible default hyperparameters based on dataset size and category."""
-    size_str = info.get("size", "100MB")
-    # Parse size string like "60MB", "1.8GB"
-    try:
-        num = float("".join(c for c in size_str if c.isdigit() or c == "."))
-        unit = "".join(c for c in size_str if c.isalpha()).upper()
-        size_mb = num * 1024 if unit == "GB" else num
-    except (ValueError, AttributeError):
-        size_mb = 100
-
     category = info.get("category", "vision")
-
     if category == "nlp":
         return {"epochs": 5, "batch_size": 16, "lr": 2e-5, "optimizer": "adamw"}
-    elif category == "tabular":
+    if category == "tabular":
         return {"epochs": 50, "batch_size": 256, "lr": 1e-3, "optimizer": "adam"}
-    elif size_mb < 100:
+
+    size_mb = _parse_size(info.get("size", "100MB"))
+    if size_mb < 500:
         return {"epochs": 15, "batch_size": 64, "lr": 1e-3, "optimizer": "adam"}
-    elif size_mb < 500:
-        return {"epochs": 20, "batch_size": 64, "lr": 1e-3, "optimizer": "adam"}
     elif size_mb < 2000:
         return {"epochs": 25, "batch_size": 32, "lr": 1e-4, "optimizer": "adamw"}
-    else:
-        return {"epochs": 30, "batch_size": 16, "lr": 1e-4, "optimizer": "adamw"}
+    return {"epochs": 30, "batch_size": 16, "lr": 1e-4, "optimizer": "adamw"}
 
 
 # =============================================================================
@@ -118,15 +102,15 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
     # ----------------------------------------------------------------
     # Create mapped exploration notebook
     # ----------------------------------------------------------------
-    EXPLORATIONS_DIR = PROJECT_ROOT / "explorations"
-    template_nb = EXPLORATIONS_DIR / "_template.ipynb"
-    target_nb = EXPLORATIONS_DIR / f"{exp_name}.ipynb"
+    NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
+    template_nb = NOTEBOOKS_DIR / "_template.ipynb"
+    target_nb = NOTEBOOKS_DIR / f"{exp_name}.ipynb"
     
     if template_nb.exists() and not target_nb.exists():
         nb_text = template_nb.read_text(encoding="utf-8")
         nb_text = nb_text.replace("{DATASET_NAME}", dataset_name)
         target_nb.write_text(nb_text, encoding="utf-8")
-        print(f"Created paired exploration -> explorations/{target_nb.name}")
+        print(f"Created paired notebook -> notebooks/{target_nb.name}")
 
     # ----------------------------------------------------------------
     # Patch config.yaml
@@ -169,10 +153,24 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
         readme = readme.replace("experiment_name", exp_name)
         readme_path.write_text(readme, encoding="utf-8")
 
+    # ----------------------------------------------------------------
+    # Patch and rename Colab launcher notebook
+    # ----------------------------------------------------------------
+    template_launcher = exp_dir / "template_reference_train.ipynb"
+    target_launcher = exp_dir / f"{exp_name}_train.ipynb"
+    if template_launcher.exists():
+        nb_content = template_launcher.read_text(encoding="utf-8")
+        nb_content = nb_content.replace("{EXPERIMENT_NAME}", exp_name)
+        nb_content = nb_content.replace("experiments/_template", f"experiments/{exp_name}")
+        target_launcher.write_text(nb_content, encoding="utf-8")
+        template_launcher.unlink()
+        print(f"Created Colab launcher -> {exp_dir.name}/{target_launcher.name}")
+
+    launcher_name = target_launcher.name if target_launcher.exists() else "train.ipynb"
     print(f"\nNext steps:")
-    print(f"  1. Edit {exp_name}/train.py — implement get_model() and get_dataloaders()")
-    print(f"  2. Edit {exp_name}/requirements.txt — add experiment-specific packages")
-    print(f"  3. Run via Colab: open {exp_name}/template_reference_train.ipynb")
+    print(f"  1. Prototype & explore in notebooks/{exp_name}.ipynb")
+    print(f"  2. Finalize architecture & config in experiments/{exp_name}/train.py")
+    print(f"  3. Launch training on Google Colab: open experiments/{exp_name}/{launcher_name}")
 
     return exp_dir
 

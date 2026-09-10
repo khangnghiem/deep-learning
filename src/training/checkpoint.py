@@ -12,10 +12,6 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 from typing import Optional
-import sys
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config.paths import TRAINED
 

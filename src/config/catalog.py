@@ -102,150 +102,150 @@ DATASETS = {
     # =========================================================================
     # VISION - Object Detection (15+ datasets)
     # =========================================================================
-    "coco": {"source": "url", "url": "http://images.cocodataset.org/zips/train2017.zip", "size": "18GB", "category": "detection"},
-    "voc2007": {"source": "huggingface", "hf_id": "detection-datasets/coco", "size": "500MB", "category": "detection"},
-    "voc2012": {"source": "huggingface", "hf_id": "detection-datasets/coco", "size": "2GB", "category": "detection"},
-    "global-wheat": {"source": "kaggle", "kaggle_id": "competitions/global-wheat-detection", "size": "3GB", "category": "detection"},
-    "open-images": {"source": "kaggle", "kaggle_id": "competitions/open-images-2019-object-detection", "size": "10GB", "category": "detection"},
-    "vindr-cxr": {"source": "kaggle", "kaggle_id": "competitions/vinbigdata-chest-xray-abnormalities-detection", "size": "5GB", "category": "detection"},
-    "sartorius": {"source": "kaggle", "kaggle_id": "competitions/sartorius-cell-instance-segmentation", "size": "2GB", "category": "detection"},
-    "uw-madison": {"source": "kaggle", "kaggle_id": "competitions/uw-madison-gi-tract-image-segmentation", "size": "4GB", "category": "detection"},
-    "hubmap": {"source": "kaggle", "kaggle_id": "competitions/hubmap-organ-segmentation", "size": "3GB", "category": "detection"},
-    "rsna-breast": {"source": "kaggle", "kaggle_id": "competitions/rsna-breast-cancer-detection", "size": "8GB", "category": "detection"},
-    "lvis": {"source": "huggingface", "hf_id": "lvis/lvis", "size": "15GB", "category": "detection"},
+    "coco": {"source": "url", "url": "http://images.cocodataset.org/zips/train2017.zip", "size": "18GB", "category": "vision"},
+    "voc2007": {"source": "huggingface", "hf_id": "detection-datasets/coco", "size": "500MB", "category": "vision"},
+    "voc2012": {"source": "huggingface", "hf_id": "detection-datasets/coco", "size": "2GB", "category": "vision"},
+    "global-wheat": {"source": "kaggle", "kaggle_id": "competitions/global-wheat-detection", "size": "3GB", "category": "vision"},
+    "open-images": {"source": "kaggle", "kaggle_id": "competitions/open-images-2019-object-detection", "size": "10GB", "category": "vision"},
+    "vindr-cxr": {"source": "kaggle", "kaggle_id": "competitions/vinbigdata-chest-xray-abnormalities-detection", "size": "5GB", "category": "vision", "domain": "medical"},
+    "sartorius": {"source": "kaggle", "kaggle_id": "competitions/sartorius-cell-instance-segmentation", "size": "2GB", "category": "vision", "domain": "medical"},
+    "uw-madison": {"source": "kaggle", "kaggle_id": "competitions/uw-madison-gi-tract-image-segmentation", "size": "4GB", "category": "vision", "domain": "medical"},
+    "hubmap": {"source": "kaggle", "kaggle_id": "competitions/hubmap-organ-segmentation", "size": "3GB", "category": "vision", "domain": "medical"},
+    "rsna-breast": {"source": "kaggle", "kaggle_id": "competitions/rsna-breast-cancer-detection", "size": "8GB", "category": "vision", "domain": "medical"},
+    "lvis": {"source": "huggingface", "hf_id": "lvis/lvis", "size": "15GB", "category": "vision"},
     
     # =========================================================================
-    # MEDICAL IMAGING (40+ datasets) - Organized by Modality
+# VISION - Medical Imaging (40+ datasets) [domain: medical]
     # =========================================================================
     
     # --- ULTRASOUND (30+ datasets) ---
     # HuggingFace datasets (no rule acceptance required)
-    "hf-breast-ultrasound": {"source": "huggingface", "hf_id": "alkzar90/NIH-Chest-X-ray-dataset", "size": "200MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
-    "hf-busi": {"source": "huggingface", "hf_id": "gymprathap/Breast-Cancer-Ultrasound-Images-Dataset", "size": "150MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
-    "hf-busi-nnunet": {"source": "huggingface", "hf_id": "veyselozdemir/nnUNet-Breast-Cancer-Ultrasound", "size": "200MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
-    "hf-busi-shivam": {"source": "huggingface", "hf_id": "ShivamRaisharma/breastcancer", "size": "150MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
+    "hf-breast-ultrasound": {"source": "huggingface", "hf_id": "alkzar90/NIH-Chest-X-ray-dataset", "size": "200MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
+    "hf-busi": {"source": "huggingface", "hf_id": "gymprathap/Breast-Cancer-Ultrasound-Images-Dataset", "size": "150MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
+    "hf-busi-nnunet": {"source": "huggingface", "hf_id": "veyselozdemir/nnUNet-Breast-Cancer-Ultrasound", "size": "200MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
+    "hf-busi-shivam": {"source": "huggingface", "hf_id": "ShivamRaisharma/breastcancer", "size": "150MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
     
     # Zenodo datasets (open access, no acceptance required)
-    "zenodo-fetal-planes": {"source": "url", "url": "https://zenodo.org/records/3904280/files/FETAL_PLANES_ZENODO.zip?download=1", "size": "2.1GB", "category": "medical", "classes": 6, "modality": "ultrasound"},
+    "zenodo-fetal-planes": {"source": "url", "url": "https://zenodo.org/records/3904280/files/FETAL_PLANES_ZENODO.zip?download=1", "size": "2.1GB", "category": "vision", "domain": "medical", "classes": 6, "modality": "ultrasound"},
     # Note: TNSCUI requires registration at grand-challenge.org - keeping as reference
-    # "zenodo-thyroid-nodules": {"source": "url", "url": "https://tn-scui2020.grand-challenge.org/", "size": "500MB", "category": "medical", "classes": 2, "modality": "ultrasound"},
+    # "zenodo-thyroid-nodules": {"source": "url", "url": "https://tn-scui2020.grand-challenge.org/", "size": "500MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ultrasound"},
     
     # Zenodo datasets (open access, high quality - NEW Feb 2026)
-    "zenodo-bus-bra": {"source": "url", "url": "https://zenodo.org/records/8231412/files/BUS-BRA.zip?download=1", "size": "1.5GB", "category": "medical", "classes": 2, "modality": "ultrasound"},
-    "zenodo-focus-fetal-cardiac": {"source": "url", "url": "https://zenodo.org/records/14597550/files/FOCUS.zip?download=1", "size": "100MB", "category": "medical", "modality": "ultrasound"},
+    "zenodo-bus-bra": {"source": "url", "url": "https://zenodo.org/records/8231412/files/BUS-BRA.zip?download=1", "size": "1.5GB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ultrasound"},
+    "zenodo-focus-fetal-cardiac": {"source": "url", "url": "https://zenodo.org/records/14597550/files/FOCUS.zip?download=1", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # GitHub datasets (direct download)
-    "github-breast-kidney-us": {"source": "url", "url": "https://github.com/CGPxy/Ultrasound-Dataset/archive/refs/heads/main.zip", "size": "100MB", "category": "medical", "modality": "ultrasound"},
+    "github-breast-kidney-us": {"source": "url", "url": "https://github.com/CGPxy/Ultrasound-Dataset/archive/refs/heads/main.zip", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     # Note: BUS-Synthetic repo appears to be removed, commenting out
-    # "github-bus-synthetic": {"source": "url", "url": "https://github.com/udiat-group/BUS-Synthetic/archive/refs/heads/main.zip", "size": "200MB", "category": "medical", "classes": 2, "modality": "ultrasound"},
+    # "github-bus-synthetic": {"source": "url", "url": "https://github.com/udiat-group/BUS-Synthetic/archive/refs/heads/main.zip", "size": "200MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ultrasound"},
     
     # Kaggle datasets (verified to work without rule acceptance)
-    "polypgen": {"source": "kaggle", "kaggle_id": "aliabozorgy/polypgen2021-segmentation-2", "size": "3GB", "category": "medical", "classes": 2, "modality": "endoscopy"},
+    "polypgen": {"source": "kaggle", "kaggle_id": "aliabozorgy/polypgen2021-segmentation-2", "size": "3GB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
     
     # --- ENDOSCOPY / POLYP DATASETS (Fast-Diag) ---
-    "kvasir-seg": {"source": "kaggle", "kaggle_id": "debeshjha1/kvasirseg", "size": "44MB", "category": "medical", "classes": 2, "modality": "endoscopy"},
-    "cvc-clinicdb": {"source": "kaggle", "kaggle_id": "balraj98/cvcclinicdb", "size": "50MB", "category": "medical", "classes": 2, "modality": "endoscopy"},
-    "cvc-colondb": {"source": "kaggle", "kaggle_id": "hopmai/cvc-colondb", "size": "30MB", "category": "medical", "classes": 2, "modality": "endoscopy"},
-    "bkai-igh": {"source": "kaggle", "kaggle_id": "phamsohanh/bkai-igh-neopolypsmall", "size": "100MB", "category": "medical", "classes": 3, "modality": "endoscopy"},
-    "etis-larib": {"source": "kaggle", "kaggle_id": "nguyenvoquocduong/etis-laribpolypdb", "size": "50MB", "category": "medical", "classes": 2, "modality": "endoscopy"},
-    "polypdb": {"source": "url", "url": "https://osf.io/pr7ms/download", "size": "500MB", "category": "medical", "classes": 2, "modality": "endoscopy"},
-    "ldpolypvideo": {"source": "url", "url": "https://drive.google.com/drive/folders/13KwU_uZcxsl6dL-mqcs39Yb0gjU9vn3G", "size": "5GB", "category": "medical", "modality": "endoscopy"},
+    "kvasir-seg": {"source": "kaggle", "kaggle_id": "debeshjha1/kvasirseg", "size": "44MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
+    "cvc-clinicdb": {"source": "kaggle", "kaggle_id": "balraj98/cvcclinicdb", "size": "50MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
+    "cvc-colondb": {"source": "kaggle", "kaggle_id": "hopmai/cvc-colondb", "size": "30MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
+    "bkai-igh": {"source": "kaggle", "kaggle_id": "phamsohanh/bkai-igh-neopolypsmall", "size": "100MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "endoscopy"},
+    "etis-larib": {"source": "kaggle", "kaggle_id": "nguyenvoquocduong/etis-laribpolypdb", "size": "50MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
+    "polypdb": {"source": "url", "url": "https://osf.io/pr7ms/download", "size": "500MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "endoscopy"},
+    "ldpolypvideo": {"source": "url", "url": "https://drive.google.com/drive/folders/13KwU_uZcxsl6dL-mqcs39Yb0gjU9vn3G", "size": "5GB", "category": "vision", "domain": "medical", "modality": "endoscopy"},
     
-    "breast-ultrasound": {"source": "kaggle", "kaggle_id": "aryashah2k/breast-ultrasound-images-dataset", "size": "200MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
-    "bus-uclm-breast": {"source": "kaggle", "kaggle_id": "sabahesaraki/breast-ultrasound-images-dataset", "size": "150MB", "category": "medical", "modality": "ultrasound"},
+    "breast-ultrasound": {"source": "kaggle", "kaggle_id": "aryashah2k/breast-ultrasound-images-dataset", "size": "200MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
+    "bus-uclm-breast": {"source": "kaggle", "kaggle_id": "sabahesaraki/breast-ultrasound-images-dataset", "size": "150MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Fetal/Obstetric
-    "fetal-ultrasound": {"source": "kaggle", "kaggle_id": "andrewmvd/fetal-head-ultrasound", "size": "150MB", "category": "medical", "modality": "ultrasound"},
-    "fetal-planes": {"source": "kaggle", "kaggle_id": "drajayshukla/fetus-ultrasound-images", "size": "100MB", "category": "medical", "modality": "ultrasound"},
+    "fetal-ultrasound": {"source": "kaggle", "kaggle_id": "andrewmvd/fetal-head-ultrasound", "size": "150MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "fetal-planes": {"source": "kaggle", "kaggle_id": "drajayshukla/fetus-ultrasound-images", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Thyroid/Neck (using dataset uploads, not competitions)
-    "thyroid-ultrasound": {"source": "kaggle", "kaggle_id": "dasmehdixtr/thyroid-disease-dataset", "size": "100MB", "category": "medical", "modality": "ultrasound"},
-    "thyroid-nodules": {"source": "kaggle", "kaggle_id": "homayoonkhadivi/thyroid-nodules-ultrasound-images", "size": "100MB", "category": "medical", "modality": "ultrasound"},
+    "thyroid-ultrasound": {"source": "kaggle", "kaggle_id": "dasmehdixtr/thyroid-disease-dataset", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "thyroid-nodules": {"source": "kaggle", "kaggle_id": "homayoonkhadivi/thyroid-nodules-ultrasound-images", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Echocardiogram/Cardiac (using data uploads, not competitions)
-    "echonet-dynamic": {"source": "kaggle", "kaggle_id": "xiaowenlimarketing/echonet-dynamic", "size": "1GB", "category": "medical", "modality": "ultrasound"},
-    "camus-echo": {"source": "kaggle", "kaggle_id": "andrewmvd/camus-cardiac-ultrasound", "size": "300MB", "category": "medical", "modality": "ultrasound"},
-    "echo-apical": {"source": "kaggle", "kaggle_id": "aysendegerli/echonet-dynamic-videos", "size": "500MB", "category": "medical", "modality": "ultrasound"},
+    "echonet-dynamic": {"source": "kaggle", "kaggle_id": "xiaowenlimarketing/echonet-dynamic", "size": "1GB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "camus-echo": {"source": "kaggle", "kaggle_id": "andrewmvd/camus-cardiac-ultrasound", "size": "300MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "echo-apical": {"source": "kaggle", "kaggle_id": "aysendegerli/echonet-dynamic-videos", "size": "500MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Liver (verified to work)
-    "liver-ultrasound": {"source": "kaggle", "kaggle_id": "kpnchan/annotated-ultrasound-liver-images-dataset", "size": "100MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
-    "fatty-liver-us": {"source": "kaggle", "kaggle_id": "wanghaifeng/dataset-of-bmode-fatty-liver-ultrasound-images", "size": "50MB", "category": "medical", "modality": "ultrasound"},
+    "liver-ultrasound": {"source": "kaggle", "kaggle_id": "kpnchan/annotated-ultrasound-liver-images-dataset", "size": "100MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
+    "fatty-liver-us": {"source": "kaggle", "kaggle_id": "wanghaifeng/dataset-of-bmode-fatty-liver-ultrasound-images", "size": "50MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Kidney (verified to work)
-    "kidney-ultrasound": {"source": "kaggle", "kaggle_id": "azmatsiddique/kidney-failure-ultrasound-clinical-images", "size": "100MB", "category": "medical", "modality": "ultrasound"},
-    "kidney-stone-us": {"source": "kaggle", "kaggle_id": "nazmul0087/kidney-ultrasound-images-stone-and-no-stone", "size": "200MB", "category": "medical", "classes": 2, "modality": "ultrasound"},
+    "kidney-ultrasound": {"source": "kaggle", "kaggle_id": "azmatsiddique/kidney-failure-ultrasound-clinical-images", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "kidney-stone-us": {"source": "kaggle", "kaggle_id": "nazmul0087/kidney-ultrasound-images-stone-and-no-stone", "size": "200MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ultrasound"},
     
     # Lung
-    "lung-ultrasound": {"source": "kaggle", "kaggle_id": "patzeck/lung-ultrasound-images", "size": "100MB", "category": "medical", "modality": "ultrasound"},
-    "covid-lung-us": {"source": "kaggle", "kaggle_id": "andyczhao/covid19-ultrasound-data", "size": "200MB", "category": "medical", "classes": 3, "modality": "ultrasound"},
+    "lung-ultrasound": {"source": "kaggle", "kaggle_id": "patzeck/lung-ultrasound-images", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "covid-lung-us": {"source": "kaggle", "kaggle_id": "andyczhao/covid19-ultrasound-data", "size": "200MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "ultrasound"},
     
     # Muscle/Musculoskeletal
-    "muscle-ultrasound": {"source": "kaggle", "kaggle_id": "mursalin1199/muscle-ultrasound-images", "size": "100MB", "category": "medical", "modality": "ultrasound"},
-    "nerve-ultrasound-v2": {"source": "kaggle", "kaggle_id": "paultimothymooney/brachial-plexus-nerve-segmentation", "size": "200MB", "category": "medical", "modality": "ultrasound"},
+    "muscle-ultrasound": {"source": "kaggle", "kaggle_id": "mursalin1199/muscle-ultrasound-images", "size": "100MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "nerve-ultrasound-v2": {"source": "kaggle", "kaggle_id": "paultimothymooney/brachial-plexus-nerve-segmentation", "size": "200MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
     
     # Abdominal/General
-    "abdominal-organs-us": {"source": "kaggle", "kaggle_id": "ignaciorlando/ussimandseg", "size": "300MB", "category": "medical", "modality": "ultrasound"},
-    "ovarian-ultrasound": {"source": "kaggle", "kaggle_id": "saurabhshahane/ovarian-ultrasound-images", "size": "200MB", "category": "medical", "modality": "ultrasound"},
+    "abdominal-organs-us": {"source": "kaggle", "kaggle_id": "ignaciorlando/ussimandseg", "size": "300MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
+    "ovarian-ultrasound": {"source": "kaggle", "kaggle_id": "saurabhshahane/ovarian-ultrasound-images", "size": "200MB", "category": "vision", "domain": "medical", "modality": "ultrasound"},
 
 
 
     # --- X-RAY ---
-    "chest-xray": {"source": "kaggle", "kaggle_id": "paultimothymooney/chest-xray-pneumonia", "size": "1.2GB", "category": "medical", "classes": 2, "modality": "xray"},
-    "nih-chest-xray": {"source": "kaggle", "kaggle_id": "nih-chest-xrays/data", "size": "42GB", "category": "medical", "classes": 14, "modality": "xray"},
-    "pediatric-xray": {"source": "kaggle", "kaggle_id": "andrewmvd/pediatric-pneumonia-chest-xray", "size": "300MB", "category": "medical", "classes": 2, "modality": "xray"},
-    "mura-xray": {"source": "kaggle", "kaggle_id": "cjinny/mura-v11", "size": "3GB", "category": "medical", "classes": 2, "modality": "xray"},
-    "rsna-pneumonia": {"source": "kaggle", "kaggle_id": "competitions/rsna-pneumonia-detection-challenge", "size": "2GB", "category": "medical", "classes": 2, "modality": "xray"},
-    "covid-xray": {"source": "kaggle", "kaggle_id": "prashant268/chest-xray-covid19-pneumonia", "size": "100MB", "category": "medical", "classes": 3, "modality": "xray"},
-    "dental-xray": {"source": "kaggle", "kaggle_id": "humansintheloop/teeth-segmentation-on-dental-x-ray-images", "size": "200MB", "category": "medical", "modality": "xray"},
-    "bone-fracture": {"source": "kaggle", "kaggle_id": "bmadushanirodrigo/fracture-multi-region-x-ray-data", "size": "200MB", "category": "medical", "classes": 7, "modality": "xray"},
-    "tuberculosis-xray": {"source": "kaggle", "kaggle_id": "tawsifurrahman/tuberculosis-tb-chest-xray-dataset", "size": "700MB", "category": "medical", "classes": 2, "modality": "xray"},
+    "chest-xray": {"source": "kaggle", "kaggle_id": "paultimothymooney/chest-xray-pneumonia", "size": "1.2GB", "category": "vision", "domain": "medical", "classes": 2, "modality": "xray"},
+    "nih-chest-xray": {"source": "kaggle", "kaggle_id": "nih-chest-xrays/data", "size": "42GB", "category": "vision", "domain": "medical", "classes": 14, "modality": "xray"},
+    "pediatric-xray": {"source": "kaggle", "kaggle_id": "andrewmvd/pediatric-pneumonia-chest-xray", "size": "300MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "xray"},
+    "mura-xray": {"source": "kaggle", "kaggle_id": "cjinny/mura-v11", "size": "3GB", "category": "vision", "domain": "medical", "classes": 2, "modality": "xray"},
+    "rsna-pneumonia": {"source": "kaggle", "kaggle_id": "competitions/rsna-pneumonia-detection-challenge", "size": "2GB", "category": "vision", "domain": "medical", "classes": 2, "modality": "xray"},
+    "covid-xray": {"source": "kaggle", "kaggle_id": "prashant268/chest-xray-covid19-pneumonia", "size": "100MB", "category": "vision", "domain": "medical", "classes": 3, "modality": "xray"},
+    "dental-xray": {"source": "kaggle", "kaggle_id": "humansintheloop/teeth-segmentation-on-dental-x-ray-images", "size": "200MB", "category": "vision", "domain": "medical", "modality": "xray"},
+    "bone-fracture": {"source": "kaggle", "kaggle_id": "bmadushanirodrigo/fracture-multi-region-x-ray-data", "size": "200MB", "category": "vision", "domain": "medical", "classes": 7, "modality": "xray"},
+    "tuberculosis-xray": {"source": "kaggle", "kaggle_id": "tawsifurrahman/tuberculosis-tb-chest-xray-dataset", "size": "700MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "xray"},
     
     # --- CT SCAN ---
-    "covid-ct": {"source": "kaggle", "kaggle_id": "plameneduardo/sarscov2-ctscan-dataset", "size": "400MB", "category": "medical", "classes": 2, "modality": "ct"},
-    "kidney-ct": {"source": "kaggle", "kaggle_id": "nazmul0087/ct-kidney-dataset-normal-cyst-tumor-and-stone", "size": "500MB", "category": "medical", "classes": 4, "modality": "ct"},
-    "liver-ct": {"source": "kaggle", "kaggle_id": "andrewmvd/lits-liver-tumor-segmentation", "size": "500MB", "category": "medical", "modality": "ct"},
-    "lung-ct": {"source": "kaggle", "kaggle_id": "mohamedhanyyy/chest-ctscan-images", "size": "200MB", "category": "medical", "classes": 4, "modality": "ct"},
-    "head-ct": {"source": "kaggle", "kaggle_id": "felipekitamura/head-ct-hemorrhage", "size": "200MB", "category": "medical", "classes": 2, "modality": "ct"},
-    "kits19-kidney-ct": {"source": "kaggle", "kaggle_id": "nazmul0087/kits19-dataset", "size": "30GB", "category": "medical", "modality": "ct"},
-    "luna16-lung-ct": {"source": "kaggle", "kaggle_id": "competitions/data-science-bowl-2017", "size": "100GB", "category": "medical", "modality": "ct"},
+    "covid-ct": {"source": "kaggle", "kaggle_id": "plameneduardo/sarscov2-ctscan-dataset", "size": "400MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ct"},
+    "kidney-ct": {"source": "kaggle", "kaggle_id": "nazmul0087/ct-kidney-dataset-normal-cyst-tumor-and-stone", "size": "500MB", "category": "vision", "domain": "medical", "classes": 4, "modality": "ct"},
+    "liver-ct": {"source": "kaggle", "kaggle_id": "andrewmvd/lits-liver-tumor-segmentation", "size": "500MB", "category": "vision", "domain": "medical", "modality": "ct"},
+    "lung-ct": {"source": "kaggle", "kaggle_id": "mohamedhanyyy/chest-ctscan-images", "size": "200MB", "category": "vision", "domain": "medical", "classes": 4, "modality": "ct"},
+    "head-ct": {"source": "kaggle", "kaggle_id": "felipekitamura/head-ct-hemorrhage", "size": "200MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "ct"},
+    "kits19-kidney-ct": {"source": "kaggle", "kaggle_id": "nazmul0087/kits19-dataset", "size": "30GB", "category": "vision", "domain": "medical", "modality": "ct"},
+    "luna16-lung-ct": {"source": "kaggle", "kaggle_id": "competitions/data-science-bowl-2017", "size": "100GB", "category": "vision", "domain": "medical", "modality": "ct"},
     
     # --- MRI ---
-    "brain-tumor": {"source": "kaggle", "kaggle_id": "sartajbhuvaji/brain-tumor-classification-mri", "size": "100MB", "category": "medical", "classes": 4, "modality": "mri"},
-    "alzheimer-mri": {"source": "kaggle", "kaggle_id": "tourist55/alzheimers-dataset-4-class-of-images", "size": "100MB", "category": "medical", "classes": 4, "modality": "mri"},
-    "prostate-mri": {"source": "kaggle", "kaggle_id": "competitions/prostate-cancer-grade-assessment", "size": "500MB", "category": "medical", "modality": "mri"},
-    "knee-mri": {"source": "kaggle", "kaggle_id": "cburns/mrnet-mri", "size": "200MB", "category": "medical", "classes": 2, "modality": "mri"},
-    "cardiac-mri": {"source": "kaggle", "kaggle_id": "competitions/second-annual-data-science-bowl", "size": "1GB", "category": "medical", "modality": "mri"},
-    "brats-mri": {"source": "kaggle", "kaggle_id": "awsaf49/brats2020-training-data", "size": "5GB", "category": "medical", "classes": 4, "modality": "mri"},
-    "oasis-brain-mri": {"source": "kaggle", "kaggle_id": "jboysen/mri-and-alzheimers", "size": "100MB", "category": "medical", "modality": "mri"},
-    "fastmri-brain": {"source": "huggingface", "hf_id": "jldbc/fastmri-brain", "size": "3GB", "category": "medical", "modality": "mri"},
+    "brain-tumor": {"source": "kaggle", "kaggle_id": "sartajbhuvaji/brain-tumor-classification-mri", "size": "100MB", "category": "vision", "domain": "medical", "classes": 4, "modality": "mri"},
+    "alzheimer-mri": {"source": "kaggle", "kaggle_id": "tourist55/alzheimers-dataset-4-class-of-images", "size": "100MB", "category": "vision", "domain": "medical", "classes": 4, "modality": "mri"},
+    "prostate-mri": {"source": "kaggle", "kaggle_id": "competitions/prostate-cancer-grade-assessment", "size": "500MB", "category": "vision", "domain": "medical", "modality": "mri"},
+    "knee-mri": {"source": "kaggle", "kaggle_id": "cburns/mrnet-mri", "size": "200MB", "category": "vision", "domain": "medical", "classes": 2, "modality": "mri"},
+    "cardiac-mri": {"source": "kaggle", "kaggle_id": "competitions/second-annual-data-science-bowl", "size": "1GB", "category": "vision", "domain": "medical", "modality": "mri"},
+    "brats-mri": {"source": "kaggle", "kaggle_id": "awsaf49/brats2020-training-data", "size": "5GB", "category": "vision", "domain": "medical", "classes": 4, "modality": "mri"},
+    "oasis-brain-mri": {"source": "kaggle", "kaggle_id": "jboysen/mri-and-alzheimers", "size": "100MB", "category": "vision", "domain": "medical", "modality": "mri"},
+    "fastmri-brain": {"source": "huggingface", "hf_id": "jldbc/fastmri-brain", "size": "3GB", "category": "vision", "domain": "medical", "modality": "mri"},
     
     # --- OTHER MEDICAL (Histopathology, Microscopy, etc.) ---
-    "skin-cancer": {"source": "kaggle", "kaggle_id": "kmader/skin-cancer-mnist-ham10000", "size": "500MB", "category": "medical", "classes": 7},
-    "diabetic-retinopathy": {"source": "kaggle", "kaggle_id": "competitions/diabetic-retinopathy-detection", "size": "80GB", "category": "medical", "classes": 5},
-    "malaria": {"source": "kaggle", "kaggle_id": "iarunava/cell-images-for-detecting-malaria", "size": "350MB", "category": "medical", "classes": 2},
-    "blood-cells": {"source": "kaggle", "kaggle_id": "paultimothymooney/blood-cells", "size": "350MB", "category": "medical", "classes": 4},
-    "eye-disease": {"source": "kaggle", "kaggle_id": "gunavenkatdoddi/eye-diseases-classification", "size": "500MB", "category": "medical", "classes": 4},
-    "lung-cancer": {"source": "kaggle", "kaggle_id": "adityamahimkar/iqothnccd-lung-cancer-dataset", "size": "100MB", "category": "medical", "classes": 3},
-    "colon-cancer": {"source": "kaggle", "kaggle_id": "andrewmvd/lung-and-colon-cancer-histopathological-images", "size": "1.5GB", "category": "medical", "classes": 5},
-    "leukemia": {"source": "kaggle", "kaggle_id": "andrewmvd/leukemia-classification", "size": "100MB", "category": "medical", "classes": 2},
+    "skin-cancer": {"source": "kaggle", "kaggle_id": "kmader/skin-cancer-mnist-ham10000", "size": "500MB", "category": "vision", "domain": "medical", "classes": 7},
+    "diabetic-retinopathy": {"source": "kaggle", "kaggle_id": "competitions/diabetic-retinopathy-detection", "size": "80GB", "category": "vision", "domain": "medical", "classes": 5},
+    "malaria": {"source": "kaggle", "kaggle_id": "iarunava/cell-images-for-detecting-malaria", "size": "350MB", "category": "vision", "domain": "medical", "classes": 2},
+    "blood-cells": {"source": "kaggle", "kaggle_id": "paultimothymooney/blood-cells", "size": "350MB", "category": "vision", "domain": "medical", "classes": 4},
+    "eye-disease": {"source": "kaggle", "kaggle_id": "gunavenkatdoddi/eye-diseases-classification", "size": "500MB", "category": "vision", "domain": "medical", "classes": 4},
+    "lung-cancer": {"source": "kaggle", "kaggle_id": "adityamahimkar/iqothnccd-lung-cancer-dataset", "size": "100MB", "category": "vision", "domain": "medical", "classes": 3},
+    "colon-cancer": {"source": "kaggle", "kaggle_id": "andrewmvd/lung-and-colon-cancer-histopathological-images", "size": "1.5GB", "category": "vision", "domain": "medical", "classes": 5},
+    "leukemia": {"source": "kaggle", "kaggle_id": "andrewmvd/leukemia-classification", "size": "100MB", "category": "vision", "domain": "medical", "classes": 2},
     
     # =========================================================================
     # NLP & TEXT (15+ datasets)
     # =========================================================================
-    "imdb": {"source": "huggingface", "hf_id": "imdb", "size": "80MB", "category": "nlp", "classes": 2},
-    "squad": {"source": "huggingface", "hf_id": "squad", "size": "35MB", "category": "nlp"},
-    "wikitext": {"source": "huggingface", "hf_id": "Salesforce/wikitext", "hf_config": "wikitext-103-v1", "size": "500MB", "category": "nlp"},
-    "ag-news": {"source": "huggingface", "hf_id": "ag_news", "size": "30MB", "category": "nlp", "classes": 4},
-    "yelp": {"source": "huggingface", "hf_id": "yelp_review_full", "size": "500MB", "category": "nlp", "classes": 5},
-    "amazon-reviews": {"source": "huggingface", "hf_id": "amazon_polarity", "size": "2GB", "category": "nlp", "classes": 2},
-    "sst2": {"source": "huggingface", "hf_id": "sst2", "size": "10MB", "category": "nlp", "classes": 2},
-    "cola": {"source": "huggingface", "hf_id": "glue", "hf_config": "cola", "size": "1MB", "category": "nlp"},
-    "mnli": {"source": "huggingface", "hf_id": "glue", "hf_config": "mnli", "size": "300MB", "category": "nlp"},
-    "twitter-sentiment": {"source": "kaggle", "kaggle_id": "kazanova/sentiment140", "size": "300MB", "category": "nlp", "classes": 3},
-    "fake-news": {"source": "kaggle", "kaggle_id": "jruvika/fake-news-detection", "size": "50MB", "category": "nlp", "classes": 2},
-    "spam": {"source": "kaggle", "kaggle_id": "uciml/sms-spam-collection-dataset", "size": "1MB", "category": "nlp", "classes": 2},
-    "toxic-comments": {"source": "kaggle", "kaggle_id": "competitions/jigsaw-toxic-comment-classification-challenge", "size": "100MB", "category": "nlp"},
-    "quora-pairs": {"source": "kaggle", "kaggle_id": "competitions/quora-question-pairs", "size": "50MB", "category": "nlp"},
+    "imdb": {"source": "huggingface", "hf_id": "imdb", "size": "80MB", "category": "text", "classes": 2},
+    "squad": {"source": "huggingface", "hf_id": "squad", "size": "35MB", "category": "text"},
+    "wikitext": {"source": "huggingface", "hf_id": "Salesforce/wikitext", "hf_config": "wikitext-103-v1", "size": "500MB", "category": "text"},
+    "ag-news": {"source": "huggingface", "hf_id": "ag_news", "size": "30MB", "category": "text", "classes": 4},
+    "yelp": {"source": "huggingface", "hf_id": "yelp_review_full", "size": "500MB", "category": "text", "classes": 5},
+    "amazon-reviews": {"source": "huggingface", "hf_id": "amazon_polarity", "size": "2GB", "category": "text", "classes": 2},
+    "sst2": {"source": "huggingface", "hf_id": "sst2", "size": "10MB", "category": "text", "classes": 2},
+    "cola": {"source": "huggingface", "hf_id": "glue", "hf_config": "cola", "size": "1MB", "category": "text"},
+    "mnli": {"source": "huggingface", "hf_id": "glue", "hf_config": "mnli", "size": "300MB", "category": "text"},
+    "twitter-sentiment": {"source": "kaggle", "kaggle_id": "kazanova/sentiment140", "size": "300MB", "category": "text", "classes": 3},
+    "fake-news": {"source": "kaggle", "kaggle_id": "jruvika/fake-news-detection", "size": "50MB", "category": "text", "classes": 2},
+    "spam": {"source": "kaggle", "kaggle_id": "uciml/sms-spam-collection-dataset", "size": "1MB", "category": "text", "classes": 2},
+    "toxic-comments": {"source": "kaggle", "kaggle_id": "competitions/jigsaw-toxic-comment-classification-challenge", "size": "100MB", "category": "text"},
+    "quora-pairs": {"source": "kaggle", "kaggle_id": "competitions/quora-question-pairs", "size": "50MB", "category": "text"},
     
     # =========================================================================
     # AUDIO (10+ datasets)
@@ -284,11 +284,11 @@ DATASETS = {
     # =========================================================================
     # GENERATIVE / GAN (5+ datasets)
     # =========================================================================
-    "celeba": {"source": "torchvision", "size": "1.5GB", "category": "generative"},
-    "lsun": {"source": "torchvision", "size": "100GB", "category": "generative"},
-    "anime-faces": {"source": "kaggle", "kaggle_id": "splcher/animefacedataset", "size": "500MB", "category": "generative"},
-    "art-portraits": {"source": "kaggle", "kaggle_id": "karnikakapoor/art-movements-and-styles", "size": "2GB", "category": "generative"},
-    "flickr-faces": {"source": "kaggle", "kaggle_id": "xhlulu/flickrfaceshq-dataset-nvidia-resized-256px", "size": "1GB", "category": "generative"},
+    "celeba": {"source": "torchvision", "size": "1.5GB", "category": "vision"},
+    "lsun": {"source": "torchvision", "size": "100GB", "category": "vision"},
+    "anime-faces": {"source": "kaggle", "kaggle_id": "splcher/animefacedataset", "size": "500MB", "category": "vision"},
+    "art-portraits": {"source": "kaggle", "kaggle_id": "karnikakapoor/art-movements-and-styles", "size": "2GB", "category": "vision"},
+    "flickr-faces": {"source": "kaggle", "kaggle_id": "xhlulu/flickrfaceshq-dataset-nvidia-resized-256px", "size": "1GB", "category": "vision"},
     
     # =========================================================================
     # UCI MACHINE LEARNING REPOSITORY (10+ datasets)
@@ -311,8 +311,8 @@ DATASETS = {
     "imagenette": {"source": "tfds", "tfds_id": "imagenette", "size": "1.5GB", "category": "vision", "classes": 10},
     "rock-paper-scissors": {"source": "tfds", "tfds_id": "rock_paper_scissors", "size": "100MB", "category": "vision", "classes": 3},
     "horses-or-humans": {"source": "tfds", "tfds_id": "horses_or_humans", "size": "150MB", "category": "vision", "classes": 2},
-    "colorectal-histology": {"source": "tfds", "tfds_id": "colorectal_histology", "size": "100MB", "category": "medical", "classes": 8},
-    "patch-camelyon": {"source": "tfds", "tfds_id": "patch_camelyon", "size": "6GB", "category": "medical", "classes": 2},
+    "colorectal-histology": {"source": "tfds", "tfds_id": "colorectal_histology", "size": "100MB", "category": "vision", "domain": "medical", "classes": 8},
+    "patch-camelyon": {"source": "tfds", "tfds_id": "patch_camelyon", "size": "6GB", "category": "vision", "domain": "medical", "classes": 2},
     "stanford-online-products": {"source": "tfds", "tfds_id": "stanford_online_products", "size": "3GB", "category": "vision"},
     "sun397": {"source": "tfds", "tfds_id": "sun397", "size": "36GB", "category": "vision", "classes": 397},
     "dtd": {"source": "tfds", "tfds_id": "dtd", "size": "600MB", "category": "vision", "classes": 47},
@@ -334,8 +334,8 @@ DATASETS = {
     "sklearn-digits": {"source": "sklearn", "sklearn_name": "load_digits", "size": "2MB", "category": "vision", "classes": 10},
     "sklearn-california": {"source": "sklearn", "sklearn_name": "fetch_california_housing", "size": "500KB", "category": "tabular"},
     "sklearn-olivetti": {"source": "sklearn", "sklearn_name": "fetch_olivetti_faces", "size": "2MB", "category": "vision", "classes": 40},
-    "sklearn-20newsgroups": {"source": "sklearn", "sklearn_name": "fetch_20newsgroups", "size": "20MB", "category": "nlp", "classes": 20},
-    "sklearn-rcv1": {"source": "sklearn", "sklearn_name": "fetch_rcv1", "size": "200MB", "category": "nlp"},
+    "sklearn-20newsgroups": {"source": "sklearn", "sklearn_name": "fetch_20newsgroups", "size": "20MB", "category": "text", "classes": 20},
+    "sklearn-rcv1": {"source": "sklearn", "sklearn_name": "fetch_rcv1", "size": "200MB", "category": "text"},
     
     # =========================================================================
     # TIME SERIES (NEW CATEGORY - 10 datasets)
@@ -364,21 +364,21 @@ DATASETS = {
     "gender-recognition": {"source": "kaggle", "kaggle_id": "cashutosh/gender-classification-dataset", "size": "200MB", "category": "vision", "classes": 2},
     "age-gender": {"source": "kaggle", "kaggle_id": "jangedoo/utkface-new", "size": "500MB", "category": "vision"},
     "sign-language": {"source": "kaggle", "kaggle_id": "datamunge/sign-language-mnist", "size": "100MB", "category": "vision", "classes": 24},
-    "chest-ct": {"source": "kaggle", "kaggle_id": "mohamedhanyyy/chest-ctscan-images", "size": "200MB", "category": "medical", "classes": 4},
-    "retinal-oct": {"source": "kaggle", "kaggle_id": "paultimothymooney/kermany2018", "size": "1GB", "category": "medical", "classes": 4},
-    "melanoma": {"source": "kaggle", "kaggle_id": "competitions/siim-isic-melanoma-classification", "size": "15GB", "category": "medical", "classes": 2},
+    "chest-ct": {"source": "kaggle", "kaggle_id": "mohamedhanyyy/chest-ctscan-images", "size": "200MB", "category": "vision", "domain": "medical", "classes": 4},
+    "retinal-oct": {"source": "kaggle", "kaggle_id": "paultimothymooney/kermany2018", "size": "1GB", "category": "vision", "domain": "medical", "classes": 4},
+    "melanoma": {"source": "kaggle", "kaggle_id": "competitions/siim-isic-melanoma-classification", "size": "15GB", "category": "vision", "domain": "medical", "classes": 2},
     "plant-disease": {"source": "kaggle", "kaggle_id": "vipoooool/new-plant-diseases-dataset", "size": "3GB", "category": "vision", "classes": 38},
     "ocean-plastics": {"source": "kaggle", "kaggle_id": "competitions/the-nature-conservancy-fisheries-monitoring", "size": "5GB", "category": "vision", "classes": 8},
     
     # =========================================================================
     # MORE HUGGINGFACE DATASETS (10)
     # =========================================================================
-    "emotion": {"source": "huggingface", "hf_id": "emotion", "size": "5MB", "category": "nlp", "classes": 6},
-    "rotten-tomatoes": {"source": "huggingface", "hf_id": "rotten_tomatoes", "size": "3MB", "category": "nlp", "classes": 2},
-    "tweet-eval": {"source": "huggingface", "hf_id": "tweet_eval", "hf_config": "sentiment", "size": "20MB", "category": "nlp", "classes": 3},
-    "xsum": {"source": "huggingface", "hf_id": "xsum", "size": "500MB", "category": "nlp"},
-    "billsum": {"source": "huggingface", "hf_id": "billsum", "size": "100MB", "category": "nlp"},
-    "conll2003": {"source": "huggingface", "hf_id": "tner/conll2003", "size": "10MB", "category": "nlp"},
+    "emotion": {"source": "huggingface", "hf_id": "emotion", "size": "5MB", "category": "text", "classes": 6},
+    "rotten-tomatoes": {"source": "huggingface", "hf_id": "rotten_tomatoes", "size": "3MB", "category": "text", "classes": 2},
+    "tweet-eval": {"source": "huggingface", "hf_id": "tweet_eval", "hf_config": "sentiment", "size": "20MB", "category": "text", "classes": 3},
+    "xsum": {"source": "huggingface", "hf_id": "xsum", "size": "500MB", "category": "text"},
+    "billsum": {"source": "huggingface", "hf_id": "billsum", "size": "100MB", "category": "text"},
+    "conll2003": {"source": "huggingface", "hf_id": "tner/conll2003", "size": "10MB", "category": "text"},
     "hf-food101": {"source": "huggingface", "hf_id": "ethz/food101", "size": "5GB", "category": "vision", "classes": 101},
     "imagenet-sketch": {"source": "url", "url": "https://github.com/HaohanWang/ImageNet-Sketch", "size": "2GB", "category": "vision", "classes": 1000},
     "lj-speech": {"source": "huggingface", "hf_id": "keithito/lj_speech", "size": "2GB", "category": "audio"},
@@ -387,9 +387,9 @@ DATASETS = {
     # =========================================================================
     # MORE UCI DATASETS (8)
     # =========================================================================
-    "dermatology": {"source": "uci", "uci_id": 33, "size": "50KB", "category": "medical", "classes": 6},
+    "dermatology": {"source": "uci", "uci_id": 33, "size": "50KB", "category": "tabular", "domain": "medical", "classes": 6},
     "glass": {"source": "uci", "uci_id": 42, "size": "20KB", "category": "tabular", "classes": 7},
-    "hepatitis": {"source": "uci", "uci_id": 46, "size": "10KB", "category": "medical", "classes": 2},
+    "hepatitis": {"source": "uci", "uci_id": 46, "size": "10KB", "category": "tabular", "domain": "medical", "classes": 2},
     "letter-recognition": {"source": "uci", "uci_id": 59, "size": "800KB", "category": "vision", "classes": 26},
     "statlog-segment": {"source": "uci", "uci_id": 147, "size": "400KB", "category": "vision", "classes": 7},
     "optical-digits": {"source": "uci", "uci_id": 80, "size": "2MB", "category": "vision", "classes": 10},
@@ -408,32 +408,32 @@ DATASETS = {
     "esc50": {"source": "url", "url": "https://github.com/karolpiczak/ESC-50/archive/master.zip", "size": "600MB", "category": "audio", "classes": 50},
     
     # =========================================================================
-    # EDUCATION (20 datasets)
+    # EDUCATION → merged into TABULAR (20 datasets)
     # =========================================================================
     
     # UCI Education Datasets
-    "student-performance": {"source": "uci", "uci_id": 320, "size": "1MB", "category": "education"},
-    "student-academics": {"source": "uci", "uci_id": 856, "size": "500KB", "category": "education"},
-    "higher-education-dropout": {"source": "uci", "uci_id": 697, "size": "2MB", "category": "education"},
-    "national-poll-happiness": {"source": "uci", "uci_id": 826, "size": "100KB", "category": "education"},
-    "open-university-learning": {"source": "uci", "uci_id": 349, "size": "5MB", "category": "education"},
+    "student-performance": {"source": "uci", "uci_id": 320, "size": "1MB", "category": "tabular"},
+    "student-academics": {"source": "uci", "uci_id": 856, "size": "500KB", "category": "tabular"},
+    "higher-education-dropout": {"source": "uci", "uci_id": 697, "size": "2MB", "category": "tabular"},
+    "national-poll-happiness": {"source": "uci", "uci_id": 826, "size": "100KB", "category": "tabular"},
+    "open-university-learning": {"source": "uci", "uci_id": 349, "size": "5MB", "category": "tabular"},
     
     # Kaggle Education Datasets
-    "students-exam-scores": {"source": "kaggle", "kaggle_id": "desalegngeb/students-exam-scores", "size": "5MB", "category": "education"},
-    "student-study-performance": {"source": "kaggle", "kaggle_id": "nikhil7280/student-performance-multiple-linear-regression", "size": "1MB", "category": "education"},
-    "world-university-rankings": {"source": "kaggle", "kaggle_id": "mylesoneill/world-university-rankings", "size": "5MB", "category": "education"},
-    "pisa-test-scores": {"source": "kaggle", "kaggle_id": "econdata/pisa-test-score-mean-performance-on-the-mathematics-scale", "size": "1MB", "category": "education"},
-    "us-college-scorecard": {"source": "kaggle", "kaggle_id": "kaggle/college-scorecard", "size": "200MB", "category": "education"},
-    "online-education-survey": {"source": "kaggle", "kaggle_id": "nayakroshan/online-education-system-review-during-covid19", "size": "1MB", "category": "education"},
-    "coursera-courses": {"source": "kaggle", "kaggle_id": "siddharthm1698/coursera-course-dataset", "size": "5MB", "category": "education"},
-    "udemy-courses": {"source": "kaggle", "kaggle_id": "andrewmvd/udemy-courses", "size": "5MB", "category": "education"},
-    "edx-courses": {"source": "kaggle", "kaggle_id": "khusheekapoor/edx-courses-dataset-2021", "size": "2MB", "category": "education"},
-    "mooc-learner-dropout": {"source": "kaggle", "kaggle_id": "chi0726/mooc-offering-is-knowledge-half-its-battle", "size": "10MB", "category": "education"},
-    "literacy-rates-world": {"source": "kaggle", "kaggle_id": "programmerrdai/literacy-rate", "size": "500KB", "category": "education"},
-    "student-dropout-prediction": {"source": "kaggle", "kaggle_id": "nphantawee/predict-students-dropout-and-academic-success", "size": "2MB", "category": "education"},
-    "learning-styles": {"source": "kaggle", "kaggle_id": "ashydv/students-learning-styles-dataset", "size": "1MB", "category": "education"},
-    "school-performance": {"source": "kaggle", "kaggle_id": "aljarah/xAPI-Edu-Data", "size": "500KB", "category": "education"},
-    "teachers-evaluation": {"source": "kaggle", "kaggle_id": "sangarshanan/teachers-evaluation", "size": "1MB", "category": "education"},
+    "students-exam-scores": {"source": "kaggle", "kaggle_id": "desalegngeb/students-exam-scores", "size": "5MB", "category": "tabular"},
+    "student-study-performance": {"source": "kaggle", "kaggle_id": "nikhil7280/student-performance-multiple-linear-regression", "size": "1MB", "category": "tabular"},
+    "world-university-rankings": {"source": "kaggle", "kaggle_id": "mylesoneill/world-university-rankings", "size": "5MB", "category": "tabular"},
+    "pisa-test-scores": {"source": "kaggle", "kaggle_id": "econdata/pisa-test-score-mean-performance-on-the-mathematics-scale", "size": "1MB", "category": "tabular"},
+    "us-college-scorecard": {"source": "kaggle", "kaggle_id": "kaggle/college-scorecard", "size": "200MB", "category": "tabular"},
+    "online-education-survey": {"source": "kaggle", "kaggle_id": "nayakroshan/online-education-system-review-during-covid19", "size": "1MB", "category": "tabular"},
+    "coursera-courses": {"source": "kaggle", "kaggle_id": "siddharthm1698/coursera-course-dataset", "size": "5MB", "category": "tabular"},
+    "udemy-courses": {"source": "kaggle", "kaggle_id": "andrewmvd/udemy-courses", "size": "5MB", "category": "tabular"},
+    "edx-courses": {"source": "kaggle", "kaggle_id": "khusheekapoor/edx-courses-dataset-2021", "size": "2MB", "category": "tabular"},
+    "mooc-learner-dropout": {"source": "kaggle", "kaggle_id": "chi0726/mooc-offering-is-knowledge-half-its-battle", "size": "10MB", "category": "tabular"},
+    "literacy-rates-world": {"source": "kaggle", "kaggle_id": "programmerrdai/literacy-rate", "size": "500KB", "category": "tabular"},
+    "student-dropout-prediction": {"source": "kaggle", "kaggle_id": "nphantawee/predict-students-dropout-and-academic-success", "size": "2MB", "category": "tabular"},
+    "learning-styles": {"source": "kaggle", "kaggle_id": "ashydv/students-learning-styles-dataset", "size": "1MB", "category": "tabular"},
+    "school-performance": {"source": "kaggle", "kaggle_id": "aljarah/xAPI-Edu-Data", "size": "500KB", "category": "tabular"},
+    "teachers-evaluation": {"source": "kaggle", "kaggle_id": "sangarshanan/teachers-evaluation", "size": "1MB", "category": "tabular"},
 }
 
 # Total count

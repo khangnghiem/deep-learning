@@ -2,7 +2,12 @@
 Data loading, acquisition, and transforms.
 """
 
-from .huggingface import load_hf_dataset, list_popular_datasets
+try:
+    from .huggingface import load_hf_dataset, list_popular_datasets
+except ImportError:
+    load_hf_dataset = None
+    list_popular_datasets = None
+
 from .kaggle import download_dataset, download_competition
 from .transforms import (
     get_train_transforms,
@@ -17,6 +22,7 @@ from .medical import (
     list_medical_datasets,
 )
 from .gold import GoldClassificationDataset, GoldSegmentationDataset
+from .mlflow_tracker import compute_file_sha256, create_gold_manifest, log_medallion_dataset
 
 __all__ = [
     # HuggingFace
@@ -41,4 +47,8 @@ __all__ = [
     # Gold layer
     "GoldClassificationDataset",
     "GoldSegmentationDataset",
+    # MLflow lineage tracking
+    "compute_file_sha256",
+    "create_gold_manifest",
+    "log_medallion_dataset",
 ]
