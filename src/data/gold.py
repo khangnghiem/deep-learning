@@ -10,31 +10,53 @@ import numpy as np
 # so we locate GOLD relative to this, or use the centralized paths module.
 from src.config.paths import GOLD
 
+def _resolve_gold_dir(experiment_name: str, split: str, category: str = None) -> Path:
+    """Resolve gold dataset directory, supporting both hierarchical and legacy flat paths."""
+    if category:
+        cat_path = GOLD / category.lower() / experiment_name / split
+        if cat_path.exists():
+            return cat_path
+            
+    # Check direct flat path
+    flat_path = GOLD / experiment_name / split
+    if flat_path.exists():
+        return flat_path
+        
+    # Search across category subdirectories
+    if GOLD.exists():
+        for cat_dir in GOLD.iterdir():
+            if cat_dir.is_dir():
+                cand = cat_dir / experiment_name / split
+                if cand.exists():
+                    return cand
+                    
+    return flat_path
+
 class GoldClassificationDataset(ImageFolder):
     """
     Standardizes Classification data loading from the Gold layer.
     Inherits from torchvision's ImageFolder.
     """
-    def __init__(self, experiment_name: str, split: str = "train", transform=None, target_transform=None):
-        gold_dir = str(GOLD / experiment_name / split)
-        if not os.path.exists(gold_dir):
+    def __init__(self, experiment_name: str, split: str = "train", transform=None, target_transform=None, category: str = None):
+        gold_dir = _resolve_gold_dir(experiment_name, split, category)
+        if not gold_dir.exists():
             raise FileNotFoundError(f"Gold data not found for {experiment_name} split {split}. "
-                                    f"Run ingest.ipynb first to generate {gold_dir}")
+                                    f"Checked {gold_dir}. Run ingest/curate script first.")
             
-        super().__init__(root=gold_dir, transform=transform, target_transform=target_transform)
+        super().__init__(root=str(gold_dir), transform=transform, target_transform=target_transform)
 
 class GoldSegmentationDataset(Dataset):
     """
     Standardizes Segmentation data loading from the Gold layer.
     Expects structure:
-      03_gold/experiment_name/split/images/...
-      03_gold/experiment_name/split/masks/...
+      3_gold/[<category>/]experiment_name/split/images/...
+      3_gold/[<category>/]experiment_name/split/masks/...
     """
-    def __init__(self, experiment_name: str, split: str = "train", transform=None):
-        self.gold_dir = GOLD / experiment_name / split
+    def __init__(self, experiment_name: str, split: str = "train", transform=None, category: str = None):
+        self.gold_dir = _resolve_gold_dir(experiment_name, split, category)
         if not self.gold_dir.exists():
             raise FileNotFoundError(f"Gold data not found for {experiment_name} split {split}. "
-                                    f"Run ingest.ipynb first to generate {self.gold_dir}")
+                                    f"Checked {self.gold_dir}. Run ingest/curate script first.")
                                     
         self.img_dir = self.gold_dir / "images"
         self.mask_dir = self.gold_dir / "masks"

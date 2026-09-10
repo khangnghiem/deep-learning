@@ -109,7 +109,10 @@ def generate_manifest() -> dict:
 
     bronze_categories = sorted([
         d for d in DATA_LAKE.iterdir()
-        if d.is_dir() and d.name.startswith("01_bronze")
+        if d.is_dir() and (
+            d.name.startswith("01_bronze")
+            or d.name.startswith("1_bronze")
+        )
     ])
 
     total_datasets = 0
@@ -117,7 +120,13 @@ def generate_manifest() -> dict:
     total_size_bytes = 0
 
     for bronze_dir in bronze_categories:
-        category = bronze_dir.name.replace("01_bronze_", "").replace("01_bronze", "legacy")
+        category = (
+            bronze_dir.name
+            .replace("01_bronze_", "")
+            .replace("1_bronze_", "")
+            .replace("01_bronze", "legacy")
+            .replace("1_bronze", "legacy")
+        )
         category_datasets = []
 
         for ds_dir in sorted(bronze_dir.iterdir()):
@@ -158,11 +167,16 @@ def generate_manifest() -> dict:
                 total_files += file_count
                 total_size_bytes += size_bytes
 
-        manifest["layers"][bronze_dir.name] = {
+        try:
+            layer_key = str(bronze_dir.relative_to(DATA_LAKE))
+        except ValueError:
+            layer_key = bronze_dir.name
+
+        manifest["layers"][layer_key] = {
             "dataset_count": len(category_datasets),
             "datasets": category_datasets,
         }
-        print(f"  {bronze_dir.name}: {len(category_datasets)} datasets")
+        print(f"  {layer_key}: {len(category_datasets)} datasets")
 
     manifest["summary"] = {
         "total_datasets": total_datasets,
@@ -229,10 +243,15 @@ def update_manifest_entry(dataset_name: str, category: str, bronze_dir: Path) ->
                 extensions.add(f.suffix.lower())
 
         # Map category to bronze folder name
+        # Use the resolved BRONZE directory name for layer key
+        from src.config.paths import BRONZE as _BRONZE
+        bronze_prefix = _BRONZE.name  # e.g. '1_bronze' or '01_bronze'
         if category == "legacy":
-            layer_name = "01_bronze"
+            layer_name = bronze_prefix
+        elif bronze_dir.parent == _BRONZE or (DATA_LAKE / bronze_prefix / category).exists():
+            layer_name = f"{bronze_prefix}/{category}"
         else:
-            layer_name = f"01_bronze_{category}"
+            layer_name = f"{bronze_prefix}_{category}"
 
         ds_info = {
             "category": category,

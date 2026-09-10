@@ -35,21 +35,30 @@ deep-learning/
 ├── scripts/            # Utility scripts (create_experiment, batch_download, data ingestion)
 ├── tests/              # Unit & integration tests (pytest)
 ├── deploy/             # Deployment configs (Modal.com SAM2 inference)
-└── docs/               # Design docs, data source references
+└── docs/               # 4-Pillar documentation portal (architecture, ADRs, runbooks, quality)
 ```
+
+## Documentation
+
+Full architectural specifications, operational runbooks, and decision logs are centralized in [**`docs/`**](docs/README.md):
+
+- 🏛️ [**Architecture**](docs/architecture/README.md): [Medallion Data Lake](docs/architecture/data_lake.md), [Google Drive 3-Pillar Storage](docs/architecture/drive_storage.md), [MLOps Platform](docs/architecture/mlops_platform.md).
+- 📜 [**Decisions (ADRs)**](docs/decisions/README.md): [ADR-0001 Medallion Lake](docs/decisions/ADR-0001-medallion-data-lake-architecture.md), [ADR-0002 3-Pillar Drive Layout](docs/decisions/ADR-0002-google-drive-three-pillar-layout.md).
+- 🛠️ [**Runbooks**](docs/runbooks/README.md): [Colab Pro+ Training](docs/runbooks/colab_training.md), [Dataset Ingestion](docs/runbooks/dataset_ingestion.md).
+- 🛡️ [**Quality & Testing**](docs/quality.md): Testing pyramid, TDD workflow, and quality gates.
 
 ## Data Lake (Medallion Architecture)
 
-All data lives on Google Drive at `MyDrive/data_lake/`:
+All data lives on Google Drive under the project root (`data/`):
 
-| Layer      | Path             | Purpose                                           |
-| ---------- | ---------------- | ------------------------------------------------- |
-| Landing    | `00_landing/`    | Raw uploads, zips, untouched files                |
-| Bronze     | `01_bronze_*/`   | Extracted raw data (CIFAR, MNIST, etc.)           |
-| Silver     | `02_silver/`     | Cleaned, validated data                           |
-| Gold       | `03_gold/`       | Analysis-ready datasets                           |
+| Layer      | Path                  | Purpose                                           |
+| ---------- | --------------------- | ------------------------------------------------- |
+| Landing    | `0_landing/`          | Raw uploads, zips, untouched files                |
+| Bronze     | `1_bronze/<category>/`| Extracted raw data by category (medical, vision)  |
+| Silver     | `2_silver/<category>/`| Cleaned annotations, masks & Feature Store        |
+| Gold       | `3_gold/<category>/`  | Analysis-ready datasets (.tar.gz bundles)         |
 
-See [`src/config/paths.py`](src/config/paths.py) for all path constants.
+See [`src/config/paths.py`](src/config/paths.py) for all path constants and [`docs/architecture/data_lake.md`](docs/architecture/data_lake.md) for full data lake specifications.
 
 ## Development Workflow
 

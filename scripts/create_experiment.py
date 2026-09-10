@@ -22,11 +22,7 @@ import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-
-if os.name == "nt" and "DRIVE_ROOT" not in os.environ:
-    os.environ["DRIVE_ROOT"] = "G:\\My Drive"
-
-from src.config.catalog import DATASETS
+from src.config.catalog import DATASETS, _parse_size
 
 EXPERIMENTS_DIR = PROJECT_ROOT / "experiments"
 TEMPLATE_DIR = EXPERIMENTS_DIR / "_template"
@@ -49,29 +45,18 @@ def get_next_experiment_number() -> int:
 
 def _smart_hyperparams(info: dict) -> dict:
     """Pick sensible default hyperparameters based on dataset size and category."""
-    size_str = info.get("size", "100MB")
-    # Parse size string like "60MB", "1.8GB"
-    try:
-        num = float("".join(c for c in size_str if c.isdigit() or c == "."))
-        unit = "".join(c for c in size_str if c.isalpha()).upper()
-        size_mb = num * 1024 if unit == "GB" else num
-    except (ValueError, AttributeError):
-        size_mb = 100
-
     category = info.get("category", "vision")
-
     if category == "nlp":
         return {"epochs": 5, "batch_size": 16, "lr": 2e-5, "optimizer": "adamw"}
-    elif category == "tabular":
+    if category == "tabular":
         return {"epochs": 50, "batch_size": 256, "lr": 1e-3, "optimizer": "adam"}
-    elif size_mb < 100:
+
+    size_mb = _parse_size(info.get("size", "100MB"))
+    if size_mb < 500:
         return {"epochs": 15, "batch_size": 64, "lr": 1e-3, "optimizer": "adam"}
-    elif size_mb < 500:
-        return {"epochs": 20, "batch_size": 64, "lr": 1e-3, "optimizer": "adam"}
     elif size_mb < 2000:
         return {"epochs": 25, "batch_size": 32, "lr": 1e-4, "optimizer": "adamw"}
-    else:
-        return {"epochs": 30, "batch_size": 16, "lr": 1e-4, "optimizer": "adamw"}
+    return {"epochs": 30, "batch_size": 16, "lr": 1e-4, "optimizer": "adamw"}
 
 
 # =============================================================================
@@ -169,24 +154,6 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
         readme_path.write_text(readme, encoding="utf-8")
 
     # ----------------------------------------------------------------
-    # Generate REQUIREMENTS.md from template
-    # ----------------------------------------------------------------
-    req_template = PROJECT_ROOT / "docs" / "requirements" / "REQUIREMENTS_TEMPLATE.md"
-    req_path = exp_dir / "REQUIREMENTS.md"
-    if req_template.exists():
-        req_text = req_template.read_text(encoding="utf-8")
-        req_text = req_text.replace("{EXPERIMENT_ID}", exp_name)
-        req_text = req_text.replace("{DATASET_NAME}", dataset_name)
-        req_text = req_text.replace("{NUM_CLASSES}", str(info.get("classes", 10)))
-        req_text = req_text.replace("{OPTIMIZER}", hp["optimizer"])
-        req_text = req_text.replace("{LR}", str(hp["lr"]))
-        req_text = req_text.replace("{BATCH_SIZE}", str(hp["batch_size"]))
-        req_text = req_text.replace("{EPOCHS}", str(hp["epochs"]))
-        req_text = req_text.replace("{MLFLOW_EXP_NAME}", dataset_name.replace("_", "-"))
-        req_path.write_text(req_text, encoding="utf-8")
-        print(f"Created requirements -> {exp_dir.name}/REQUIREMENTS.md")
-
-    # ----------------------------------------------------------------
     # Patch and rename Colab launcher notebook
     # ----------------------------------------------------------------
     template_launcher = exp_dir / "template_reference_train.ipynb"
@@ -201,10 +168,9 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
 
     launcher_name = target_launcher.name if target_launcher.exists() else "train.ipynb"
     print(f"\nNext steps:")
-    print(f"  1. Define hypothesis in {exp_name}/REQUIREMENTS.md")
-    print(f"  2. Prototype in notebooks/{exp_name}.ipynb")
-    print(f"  3. Implement {exp_name}/train.py (model, dataloaders, loss)")
-    print(f"  4. Run on Google Colab Pro+: open {exp_name}/{launcher_name}")
+    print(f"  1. Prototype & explore in notebooks/{exp_name}.ipynb")
+    print(f"  2. Finalize architecture & config in experiments/{exp_name}/train.py")
+    print(f"  3. Launch training on Google Colab: open experiments/{exp_name}/{launcher_name}")
 
     return exp_dir
 

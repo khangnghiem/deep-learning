@@ -30,7 +30,7 @@ Traditional TDD doesn't fit ML perfectly because:
 ## TDD Workflow for ML
 
 ```
-1. Write experiment requirements (REQUIREMENTS.md via docs/requirements/REQUIREMENTS_TEMPLATE.md)
+1. Specify hypothesis, data contract, and acceptance gates using `docs/_template/M-design-template.md` & `experiments/{NNN}_*/README.md`
 2. Explore & prototype in notebooks/ (ephemeral data on Colab /content/)
 3. Write unit tests for data transforms (tests/unit/test_transforms.py)
 4. Implement data pipeline in src/data/ → tests pass
