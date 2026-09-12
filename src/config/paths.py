@@ -3,7 +3,7 @@ Environment-aware path configuration for multi-environment ML workflows.
 
 Supports:
 - Google Colab (Web)
-- Google Colab VSCode Extension  
+- Google Colab VSCode Extension
 - Local MacOS development
 
 All path constants use dynamic resolution with legacy fallback:
@@ -31,6 +31,7 @@ load_dotenv(_REPO_ROOT / ".env", override=False)
 # Environment Detection
 # =============================================================================
 
+
 def _is_colab() -> bool:
     """Detect if running in Google Colab."""
     # Check sys.modules (works after google.colab is imported)
@@ -41,14 +42,16 @@ def _is_colab() -> bool:
         return True
     return False
 
+
 IN_COLAB = _is_colab()
+
 
 def get_drive_root() -> Path:
     """Determine the Google Drive root based on execution environment."""
     # 1. Explicit override always wins
     if "DRIVE_ROOT" in os.environ:
         return Path(os.environ["DRIVE_ROOT"])
-        
+
     # 2. Colab
     if IN_COLAB:
         colab_drive = Path("/content/drive/MyDrive")
@@ -57,16 +60,17 @@ def get_drive_root() -> Path:
         raise FileNotFoundError(
             "Drive not mounted. Run: from google.colab import drive; drive.mount('/content/drive')"
         )
-        
+
     # 3. Windows default fallback
     win_path = Path("G:/My Drive")
     if win_path.exists():
         return win_path
-        
+
     raise FileNotFoundError(
         "Google Drive not found at default locations. "
         "Set DRIVE_ROOT in .env or environment variable."
     )
+
 
 # Allow override via environment variable
 DRIVE = get_drive_root()
@@ -74,6 +78,7 @@ DRIVE = get_drive_root()
 # =============================================================================
 # Internal Resolution Helpers
 # =============================================================================
+
 
 def _resolve_dir(parent: Path, new_name: str, legacy_name: str) -> Path:
     """Resolve a directory preferring new_name, falling back to legacy_name."""
@@ -88,7 +93,7 @@ def _resolve_dir(parent: Path, new_name: str, legacy_name: str) -> Path:
 
 def _resolve_layer(root: Path, new_prefix: str, legacy_prefix: str, name: str) -> Path:
     """Resolve a Medallion layer directory with prefix fallback.
-    
+
     Prefers '{new_prefix}_{name}' (e.g. '1_bronze'),
     falls back to '{legacy_prefix}_{name}' (e.g. '01_bronze').
     """
@@ -99,6 +104,7 @@ def _resolve_layer(root: Path, new_prefix: str, legacy_prefix: str, name: str) -
     if legacy.exists():
         return legacy
     return new  # Default for fresh installs
+
 
 # =============================================================================
 # Data Lake (Medallion Architecture)
@@ -112,6 +118,7 @@ try:
     config_path = _REPO_ROOT / "config.yaml"
     if config_path.exists():
         import yaml
+
         with open(config_path) as f:
             cf = yaml.safe_load(f)
             if cf and "data" in cf and "root" in cf["data"]:
@@ -133,9 +140,9 @@ DATA_LAKE = DATA  # Backward-compatible alias
 
 # Resolve Medallion layers with prefix fallback
 LANDING = _resolve_layer(DATA, "0", "00", "landing")
-BRONZE  = _resolve_layer(DATA, "1", "01", "bronze")
-SILVER  = _resolve_layer(DATA, "2", "02", "silver")
-GOLD    = _resolve_layer(DATA, "3", "03", "gold")
+BRONZE = _resolve_layer(DATA, "1", "01", "bronze")
+SILVER = _resolve_layer(DATA, "2", "02", "silver")
+GOLD = _resolve_layer(DATA, "3", "03", "gold")
 
 # Feature Store (Offline representations in Silver: CLIP, DINOv2, SAM embeddings & clinical features)
 FEATURES = SILVER / "features"
@@ -152,9 +159,10 @@ KNOWN_CATEGORIES = [
     "vision",
 ]
 
+
 def get_bronze_path(category: str) -> Path:
     """Get the bronze layer path for a given category.
-    
+
     Checks hierarchical '{prefix}_bronze/<category>' first.
     Falls back to legacy flat 'data_lake/01_bronze_<category>' if it exists.
     Remaps retired and domain categories to their pure modality homes.
@@ -185,6 +193,7 @@ def get_bronze_path(category: str) -> Path:
                 return legacy
     return aliased
 
+
 def get_silver_path(category: str = None) -> Path:
     """Get the silver layer path, optionally scoped to a domain category."""
     if not category:
@@ -193,6 +202,7 @@ def get_silver_path(category: str = None) -> Path:
     hierarchical = SILVER / cat
     return hierarchical if hierarchical.exists() else SILVER
 
+
 def get_gold_path(category: str = None) -> Path:
     """Get the gold layer path, optionally scoped to a domain category."""
     if not category:
@@ -200,6 +210,7 @@ def get_gold_path(category: str = None) -> Path:
     cat = category.lower()
     hierarchical = GOLD / cat
     return hierarchical if hierarchical.exists() else GOLD
+
 
 def get_all_bronze_paths() -> list:
     """Return list of all existing bronze category paths (hierarchical and legacy)."""
@@ -212,12 +223,15 @@ def get_all_bronze_paths() -> list:
     # Legacy flat 01_bronze_<category> and 1_bronze_<category>
     if DATA.exists():
         for d in DATA.iterdir():
-            if d.is_dir() and (d.name.startswith("01_bronze_") or d.name.startswith("1_bronze_")):
+            if d.is_dir() and (
+                d.name.startswith("01_bronze_") or d.name.startswith("1_bronze_")
+            ):
                 if d not in paths:
                     paths.append(d)
     if not paths:
         paths = [BRONZE / cat for cat in KNOWN_CATEGORIES]
     return sorted(list(set(paths)))
+
 
 # Backward compatibility — domain constants
 BRONZE_AUDIO = get_bronze_path("audio")
@@ -229,10 +243,10 @@ BRONZE_VIDEO = get_bronze_path("video")
 BRONZE_VISION = get_bronze_path("vision")
 
 # Legacy aliases (retired categories → their new targets)
-BRONZE_DETECTION = BRONZE_VISION      # detection merged into vision
-BRONZE_EDUCATION = BRONZE_TABULAR     # education merged into tabular
-BRONZE_GENERATIVE = BRONZE_VISION     # generative merged into vision
-BRONZE_NLP = BRONZE_TEXT              # nlp renamed to text
+BRONZE_DETECTION = BRONZE_VISION  # detection merged into vision
+BRONZE_EDUCATION = BRONZE_TABULAR  # education merged into tabular
+BRONZE_GENERATIVE = BRONZE_VISION  # generative merged into vision
+BRONZE_NLP = BRONZE_TEXT  # nlp renamed to text
 
 _BRONZE_CATEGORY_PATHS = {cat: get_bronze_path(cat) for cat in KNOWN_CATEGORIES}
 
@@ -276,14 +290,17 @@ REPOS = DRIVE / "repos"
 # Utility Functions
 # =============================================================================
 
+
 def setup_mlflow():
     """Configure MLflow with Drive-based tracking."""
     import mlflow
+
     MLFLOW_DIR.mkdir(parents=True, exist_ok=True)
     MLFLOW_ARTIFACTS.mkdir(parents=True, exist_ok=True)
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     os.environ.setdefault("MLFLOW_DEFAULT_ARTIFACT_ROOT", str(MLFLOW_ARTIFACTS))
     return mlflow
+
 
 def get_env_info() -> dict:
     """Return current environment configuration."""
@@ -298,6 +315,7 @@ def get_env_info() -> dict:
         "checkpoints": str(CHECKPOINTS),
         "mlflow_uri": MLFLOW_TRACKING_URI,
     }
+
 
 if __name__ == "__main__":
     print("Environment Configuration:")
