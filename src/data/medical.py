@@ -7,7 +7,6 @@ Usage:
     from src.data.medical import get_medical_datasets, download_medmnist
 """
 
-from pathlib import Path
 
 from src.config.paths import get_bronze_path
 

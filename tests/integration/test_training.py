@@ -2,7 +2,6 @@
 Integration tests for training pipeline.
 """
 
-import pytest
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader

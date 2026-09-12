@@ -1,4 +1,7 @@
-import json, os, glob, argparse
+import json
+import os
+import glob
+import argparse
 import xml.etree.ElementTree as ET
 
 def convert(root, out):
@@ -7,13 +10,15 @@ def convert(root, out):
     for cd in sorted(glob.glob(os.path.join(root, 'data_C*'))):
         cn = os.path.basename(cd).replace('data_','')
         bd = os.path.join(cd, 'bbox_' + cn)
-        if not os.path.exists(bd): continue
+        if not os.path.exists(bd):
+            continue
         for xp in sorted(glob.glob(os.path.join(bd, '*.xml'))):
             s = os.path.splitext(os.path.basename(xp))[0]
             tree = ET.parse(xp)
             r = tree.getroot()
             sz = r.find('size')
-            if sz is None: continue
+            if sz is None:
+                continue
             w = int(sz.find('width').text)
             h = int(sz.find('height').text)
             imgs.append({'id':iid,'file_name':cn+'/'+s+'.jpg','width':w,'height':h,
@@ -33,12 +38,12 @@ def convert(root, out):
         'categories':[{'id':1,'name':'polyp','supercategory':'lesion'}],
         'images':imgs,'annotations':anns}
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out,'w') as f: json.dump(coco,f)
+    with open(out, 'w') as f:
+        json.dump(coco, f)
     print(f'Wrote {len(imgs)} images, {len(anns)} annotations')
 
 if __name__=='__main__':
     import sys
-    from pathlib import Path
     
     # Try importing src.config to get standard paths and downloader
     try:

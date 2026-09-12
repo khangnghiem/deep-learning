@@ -4,7 +4,6 @@ Unit tests for model architectures.
 Run with: pytest tests/unit/test_models.py -v
 """
 
-import pytest
 import torch
 
 from src.models import SimpleCNN, MLP, get_pretrained_resnet

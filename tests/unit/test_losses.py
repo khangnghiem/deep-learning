@@ -2,7 +2,6 @@
 Unit tests for loss functions.
 """
 
-import pytest
 import torch
 
 from src.training.losses import FocalLoss, LabelSmoothingCE, DiceLoss
