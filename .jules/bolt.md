@@ -1,0 +1,3 @@
+## 2024-03-24 - Dataset Iteration Bottleneck
+**Learning:** Initializing components like imbalanced samplers that iterate over a PyTorch dataset to compute weights or stats can cause severe performance bottlenecks, as each `__getitem__` call triggers I/O and data augmentations. Iterating the same dataset multiple times redundantly compounds the issue.
+**Action:** Extract necessary properties (like labels) in a single pass and cache them. Refactor helper utilities (like `get_class_weights`) to optionally accept precomputed properties to safely reuse logic without re-triggering expensive iterations. Use advanced tensor indexing for mapping arrays efficiently.
