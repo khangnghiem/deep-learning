@@ -7,8 +7,6 @@ Usage:
     from src.data.medical import get_medical_datasets, download_medmnist
 """
 
-from pathlib import Path
-
 from src.config.paths import get_bronze_path
 
 BRONZE_MEDICAL = get_bronze_path("medical")
@@ -68,7 +66,6 @@ def get_medical_datasets() -> dict:
             "classes": 5,
             "modality": "Fundus",
         },
-        
         # === MEDMNIST (Small standardized datasets) ===
         "pathmnist": {
             "name": "PathMNIST (Colorectal Cancer)",
@@ -118,7 +115,6 @@ def get_medical_datasets() -> dict:
             "size": "28x28",
             "classes": 11,
         },
-        
         # === GENOMICS / GENETICS ===
         "gene_expression": {
             "name": "Gene Expression Cancer RNA-Seq",
@@ -147,47 +143,48 @@ def get_medical_datasets() -> dict:
 def download_medical_dataset(name: str):
     """
     Download a medical dataset by name.
-    
+
     Args:
         name: Dataset name from get_medical_datasets()
     """
     datasets = get_medical_datasets()
-    
+
     if name not in datasets:
         available = list(datasets.keys())
         raise ValueError(f"Unknown dataset: {name}. Available: {available}")
-    
+
     info = datasets[name]
     source = info["source"]
-    
+
     if source == "kaggle":
         from .kaggle import download_dataset, download_competition
-        
+
         dataset_id = info["id"]
         output_dir = BRONZE_MEDICAL / name
-        
+
         if "competitions" in dataset_id:
             competition = dataset_id.split("/")[-1]
             download_competition(competition, output_dir, category="medical")
         else:
             download_dataset(dataset_id, output_dir, category="medical")
-        
+
         print(f"Downloaded {name} to {output_dir}")
         return output_dir
-    
+
     elif source == "huggingface":
         from .huggingface import load_hf_dataset
-        
+
         dataset = load_hf_dataset(info["id"], name=info.get("subset"))
         print(f"Loaded {name} from HuggingFace")
         return dataset
-    
+
     elif source == "sklearn":
         from sklearn.datasets import load_breast_cancer
+
         data = load_breast_cancer()
         print(f"Loaded {name} from sklearn")
         return data
-    
+
     else:
         print(f"Manual download required. Info: {info}")
         return None
@@ -196,17 +193,17 @@ def download_medical_dataset(name: str):
 def list_medical_datasets():
     """Pretty print available medical datasets."""
     datasets = get_medical_datasets()
-    
+
     print("\n=== MEDICAL IMAGING ===")
     for name, info in datasets.items():
         if info.get("modality"):
             print(f"  {name}: {info['name']} ({info['modality']})")
-    
+
     print("\n=== MEDMNIST (28x28 standardized) ===")
     for name, info in datasets.items():
         if "mnist" in name:
             print(f"  {name}: {info['name']}")
-    
+
     print("\n=== GENOMICS / GENETICS ===")
     for name, info in datasets.items():
         if info.get("task"):

@@ -33,14 +33,17 @@ MANIFEST_PATH = DATA_LAKE / "MANIFEST.json"
 # Exceptions
 # =============================================================================
 
+
 class StaleManifestError(Exception):
     """Raised when MANIFEST.json is older than the allowed threshold."""
+
     pass
 
 
 # =============================================================================
 # Core Functions
 # =============================================================================
+
 
 def load_manifest(max_age_hours: int = 24) -> dict:
     """Load MANIFEST.json, enforcing freshness.
@@ -107,13 +110,14 @@ def generate_manifest() -> dict:
         "summary": {},
     }
 
-    bronze_categories = sorted([
-        d for d in DATA_LAKE.iterdir()
-        if d.is_dir() and (
-            d.name.startswith("01_bronze")
-            or d.name.startswith("1_bronze")
-        )
-    ])
+    bronze_categories = sorted(
+        [
+            d
+            for d in DATA_LAKE.iterdir()
+            if d.is_dir()
+            and (d.name.startswith("01_bronze") or d.name.startswith("1_bronze"))
+        ]
+    )
 
     total_datasets = 0
     total_files = 0
@@ -121,8 +125,7 @@ def generate_manifest() -> dict:
 
     for bronze_dir in bronze_categories:
         category = (
-            bronze_dir.name
-            .replace("01_bronze_", "")
+            bronze_dir.name.replace("01_bronze_", "")
             .replace("1_bronze_", "")
             .replace("01_bronze", "legacy")
             .replace("1_bronze", "legacy")
@@ -191,7 +194,7 @@ def generate_manifest() -> dict:
         json.dump(manifest, f, indent=2)
 
     print(f"\n✅ MANIFEST.json written to {MANIFEST_PATH}")
-    print(f"\n📊 Summary:")
+    print("\n📊 Summary:")
     print(f"   Total datasets: {total_datasets}")
     print(f"   Total files: {total_files:,}")
     print(f"   Total size: {total_size_bytes / (1024**3):.2f} GB")
@@ -245,10 +248,14 @@ def update_manifest_entry(dataset_name: str, category: str, bronze_dir: Path) ->
         # Map category to bronze folder name
         # Use the resolved BRONZE directory name for layer key
         from src.config.paths import BRONZE as _BRONZE
+
         bronze_prefix = _BRONZE.name  # e.g. '1_bronze' or '01_bronze'
         if category == "legacy":
             layer_name = bronze_prefix
-        elif bronze_dir.parent == _BRONZE or (DATA_LAKE / bronze_prefix / category).exists():
+        elif (
+            bronze_dir.parent == _BRONZE
+            or (DATA_LAKE / bronze_prefix / category).exists()
+        ):
             layer_name = f"{bronze_prefix}/{category}"
         else:
             layer_name = f"{bronze_prefix}_{category}"
@@ -293,7 +300,9 @@ def update_manifest_entry(dataset_name: str, category: str, bronze_dir: Path) ->
         with open(MANIFEST_PATH, "w") as f:
             json.dump(manifest, f, indent=2)
 
-        print(f"📋 MANIFEST.json updated: {dataset_name} ({ds_info['file_count']} files, {ds_info['size_mb']:.1f} MB)")
+        print(
+            f"📋 MANIFEST.json updated: {dataset_name} ({ds_info['file_count']} files, {ds_info['size_mb']:.1f} MB)"
+        )
 
 
 def get_manifest_datasets() -> set:
