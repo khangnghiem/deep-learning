@@ -18,11 +18,12 @@ import shutil
 import argparse
 from pathlib import Path
 
-import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.config.catalog import DATASETS, _parse_size
+from src.config.catalog import DATASETS, _parse_size  # noqa: E402
 
 EXPERIMENTS_DIR = PROJECT_ROOT / "experiments"
 TEMPLATE_DIR = EXPERIMENTS_DIR / "_template"
@@ -134,7 +135,7 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
     with open(config_path, "w") as f:
         yaml.dump(config, f, default_flow_style=False, sort_keys=False)
 
-    print(f"Patched config.yaml:")
+    print("Patched config.yaml:")
     print(f"  experiment:  {exp_name}")
     print(f"  dataset:     {dataset_name}  ({info.get('classes', '?')} classes)")
     print(f"  epochs:      {hp['epochs']}")
@@ -167,7 +168,7 @@ def create_experiment(dataset_name: str, number: int = None) -> Path:
         print(f"Created Colab launcher -> {exp_dir.name}/{target_launcher.name}")
 
     launcher_name = target_launcher.name if target_launcher.exists() else "train.ipynb"
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"  1. Prototype & explore in notebooks/{exp_name}.ipynb")
     print(f"  2. Finalize architecture & config in experiments/{exp_name}/train.py")
     print(f"  3. Launch training on Google Colab: open experiments/{exp_name}/{launcher_name}")

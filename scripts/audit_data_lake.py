@@ -22,8 +22,8 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.config.paths import LANDING, DATA_LAKE, get_all_bronze_paths
-from src.config.catalog import DATASETS, download_dataset, _parse_size
+from src.config.paths import LANDING, DATA_LAKE, get_all_bronze_paths  # noqa: E402
+from src.config.catalog import DATASETS, download_dataset, _parse_size  # noqa: E402
 
 
 def get_all_bronze_datasets() -> set:

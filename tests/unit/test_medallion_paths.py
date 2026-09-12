@@ -9,9 +9,6 @@ Tests cover:
 """
 
 import json
-import tempfile
-from pathlib import Path
-import pytest
 
 from src.config.paths import (
     DATA,
@@ -24,7 +21,6 @@ from src.config.paths import (
     FEATURE_STORE,
     CHECKPOINTS,
     TRAINED,
-    REGISTRY,
     get_bronze_path,
     get_all_bronze_paths,
     get_silver_path,
