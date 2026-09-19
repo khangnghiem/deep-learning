@@ -191,7 +191,7 @@ def generate_manifest() -> dict:
         json.dump(manifest, f, indent=2)
 
     print(f"\n✅ MANIFEST.json written to {MANIFEST_PATH}")
-    print(f"\n📊 Summary:")
+    print("\n📊 Summary:")
     print(f"   Total datasets: {total_datasets}")
     print(f"   Total files: {total_files:,}")
     print(f"   Total size: {total_size_bytes / (1024**3):.2f} GB")

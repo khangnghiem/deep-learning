@@ -12,7 +12,6 @@ Key features:
 - Structured Medallion run tags for filtering, auditing, and reproduction.
 """
 
-import os
 import json
 import hashlib
 from pathlib import Path
