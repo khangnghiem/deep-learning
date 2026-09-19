@@ -5,10 +5,11 @@ Usage:
     from src.data.loaders import create_dataloaders, get_class_weights
 """
 
+from src.config.constants import EPSILON
+
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split, Subset
-from typing import Optional, Tuple
-import numpy as np
+from torch.utils.data import DataLoader, Dataset, random_split
+from typing import Tuple
 
 
 def create_dataloaders(
@@ -103,7 +104,7 @@ def get_class_weights(
         class_counts[label] += 1
     
     # Inverse frequency weighting
-    weights = 1.0 / (class_counts + 1e-6)
+    weights = 1.0 / (class_counts + EPSILON)
     weights = weights / weights.sum() * num_classes  # Normalize
     
     return weights

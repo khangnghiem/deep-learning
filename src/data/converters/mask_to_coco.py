@@ -1,4 +1,8 @@
-import json, os, glob, cv2, argparse
+import json
+import os
+import glob
+import cv2
+import argparse
 import numpy as np
 
 def mask_to_polygons(mask):

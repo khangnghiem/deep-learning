@@ -1,4 +1,7 @@
-import json, os, glob, argparse
+import json
+import os
+import glob
+import argparse
 import xml.etree.ElementTree as ET
 
 def convert(root, out):
@@ -38,7 +41,6 @@ def convert(root, out):
 
 if __name__=='__main__':
     import sys
-    from pathlib import Path
     
     # Try importing src.config to get standard paths and downloader
     try:

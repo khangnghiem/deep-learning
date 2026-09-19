@@ -13,7 +13,6 @@ import torch.nn as nn
 from pathlib import Path
 from typing import Optional
 
-from src.config.paths import TRAINED
 
 
 def save_checkpoint(

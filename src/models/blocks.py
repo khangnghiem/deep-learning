@@ -5,6 +5,8 @@ Usage:
     from src.models.blocks import ConvBlock, ResidualBlock, SEBlock, AttentionBlock
 """
 
+from src.config.constants import EPSILON
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -146,7 +148,7 @@ class LayerNorm2d(nn.Module):
     LayerNorm for 2D feature maps (channels last).
     """
     
-    def __init__(self, channels: int, eps: float = 1e-6):
+    def __init__(self, channels: int, eps: float = EPSILON):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(channels))
         self.bias = nn.Parameter(torch.zeros(channels))
