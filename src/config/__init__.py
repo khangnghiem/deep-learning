@@ -21,10 +21,10 @@ from src.config.paths import (
     BRONZE_VIDEO,
     BRONZE_VISION,
     # Legacy aliases (retired categories → new targets)
-    BRONZE_DETECTION,   # → BRONZE_VISION
-    BRONZE_EDUCATION,   # → BRONZE_TABULAR
+    BRONZE_DETECTION,  # → BRONZE_VISION
+    BRONZE_EDUCATION,  # → BRONZE_TABULAR
     BRONZE_GENERATIVE,  # → BRONZE_VISION
-    BRONZE_NLP,         # → BRONZE_TEXT
+    BRONZE_NLP,  # → BRONZE_TEXT
     SILVER,
     GOLD,
     FEATURES,
@@ -53,6 +53,17 @@ from src.config.catalog import (
     download_dataset,
     list_datasets,
     _parse_size,
+)
+
+# Constants
+from src.config.constants import (
+    EPSILON,
+    IMAGENET_MEAN,
+    IMAGENET_STD,
+    CIFAR_MEAN,
+    CIFAR_STD,
+    MNIST_MEAN,
+    MNIST_STD,
 )
 
 # Manifest management
