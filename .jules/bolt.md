@@ -1,0 +1,3 @@
+## 2023-10-27 - [Avoid Standard Iteration Over PyTorch Datasets]
+**Learning:** Standard iteration over PyTorch datasets (`for item in dataset:`) relies on catching an `IndexError` at the end of the sequence. This triggers an extra, out-of-bounds `__getitem__` call which causes redundant I/O operations and augmentations, negatively impacting performance especially in initialization code like sampling weight calculations.
+**Action:** Use explicit index iteration (`for i in range(len(dataset)): item = dataset[i]`) when iterating over PyTorch datasets. Alternatively, to avoid `__getitem__` entirely for operations that only need properties like labels, extract required fields in a single pass instead of re-evaluating the entire dataset.
