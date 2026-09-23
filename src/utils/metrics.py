@@ -9,13 +9,17 @@ import torch
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 
+def _to_numpy(tensor) -> np.ndarray:
+    """Convert tensor to numpy array if needed."""
+    if isinstance(tensor, torch.Tensor):
+        return tensor.cpu().numpy()
+    return tensor
+
 
 def accuracy(y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
     """Calculate accuracy."""
-    if isinstance(y_true, torch.Tensor):
-        y_true = y_true.cpu().numpy()
-    if isinstance(y_pred, torch.Tensor):
-        y_pred = y_pred.cpu().numpy()
+    y_true = _to_numpy(y_true)
+    y_pred = _to_numpy(y_pred)
     
     return accuracy_score(y_true, y_pred)
 
@@ -36,10 +40,8 @@ def precision_recall_f1(
     Returns:
         Tuple of (precision, recall, f1)
     """
-    if isinstance(y_true, torch.Tensor):
-        y_true = y_true.cpu().numpy()
-    if isinstance(y_pred, torch.Tensor):
-        y_pred = y_pred.cpu().numpy()
+    y_true = _to_numpy(y_true)
+    y_pred = _to_numpy(y_pred)
     
     precision, recall, f1, _ = precision_recall_fscore_support(
         y_true, y_pred, average=average, zero_division=0
@@ -53,10 +55,8 @@ def get_confusion_matrix(
     y_pred: torch.Tensor
 ) -> np.ndarray:
     """Get confusion matrix."""
-    if isinstance(y_true, torch.Tensor):
-        y_true = y_true.cpu().numpy()
-    if isinstance(y_pred, torch.Tensor):
-        y_pred = y_pred.cpu().numpy()
+    y_true = _to_numpy(y_true)
+    y_pred = _to_numpy(y_pred)
     
     return confusion_matrix(y_true, y_pred)
 
