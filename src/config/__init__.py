@@ -63,3 +63,13 @@ from src.config.manifest import (
     get_manifest_datasets,
     StaleManifestError,
 )
+
+# Constants
+from src.config.constants import (
+    IMAGENET_MEAN,
+    IMAGENET_STD,
+    CIFAR_MEAN,
+    CIFAR_STD,
+    MNIST_MEAN,
+    MNIST_STD,
+)
