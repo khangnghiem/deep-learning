@@ -1,0 +1,4 @@
+## 2025-05-18 - Insecure Deserialization in PyTorch Checkpoints
+**Vulnerability:** Found `torch.load` being used without `weights_only=True` in `src/training/checkpoint.py`, allowing arbitrary code execution if an attacker modifies the checkpoint file.
+**Learning:** PyTorch uses Python's `pickle` module by default for serialization, which is inherently insecure and can execute arbitrary code during unpickling. Model state dicts and optimizer state dicts only need to store standard tensors and primitive types.
+**Prevention:** Always use `weights_only=True` when calling `torch.load` to load model weights and states. This ensures only safe types (tensors, primitives, and standard structures) are allowed during deserialization, effectively blocking execution of malicious payloads.
