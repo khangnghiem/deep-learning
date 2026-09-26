@@ -6,9 +6,8 @@ Usage:
 """
 
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split, Subset
-from typing import Optional, Tuple
-import numpy as np
+from torch.utils.data import DataLoader, Dataset, random_split
+from typing import Tuple
 
 
 def create_dataloaders(
@@ -92,7 +91,10 @@ def get_class_weights(
     """
     class_counts = torch.zeros(num_classes)
     
-    for item in dataset:
+    # ⚡ Bolt: Using explicit index iteration avoids redundant out-of-bounds __getitem__
+    # triggered by capturing StopIteration/IndexError when using `for item in dataset:`
+    for i in range(len(dataset)):
+        item = dataset[i]
         if isinstance(item, tuple):
             label = item[1]  # Assume (input, label) format
         elif isinstance(item, dict) and label_key:
@@ -112,6 +114,7 @@ def get_class_weights(
 def create_imbalanced_sampler(
     dataset: Dataset,
     num_classes: int,
+    label_key: str = None,
 ) -> torch.utils.data.WeightedRandomSampler:
     """
     Create a weighted sampler for imbalanced datasets.
@@ -119,21 +122,34 @@ def create_imbalanced_sampler(
     Args:
         dataset: Dataset with labels
         num_classes: Number of classes
+        label_key: Key to access labels if dataset returns dict
     
     Returns:
         WeightedRandomSampler
     """
-    class_weights = get_class_weights(dataset, num_classes)
+    class_counts = torch.zeros(num_classes)
+    labels = []
     
-    sample_weights = []
-    for item in dataset:
+    # ⚡ Bolt: Extract properties in a single explicit-index pass to prevent
+    # redundant, expensive __getitem__ operations (I/O and augmentations)
+    for i in range(len(dataset)):
+        item = dataset[i]
         if isinstance(item, tuple):
             label = item[1]
+        elif isinstance(item, dict) and label_key:
+            label = item[label_key]
         else:
-            raise ValueError("Expected (input, label) format")
-        sample_weights.append(class_weights[label])
+            raise ValueError("Cannot extract label from dataset item")
+
+        labels.append(label)
+        class_counts[label] += 1
+
+    weights = 1.0 / (class_counts + 1e-6)
+    class_weights = weights / weights.sum() * num_classes
     
-    sample_weights = torch.tensor(sample_weights)
+    # ⚡ Bolt: Safely index with torch.as_tensor
+    labels_tensor = torch.as_tensor(labels, dtype=torch.long)
+    sample_weights = class_weights[labels_tensor]
     
     return torch.utils.data.WeightedRandomSampler(
         weights=sample_weights,
